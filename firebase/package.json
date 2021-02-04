@@ -1,0 +1,15 @@
+{
+  "name": "announsing-firebase",
+  "private": true,
+  "scripts": {
+    "func.build": "npm --prefix ./functions run build",
+    "func.build.watch": "npm --prefix ./functions run build.watch",
+    "serve": "firebase emulators:start",
+    "start": "run-p func.build.watch serve",
+    "deploy": "firebase deploy"
+  },
+  "devDependencies": {
+    "firebase-tools": "^9.1.2",
+    "npm-run-all": "^4.1.5"
+  }
+}

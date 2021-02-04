@@ -1,0 +1,22 @@
+{
+  "name": "announsing-functions",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "build.watch": "tsc -w",
+    "test": "jest",
+    "test.watch": "jest --watch",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "12"
+  },
+  "main": "lib/index.js",
+  "devDependencies": {
+    "firebase-admin": "^9.4.2",
+    "firebase-functions": "^3.13.0",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.4.4",
+    "typescript": "^4.1.3"
+  }
+}
