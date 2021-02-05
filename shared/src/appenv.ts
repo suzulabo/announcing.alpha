@@ -1,0 +1,19 @@
+import { _appEnv } from './appenv.env';
+
+export interface AppEnvironment {
+  firebaseConfig: {
+    readonly apiKey: string;
+    readonly authDomain: string;
+    readonly projectId: string;
+    readonly storageBucket: string;
+    readonly messagingSenderId: string;
+    readonly appId: string;
+    readonly measurementId: string;
+  };
+  readonly functionsRegion: string;
+  readonly contact: string;
+}
+
+export class AppEnv {
+  constructor(readonly env: AppEnvironment = _appEnv) {}
+}

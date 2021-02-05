@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "target": "es2017",
+    "composite": true,
+    "declaration": true
+  },
+  "include": ["src/**/*", "__test__/**/*"]
+}
