@@ -1,0 +1,15 @@
+app-signin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    ap-icon {
+      font-size: 1.2rem;
+      margin-right: 5px;
+    }
+  }
+}

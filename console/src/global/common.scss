@@ -90,6 +90,11 @@ button,
     }
   }
 
+  &.clear {
+    border: none;
+    padding: 10px;
+  }
+
   &.full-width {
     width: 100%;
   }

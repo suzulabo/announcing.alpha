@@ -7,13 +7,25 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { App } from "src/app/app";
 export namespace Components {
+    interface ApIcon {
+        "icon": 'github' | 'google';
+    }
     interface AppHome {
         "app": App;
     }
     interface AppRoot {
     }
+    interface AppSignin {
+        "app": App;
+    }
 }
 declare global {
+    interface HTMLApIconElement extends Components.ApIcon, HTMLStencilElement {
+    }
+    var HTMLApIconElement: {
+        prototype: HTMLApIconElement;
+        new (): HTMLApIconElement;
+    };
     interface HTMLAppHomeElement extends Components.AppHome, HTMLStencilElement {
     }
     var HTMLAppHomeElement: {
@@ -26,28 +38,46 @@ declare global {
         prototype: HTMLAppRootElement;
         new (): HTMLAppRootElement;
     };
+    interface HTMLAppSigninElement extends Components.AppSignin, HTMLStencilElement {
+    }
+    var HTMLAppSigninElement: {
+        prototype: HTMLAppSigninElement;
+        new (): HTMLAppSigninElement;
+    };
     interface HTMLElementTagNameMap {
+        "ap-icon": HTMLApIconElement;
         "app-home": HTMLAppHomeElement;
         "app-root": HTMLAppRootElement;
+        "app-signin": HTMLAppSigninElement;
     }
 }
 declare namespace LocalJSX {
+    interface ApIcon {
+        "icon"?: 'github' | 'google';
+    }
     interface AppHome {
         "app"?: App;
     }
     interface AppRoot {
     }
+    interface AppSignin {
+        "app"?: App;
+    }
     interface IntrinsicElements {
+        "ap-icon": ApIcon;
         "app-home": AppHome;
         "app-root": AppRoot;
+        "app-signin": AppSignin;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
+            "app-signin": LocalJSX.AppSignin & JSXBase.HTMLAttributes<HTMLAppSigninElement>;
         }
     }
 }

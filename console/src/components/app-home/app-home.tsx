@@ -9,7 +9,18 @@ export class AppHome {
   @Prop()
   app: App;
 
+  private handleSignOutClick = () => {
+    void this.app.auth.signOut();
+  };
+
   render() {
-    return <Host>HOME</Host>;
+    return (
+      <Host>
+        HOME
+        <button class="clear" onClick={this.handleSignOutClick}>
+          {this.app.msgs.home.signOut}
+        </button>
+      </Host>
+    );
   }
 }

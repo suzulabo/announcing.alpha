@@ -1,4 +1,4 @@
-import { Component, h, Host } from '@stencil/core';
+import { Component, Fragment, h, Host } from '@stencil/core';
 import { AppEnv } from 'announsing-shared';
 import { App } from 'src/app/app';
 import { AppAuth } from 'src/app/auth';
@@ -24,8 +24,8 @@ export class AppRoot {
     const appState = new AppState();
     const appAuth = new AppAuth(appFirebase, appState);
     const appData = new AppData(appFirebase, appState);
-
     this.app = new App(appMsg, appFirebase, appAuth, appData, appState);
+    return this.app.init();
   }
 
   componentWillRender() {
@@ -59,9 +59,24 @@ export class AppRoot {
   }
 
   render() {
+    const signIn = this.app.state.signIn;
+
     return (
       <Host>
-        <Router.Switch>{this.renderRoute('app-home', '/')}</Router.Switch>
+        <Router.Switch>
+          {signIn && (
+            <Fragment>
+              {this.renderRoute('app-home', '/')}
+              <Route path="/signin" to="/"></Route>
+            </Fragment>
+          )}
+          {!signIn && (
+            <Fragment>
+              {this.renderRoute('app-signin', '/signin')}
+              <Route path={/.*/} to="/signin"></Route>
+            </Fragment>
+          )}
+        </Router.Switch>
         <footer>
           <div class="title">{this.app.msgs.footer.title}</div>
           <div class="copy">&copy;suzulabo</div>
