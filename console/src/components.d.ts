@@ -10,6 +10,11 @@ export namespace Components {
     interface ApIcon {
         "icon": 'github' | 'google';
     }
+    interface ApLoading {
+    }
+    interface AppAnnounceCreate {
+        "app": App;
+    }
     interface AppHome {
         "app": App;
     }
@@ -25,6 +30,18 @@ declare global {
     var HTMLApIconElement: {
         prototype: HTMLApIconElement;
         new (): HTMLApIconElement;
+    };
+    interface HTMLApLoadingElement extends Components.ApLoading, HTMLStencilElement {
+    }
+    var HTMLApLoadingElement: {
+        prototype: HTMLApLoadingElement;
+        new (): HTMLApLoadingElement;
+    };
+    interface HTMLAppAnnounceCreateElement extends Components.AppAnnounceCreate, HTMLStencilElement {
+    }
+    var HTMLAppAnnounceCreateElement: {
+        prototype: HTMLAppAnnounceCreateElement;
+        new (): HTMLAppAnnounceCreateElement;
     };
     interface HTMLAppHomeElement extends Components.AppHome, HTMLStencilElement {
     }
@@ -46,6 +63,8 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "ap-icon": HTMLApIconElement;
+        "ap-loading": HTMLApLoadingElement;
+        "app-announce-create": HTMLAppAnnounceCreateElement;
         "app-home": HTMLAppHomeElement;
         "app-root": HTMLAppRootElement;
         "app-signin": HTMLAppSigninElement;
@@ -54,6 +73,11 @@ declare global {
 declare namespace LocalJSX {
     interface ApIcon {
         "icon"?: 'github' | 'google';
+    }
+    interface ApLoading {
+    }
+    interface AppAnnounceCreate {
+        "app"?: App;
     }
     interface AppHome {
         "app"?: App;
@@ -65,6 +89,8 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "ap-icon": ApIcon;
+        "ap-loading": ApLoading;
+        "app-announce-create": AppAnnounceCreate;
         "app-home": AppHome;
         "app-root": AppRoot;
         "app-signin": AppSignin;
@@ -75,6 +101,8 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
+            "ap-loading": LocalJSX.ApLoading & JSXBase.HTMLAttributes<HTMLApLoadingElement>;
+            "app-announce-create": LocalJSX.AppAnnounceCreate & JSXBase.HTMLAttributes<HTMLAppAnnounceCreateElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-signin": LocalJSX.AppSignin & JSXBase.HTMLAttributes<HTMLAppSigninElement>;

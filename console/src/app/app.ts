@@ -1,4 +1,5 @@
 import { Build } from '@stencil/core';
+import { Router } from 'stencil-router-v2';
 import { AppAuth } from './auth';
 import { AppData } from './data';
 import { AppFirebase } from './firebase';
@@ -21,6 +22,7 @@ export class App {
     private appAuth: AppAuth,
     private appData: AppData,
     private appState: AppState,
+    private router: Router,
   ) {
     if (Build.isDev) {
       this.clientSite = `http://${location.hostname}:3371`;
@@ -36,6 +38,10 @@ export class App {
 
   setTitle(v: string) {
     document.title = v;
+  }
+
+  pushRoute(path: string) {
+    this.router.push(path);
   }
 
   get msgs() {

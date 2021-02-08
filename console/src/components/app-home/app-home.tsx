@@ -1,5 +1,6 @@
 import { Component, h, Host, Prop } from '@stencil/core';
 import { App } from 'src/app/app';
+import { href } from 'stencil-router-v2';
 
 @Component({
   tag: 'app-home',
@@ -17,6 +18,7 @@ export class AppHome {
     return (
       <Host>
         HOME
+        <a {...href('/a/create')}>+</a>
         <button class="clear" onClick={this.handleSignOutClick}>
           {this.app.msgs.home.signOut}
         </button>

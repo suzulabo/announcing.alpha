@@ -1,5 +1,9 @@
 @import '~destyle.css/destyle.css';
 
+.firebase-emulator-warning {
+  display: none;
+}
+
 html {
   --color: black;
   --border-color: black;
@@ -7,7 +11,7 @@ html {
 
   --bk-color: white;
   --button-hover-bk-color: #eeeeee;
-  --bk-overlay-color: rgba(0, 0, 0, 0.3);
+  --bk-overlay-color: rgba(255, 255, 255, 0.5);
 }
 
 html,
@@ -33,7 +37,8 @@ input {
   font-feature-settings: 'liga';
 }
 
-input {
+input,
+textarea {
   font-size: 16px;
 
   border: none;
@@ -51,6 +56,11 @@ input {
     border-width: 2px;
     padding-bottom: 4px;
   }
+}
+
+textarea {
+  resize: none;
+  height: 5em;
 }
 
 a {

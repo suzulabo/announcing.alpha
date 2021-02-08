@@ -24,7 +24,7 @@ export class AppRoot {
     const appState = new AppState();
     const appAuth = new AppAuth(appFirebase, appState);
     const appData = new AppData(appFirebase, appState);
-    this.app = new App(appMsg, appFirebase, appAuth, appData, appState);
+    this.app = new App(appMsg, appFirebase, appAuth, appData, appState, Router);
     return this.app.init();
   }
 
@@ -67,6 +67,7 @@ export class AppRoot {
           {signIn && (
             <Fragment>
               {this.renderRoute('app-home', '/')}
+              {this.renderRoute('app-announce-create', '/a/create')}
               <Route path="/signin" to="/"></Route>
             </Fragment>
           )}
