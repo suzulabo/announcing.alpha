@@ -1,0 +1,79 @@
+import { Component, h, Host } from '@stencil/core';
+import { AppEnv } from 'announsing-shared';
+import { App } from 'src/app/app';
+import { AppAuth } from 'src/app/auth';
+import { AppData } from 'src/app/data';
+import { AppFirebase } from 'src/app/firebase';
+import { AppMsg } from 'src/app/msg';
+import { AppState } from 'src/app/state';
+import { createRouter, Route } from 'stencil-router-v2';
+
+const Router = createRouter();
+
+@Component({
+  tag: 'app-root',
+  styleUrl: 'app-root.scss',
+})
+export class AppRoot {
+  private app: App;
+
+  componentWillLoad() {
+    const appEnv = new AppEnv();
+    const appMsg = new AppMsg();
+    const appFirebase = new AppFirebase(appEnv, appMsg);
+    const appState = new AppState();
+    const appAuth = new AppAuth(appFirebase, appState);
+    const appData = new AppData(appFirebase, appState);
+
+    this.app = new App(appMsg, appFirebase, appAuth, appData, appState);
+  }
+
+  componentWillRender() {
+    /* TODO
+    switch (Router.activePath) {
+      case '/keygen':
+        this.app.setTitle(this.app.msgs.keygen.title + suffix);
+        break;
+      case '/encrypt':
+        this.app.setTitle(this.app.msgs.encrypt.title + suffix);
+        break;
+      case '/decrypt':
+        this.app.setTitle(this.app.msgs.decrypt.title + suffix);
+        break;
+      case '/usage':
+        this.app.setTitle(this.app.msgs.usage.title + suffix);
+        break;
+      default:
+        this.app.setTitle(this.app.msgs.home.title + suffix);
+        break;
+    }
+    */
+  }
+
+  private renderRoute(Tag: string, path: string) {
+    return (
+      <Route path={path}>
+        <Tag app={this.app} class="page"></Tag>
+      </Route>
+    );
+  }
+
+  render() {
+    return (
+      <Host>
+        <Router.Switch>{this.renderRoute('app-home', '/')}</Router.Switch>
+        <footer>
+          <div class="title">{this.app.msgs.footer.title}</div>
+          <div class="copy">&copy;suzulabo</div>
+          <div class="build-info">Version: {this.app.buildInfo.src}</div>
+          <div class="build-info">Built at {new Date(this.app.buildInfo.time).toISOString()}</div>
+          <div class="github">
+            <a href="https://github.com/suzulabo/announsing">
+              <ap-icon icon="github" />
+            </a>
+          </div>
+        </footer>
+      </Host>
+    );
+  }
+}
