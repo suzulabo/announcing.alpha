@@ -1,5 +1,6 @@
 import { Build } from '@stencil/core';
 import { Router } from 'stencil-router-v2';
+import { AnnounceState, PostState } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
@@ -58,5 +59,42 @@ export class App {
 
   createAnnounce(name: string, desc: string) {
     return this.appFirebase.callCreateAnnounce({ name, desc });
+  }
+
+  private async listenAnnounces() {
+    await this.appFirebase.listenAnnounces(async () => {
+      const docs = await this.appFirebase.cachedAnnounces();
+      docs.sort((v1, v2) => {
+        return v2.uT - v1.uT;
+      });
+
+      const as = [] as AnnounceState[];
+      for (const doc of docs) {
+        const postsData = [] as PostState[];
+        if (doc.posts) {
+          for (const postID of doc.posts) {
+            const post = await this.appFirebase.getPost(doc.id, postID);
+            if (post) {
+              postsData.push({ ...post, id: postID });
+            }
+          }
+        }
+
+        postsData.sort((v1, v2) => {
+          return v2.pT - v1.pT;
+        });
+
+        const meta = await this.appFirebase.getAnnounceMeta(doc.id, doc.mid);
+
+        as.push({ ...doc, ...meta, postsData });
+      }
+
+      this.appState.updateAnnounces(as);
+    });
+  }
+
+  getAnnounces() {
+    void this.listenAnnounces();
+    return this.appState.state.announces;
   }
 }

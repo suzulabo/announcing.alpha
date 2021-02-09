@@ -1,6 +1,5 @@
 import { Build } from '@stencil/core';
 import {
-  Announce,
   AnnounceHelper,
   AnnounceMetaHelper,
   AppEnv,
@@ -14,6 +13,8 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
 import { AppMsg } from './msg';
+
+const ANNOUNCES_LIMIT = 10;
 
 import FieldValue = firebase.firestore.FieldValue;
 import Timestamp = firebase.firestore.Timestamp;
@@ -76,7 +77,11 @@ export class AppFirebase {
     this.auth = this._firebaseApp.auth();
     this.devonly_setEmulator();
 
-    await this.firestore.enablePersistence();
+    try {
+      await this.firestore.enablePersistence({ synchronizeTabs: true });
+    } catch (err) {
+      console.warn('enablePersistence', err);
+    }
 
     await new Promise<void>(resolve => {
       this.auth.onAuthStateChanged(() => {
@@ -121,24 +126,40 @@ export class AppFirebase {
     return this.callFunc<void>('importFeed', params);
   }
 
-  listenAnnounces(cb: (v: [string, Announce][]) => void) {
-    if (this.announcesListener) {
-      return;
-    }
-
+  async cachedAnnounces() {
     const uid = this.user.uid;
     const q = this.firestore
       .collection('announces')
       .withConverter(fsHelper.announce.converter)
       .where(`users.${uid}.own`, '==', true);
+    const qs = await q.get({ source: 'cache' });
+    return qs.docs.map(v => {
+      return { id: v.id, ...v.data() };
+    });
+  }
+
+  async listenAnnounces(cb: () => void) {
+    if (this.announcesListener) {
+      return;
+    }
+
+    const cached = await this.cachedAnnounces();
+    const lastUpdated = cached.reduce((p, c) => {
+      return c.uT > p ? c.uT : p;
+    }, 0);
+
+    const uid = this.user.uid;
+    const q = this.firestore
+      .collection('announces')
+      .withConverter(fsHelper.announce.converter)
+      .where(`users.${uid}.own`, '==', true)
+      .where('uT', '>', Timestamp.fromMillis(lastUpdated))
+      .limit(ANNOUNCES_LIMIT);
     this.announcesListener = q.onSnapshot(qs => {
       if (qs.metadata.hasPendingWrites) {
         return;
       }
-      const l = qs.docs.map(v => {
-        return [v.id, v.data()] as [string, Announce];
-      });
-      cb(l);
+      cb();
     });
   }
 
