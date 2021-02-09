@@ -10,7 +10,7 @@ export class AppSignIn {
   app: App;
 
   private handleGoogleClick = () => {
-    void this.app.auth.signIn.google();
+    return this.app.signInGoogle();
   };
 
   render() {

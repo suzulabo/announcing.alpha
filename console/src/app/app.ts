@@ -1,7 +1,5 @@
 import { Build } from '@stencil/core';
 import { Router } from 'stencil-router-v2';
-import { AppAuth } from './auth';
-import { AppData } from './data';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
@@ -19,8 +17,6 @@ export class App {
   constructor(
     private appMsg: AppMsg,
     private appFirebase: AppFirebase,
-    private appAuth: AppAuth,
-    private appData: AppData,
     private appState: AppState,
     private router: Router,
   ) {
@@ -32,8 +28,8 @@ export class App {
   }
 
   async init() {
-    await Promise.all([this.appFirebase.init()]);
-    this.appAuth.updateAuthState();
+    await this.appFirebase.init();
+    this.appState.updateSignIn(this.appFirebase.user != null);
   }
 
   setTitle(v: string) {
@@ -48,9 +44,19 @@ export class App {
     return this.appMsg.msgs;
   }
 
-  readonly state = this.appState.state as Readonly<AppState['state']>;
+  get isSignIn() {
+    return this.appState.state.signIn;
+  }
 
-  readonly auth = this.appAuth;
+  signOut() {
+    return this.appFirebase.signOut();
+  }
 
-  readonly data = this.appData;
+  signInGoogle() {
+    return this.appFirebase.signInGoogle();
+  }
+
+  createAnnounce(name: string, desc: string) {
+    return this.appFirebase.callCreateAnnounce({ name, desc });
+  }
 }

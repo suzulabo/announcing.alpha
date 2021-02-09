@@ -11,7 +11,7 @@ export class AppHome {
   app: App;
 
   private handleSignOutClick = () => {
-    void this.app.auth.signOut();
+    void this.app.signOut();
   };
 
   render() {

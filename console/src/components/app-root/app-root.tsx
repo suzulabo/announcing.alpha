@@ -1,8 +1,6 @@
 import { Component, Fragment, h, Host } from '@stencil/core';
 import { AppEnv } from 'announsing-shared';
 import { App } from 'src/app/app';
-import { AppAuth } from 'src/app/auth';
-import { AppData } from 'src/app/data';
 import { AppFirebase } from 'src/app/firebase';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
@@ -22,9 +20,7 @@ export class AppRoot {
     const appMsg = new AppMsg();
     const appFirebase = new AppFirebase(appEnv, appMsg);
     const appState = new AppState();
-    const appAuth = new AppAuth(appFirebase, appState);
-    const appData = new AppData(appFirebase, appState);
-    this.app = new App(appMsg, appFirebase, appAuth, appData, appState, Router);
+    this.app = new App(appMsg, appFirebase, appState, Router);
     return this.app.init();
   }
 
@@ -59,7 +55,7 @@ export class AppRoot {
   }
 
   render() {
-    const signIn = this.app.state.signIn;
+    const signIn = this.app.isSignIn;
 
     return (
       <Host>

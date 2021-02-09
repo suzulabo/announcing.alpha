@@ -28,7 +28,7 @@ export class AppAnnounceCreate {
   private handleSubmitClick = async () => {
     this.saving = true;
     try {
-      await this.app.data.announces.create(this.values);
+      await this.app.createAnnounce(this.values.name, this.values.desc);
       this.app.pushRoute('/');
     } finally {
       this.saving = false;
