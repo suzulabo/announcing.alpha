@@ -4,7 +4,8 @@ import { App } from 'src/app/app';
 import { AppFirebase } from 'src/app/firebase';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
-import { createRouter, Route } from 'stencil-router-v2';
+import { createRouter, match, Route } from 'stencil-router-v2';
+import { RoutePath } from 'stencil-router-v2/dist/types';
 
 const Router = createRouter();
 
@@ -46,11 +47,10 @@ export class AppRoot {
     */
   }
 
-  private renderRoute(Tag: string, path: string) {
+  private renderRoute(Tag: string, path: RoutePath) {
     return (
-      <Route path={path}>
-        <Tag app={this.app} class="page"></Tag>
-      </Route>
+      // eslint-disable-next-line react/jsx-no-bind
+      <Route path={path} render={params => <Tag app={this.app} class="page" {...params}></Tag>} />
     );
   }
 
@@ -64,6 +64,7 @@ export class AppRoot {
             <Fragment>
               {this.renderRoute('app-home', '/')}
               {this.renderRoute('app-announce-create', '/a/create')}
+              {this.renderRoute('app-announce-edit', match('/a/:announceID/edit'))}
               <Route path="/signin" to="/"></Route>
             </Fragment>
           )}

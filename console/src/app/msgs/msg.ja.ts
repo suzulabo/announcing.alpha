@@ -30,7 +30,7 @@ export const msgs = {
       postCount: '投稿数',
       lastPostDate: '最終投稿',
       postBtn: '投稿',
-      configBtn: '設定',
+      editBtn: '設定',
     },
   },
   announce: {
@@ -45,7 +45,7 @@ export const msgs = {
       },
     },
     edit: {
-      title: '編集',
+      title: 'アナウンス編集',
       form: {
         name: 'アナウンス名',
         desc: '紹介文',

@@ -1,7 +1,7 @@
 import { autoID, CreateAnnounceParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { fsHelper } from './firestore';
+import { announceMetaHash, AnnounceMeta_FS, Announce_FS } from './firestore';
 
 export const callCreateAnnounce = async (
   params: CreateAnnounceParams,
@@ -30,26 +30,26 @@ const createAnnounce = async (
     throw new Error('desc is too long');
   }
 
-  const id = autoID();
-  const mid = '0';
+  const dataMeta: AnnounceMeta_FS = {
+    name: params.name.trim(),
+    ...(!!params.desc && { desc: params.desc.trim() }),
+    cT: admin.firestore.FieldValue.serverTimestamp(),
+  };
 
-  const data = {
+  const id = autoID();
+  const mid = announceMetaHash(dataMeta);
+
+  const data: Announce_FS = {
     id,
     users: { [uid]: { own: true } },
     mid,
     uT: admin.firestore.FieldValue.serverTimestamp(),
   };
 
-  const dataMeta = {
-    name: params.name.trim(),
-    ...(!!params.desc && { desc: params.desc.trim() }),
-    cT: admin.firestore.FieldValue.serverTimestamp(),
-  };
-
   const firestore = adminApp.firestore();
   const batch = firestore.batch();
-  fsHelper.announce.createTB(batch, firestore.doc(`announces/${id}`), data);
-  fsHelper.announceMeta.createTB(batch, firestore.doc(`announces/${id}/meta/${mid}`), dataMeta);
+  batch.create(firestore.doc(`announces/${id}`), data);
+  batch.create(firestore.doc(`announces/${id}/meta/${mid}`), dataMeta);
   await batch.commit();
   console.log('CREATE ANNOUNCE', data, dataMeta);
 };

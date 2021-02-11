@@ -1,5 +1,4 @@
 export interface Post {
-  oid: string; // original ID
   title: string;
   body: string;
   link?: string;
@@ -11,7 +10,6 @@ export interface Announce {
   id: string;
   users: { [key: string]: { own: boolean } };
   posts?: string[];
-  pid?: string; // (current) post id
   mid: string; // meta id
   uT: number; // updated time
   del?: boolean;
@@ -21,15 +19,7 @@ export interface AnnounceMeta {
   name: string;
   desc?: string;
   link?: string;
-  icon?: string;
-  feed?: string;
-  cT: number; // created time
-}
-
-export interface Feed {
-  url: string;
-  users: { [key: string]: { own: boolean } };
-  uT: number; // updated time
+  icon?: Uint8Array;
   cT: number; // created time
 }
 
@@ -41,6 +31,13 @@ export interface Device {
 export interface CreateAnnounceParams {
   name: string;
   desc?: string;
+}
+
+export interface EditAnnounceParams {
+  id: string;
+  name: string;
+  desc?: string;
+  link?: string;
 }
 
 export type NotificationMode = 'disabled' | 'always' | 'hours';

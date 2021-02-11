@@ -1,4 +1,5 @@
 import { Build } from '@stencil/core';
+import { Announce } from 'announsing-shared';
 import { Router } from 'stencil-router-v2';
 import { AnnounceState, PostState } from './datatypes';
 import { AppFirebase } from './firebase';
@@ -61,6 +62,33 @@ export class App {
     return this.appFirebase.callCreateAnnounce({ name, desc });
   }
 
+  editAnnounce(id: string, name: string, desc: string, link: string) {
+    return this.appFirebase.callEditAnnounce({ id, name, desc, link });
+  }
+
+  private async toAnnounceState(a: Announce) {
+    const meta = await this.appFirebase.getAnnounceMeta(a.id, a.mid);
+    if (!meta) {
+      return;
+    }
+
+    const postsData = [] as PostState[];
+    if (a.posts) {
+      for (const postID of a.posts) {
+        const post = await this.appFirebase.getPost(a.id, postID);
+        if (post) {
+          postsData.push({ ...post, id: postID });
+        }
+      }
+    }
+
+    postsData.sort((v1, v2) => {
+      return v2.pT - v1.pT;
+    });
+
+    return { ...a, ...meta, postsData } as AnnounceState;
+  }
+
   private async listenAnnounces() {
     await this.appFirebase.listenAnnounces(async () => {
       const docs = await this.appFirebase.cachedAnnounces();
@@ -70,23 +98,10 @@ export class App {
 
       const as = [] as AnnounceState[];
       for (const doc of docs) {
-        const postsData = [] as PostState[];
-        if (doc.posts) {
-          for (const postID of doc.posts) {
-            const post = await this.appFirebase.getPost(doc.id, postID);
-            if (post) {
-              postsData.push({ ...post, id: postID });
-            }
-          }
+        const v = await this.toAnnounceState(doc);
+        if (v) {
+          as.push(v);
         }
-
-        postsData.sort((v1, v2) => {
-          return v2.pT - v1.pT;
-        });
-
-        const meta = await this.appFirebase.getAnnounceMeta(doc.id, doc.mid);
-
-        as.push({ ...doc, ...meta, postsData });
       }
 
       this.appState.updateAnnounces(as);
@@ -96,5 +111,12 @@ export class App {
   getAnnounces() {
     void this.listenAnnounces();
     return this.appState.state.announces;
+  }
+
+  async getAnnounceState(id: string) {
+    const a = await this.appFirebase.getAnnounce(id);
+    if (a) {
+      return await this.toAnnounceState(a);
+    }
   }
 }

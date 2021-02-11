@@ -1,19 +1,20 @@
 import { Merge } from 'type-fest';
 import { Announce, AnnounceMeta, Post } from './datatypes';
-import { StrictPropertyCheck } from './utils';
 
 type Timestamp = {
   toMillis: () => number;
 };
 
-type Announce_FS<FieldValueT> = Merge<
+type Announce_FS<TFieldValue> = Merge<
   Announce,
-  { posts?: string[] | FieldValueT; uT: Timestamp | FieldValueT }
+  { posts?: string[] | TFieldValue; uT: Timestamp | TFieldValue }
 >;
-type AnnounceMeta_FS<FieldValueT> = Merge<AnnounceMeta, { cT: Timestamp | FieldValueT }>;
-type Post_FS<FieldValueT> = Merge<Post, { pT: Timestamp | FieldValueT }>;
+type AnnounceMeta_FS<TFieldValue> = Merge<AnnounceMeta, { cT: Timestamp | TFieldValue }>;
+type Post_FS<TFieldValue> = Merge<Post, { pT: Timestamp | TFieldValue }>;
 
 abstract class ConverterBase<T, U> {
+  fsType!: U;
+
   // not use
   toFirestore(o: any) {
     return o;
@@ -27,8 +28,11 @@ abstract class ConverterBase<T, U> {
   abstract fromFirebaseImpl(data: U): T;
 }
 
-class AnnounceConverter<FieldValueT> extends ConverterBase<Announce, Announce_FS<FieldValueT>> {
-  fromFirebaseImpl(data: Announce_FS<FieldValueT>) {
+export class AnnounceConverter<TFieldValue> extends ConverterBase<
+  Announce,
+  Announce_FS<TFieldValue>
+> {
+  fromFirebaseImpl(data: Announce_FS<TFieldValue>) {
     return {
       ...data,
       posts: data.posts as string[],
@@ -37,11 +41,11 @@ class AnnounceConverter<FieldValueT> extends ConverterBase<Announce, Announce_FS
   }
 }
 
-class AnnounceMetaConverter<FieldValueT> extends ConverterBase<
+export class AnnounceMetaConverter<TFieldValue> extends ConverterBase<
   AnnounceMeta,
-  AnnounceMeta_FS<FieldValueT>
+  AnnounceMeta_FS<TFieldValue>
 > {
-  fromFirebaseImpl(data: AnnounceMeta_FS<FieldValueT>) {
+  fromFirebaseImpl(data: AnnounceMeta_FS<TFieldValue>) {
     return {
       ...data,
       cT: (data.cT as Timestamp).toMillis(),
@@ -49,61 +53,11 @@ class AnnounceMetaConverter<FieldValueT> extends ConverterBase<
   }
 }
 
-class PostConverter<FieldValueT> extends ConverterBase<Post, Post_FS<FieldValueT>> {
-  fromFirebaseImpl(data: Post_FS<FieldValueT>) {
+export class PostConverter<TFieldValue> extends ConverterBase<Post, Post_FS<TFieldValue>> {
+  fromFirebaseImpl(data: Post_FS<TFieldValue>) {
     return {
       ...data,
       pT: (data.pT as Timestamp).toMillis(),
     };
   }
-}
-
-type DocRef = { id: string; path: string };
-
-class FirestoreHelperBase<T> {
-  set = <U extends T>(c: { set: (v: T) => Promise<unknown> }, v: U & StrictPropertyCheck<U, T>) => {
-    return c.set(v);
-  };
-  update = <U extends Partial<T>>(
-    c: { update: (v: Partial<T>) => Promise<unknown> },
-    v: U & StrictPropertyCheck<U, T>,
-  ) => {
-    return c.update(v);
-  };
-  // transaction or batch
-  setTB = <U extends T>(
-    c: { set: (ref: any, v: T) => unknown },
-    ref: DocRef,
-    v: U & StrictPropertyCheck<U, T>,
-  ) => {
-    return c.set(ref, v);
-  };
-  updateTB = <U extends Partial<T>>(
-    c: { update: (ref: any, v: Partial<T>) => unknown },
-    ref: DocRef,
-    v: U & StrictPropertyCheck<U, T>,
-  ) => {
-    return c.update(ref, v);
-  };
-  createTB = <U extends T>(
-    c: { create: (ref: any, v: T) => unknown },
-    ref: DocRef,
-    v: U & StrictPropertyCheck<U, T>,
-  ) => {
-    return c.create(ref, v);
-  };
-}
-
-export class AnnounceHelper<FieldValueT> extends FirestoreHelperBase<Announce_FS<FieldValueT>> {
-  readonly converter = new AnnounceConverter<FieldValueT>();
-}
-
-export class AnnounceMetaHelper<FieldValueT> extends FirestoreHelperBase<
-  AnnounceMeta_FS<FieldValueT>
-> {
-  readonly converter = new AnnounceMetaConverter<FieldValueT>();
-}
-
-export class PostHelper<FieldValueT> extends FirestoreHelperBase<Post_FS<FieldValueT>> {
-  readonly converter = new PostConverter<FieldValueT>();
 }
