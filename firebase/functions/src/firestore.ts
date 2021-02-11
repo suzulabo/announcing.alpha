@@ -15,7 +15,10 @@ export type AnnounceMeta_FS = AnnounceMetaConverter<FieldValue>['fsType'];
 export type Post_FS = PostConverter<FieldValue>['fsType'];
 
 const serialize = (...args: (string | undefined)[]) => {
-  return args.map(v => (!v ? '' : v)).join('\0');
+  return args
+    .map(v => (!v ? '' : v))
+    .join('\0')
+    .replace(/\0+$/, '');
 };
 
 const toHash = (...args: (string | undefined)[]) => {
@@ -31,3 +34,6 @@ const toHash = (...args: (string | undefined)[]) => {
 export const announceMetaHash = (v: AnnounceMeta_FS) => {
   return toHash(v.name, v.desc, v.link);
 };
+
+// testing
+export const _serialize = serialize;
