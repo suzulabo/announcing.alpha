@@ -15,7 +15,9 @@ export class AppAnnounceEdit {
   announceID: string;
 
   @State()
-  values: AnnounceState;
+  values = { name: '', desc: '', link: '' };
+
+  private announce: AnnounceState;
 
   @State()
   saving = false;
@@ -48,16 +50,24 @@ export class AppAnnounceEdit {
   };
 
   async componentWillLoad() {
-    this.values = await this.app.getAnnounceState(this.announceID.toUpperCase());
-    if (!this.values) {
+    const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
+    if (!as) {
       this.app.pushRoute('/');
     }
+
+    this.announce = as;
+    this.values = { name: as.name, desc: as.desc, link: as.link };
   }
 
   render() {
     if (!this.values) {
       return;
     }
+
+    const modified =
+      this.values.name != this.announce.name ||
+      this.values.desc != this.announce.desc ||
+      this.values.link != this.announce.link;
 
     return (
       <Host>
@@ -78,7 +88,7 @@ export class AppAnnounceEdit {
           value={this.values.link}
           onInput={this.handleInput.link}
         />
-        <button disabled={!this.values.name} onClick={this.handleSubmitClick}>
+        <button disabled={!this.values.name || !modified} onClick={this.handleSubmitClick}>
           {this.app.msgs.announce.edit.form.btn}
         </button>
         <a {...href('/')}>{this.app.msgs.common.back}</a>
