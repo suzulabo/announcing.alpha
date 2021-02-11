@@ -1,7 +1,7 @@
 import { EditAnnounceParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { announceMetaHash, AnnounceMeta_FS, converters } from './firestore';
+import { announceMetaHash, AnnounceMeta_FS, Announce_FS, converters } from './firestore';
 
 export const callEditAnnounce = async (
   params: EditAnnounceParams,
@@ -47,6 +47,11 @@ const editAnnounce = async (
   };
   const newMetaID = announceMetaHash(newMeta);
 
+  const updateData: Partial<Announce_FS> = {
+    mid: newMetaID,
+    uT: admin.firestore.FieldValue.serverTimestamp(),
+  };
+
   console.log('newMeta', params.id, newMeta);
 
   const docRef = firestore.doc(`announces/${params.id}`).withConverter(converters.announce);
@@ -62,7 +67,7 @@ const editAnnounce = async (
 
   const batch = firestore.batch();
   batch.create(firestore.doc(`announces/${params.id}/meta/${newMetaID}`), newMeta);
-  batch.update(docRef, { mid: newMetaID });
+  batch.update(docRef, updateData);
   batch.delete(firestore.doc(`announces/${params.id}/meta/${curData.mid}`));
   await batch.commit();
 };
