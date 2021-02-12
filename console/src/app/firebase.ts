@@ -4,6 +4,7 @@ import {
   AnnounceMetaConverter,
   AppEnv,
   CreateAnnounceParams,
+  DeleteAnnounceParams,
   EditAnnounceParams,
   PostConverter,
 } from 'announsing-shared';
@@ -16,7 +17,7 @@ import { AppMsg } from './msg';
 const ANNOUNCES_LIMIT = 10;
 
 import FieldValue = firebase.firestore.FieldValue;
-import Timestamp = firebase.firestore.Timestamp;
+//import Timestamp = firebase.firestore.Timestamp;
 
 export const converters = {
   announce: new AnnounceConverter<FieldValue>(),
@@ -125,34 +126,34 @@ export class AppFirebase {
     return this.callFunc<void>('editAnnounce', params);
   }
 
+  async callDeleteAnnounce(params: DeleteAnnounceParams) {
+    return this.callFunc<void>('deleteAnnounce', params);
+  }
+
   async cachedAnnounces() {
     const uid = this.user.uid;
     const q = this.firestore
       .collection('announces')
       .withConverter(converters.announce)
-      .where(`users.${uid}.own`, '==', true);
+      .where(`users.${uid}.own`, '==', true)
+      .where(`del`, '==', false);
     const qs = await q.get({ source: 'cache' });
     return qs.docs.map(v => {
       return { id: v.id, ...v.data() };
     });
   }
 
-  async listenAnnounces(cb: () => void) {
+  listenAnnounces(cb: () => void) {
     if (this.announcesListener) {
       return;
     }
-
-    const cached = await this.cachedAnnounces();
-    const lastUpdated = cached.reduce((p, c) => {
-      return c.uT > p ? c.uT : p;
-    }, 0);
 
     const uid = this.user.uid;
     const q = this.firestore
       .collection('announces')
       .withConverter(converters.announce)
       .where(`users.${uid}.own`, '==', true)
-      .where('uT', '>', Timestamp.fromMillis(lastUpdated))
+      .where(`del`, '==', false)
       .limit(ANNOUNCES_LIMIT);
     this.announcesListener = q.onSnapshot(qs => {
       if (qs.metadata.hasPendingWrites) {

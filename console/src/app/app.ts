@@ -66,6 +66,10 @@ export class App {
     return this.appFirebase.callEditAnnounce({ id, name, desc, link });
   }
 
+  deleteAnnounce(id: string) {
+    return this.appFirebase.callDeleteAnnounce({ id });
+  }
+
   private async toAnnounceState(a: Announce) {
     const meta = await this.appFirebase.getAnnounceMeta(a.id, a.mid);
     if (!meta) {

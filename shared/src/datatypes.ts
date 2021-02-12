@@ -12,7 +12,7 @@ export interface Announce {
   posts?: string[];
   mid: string; // meta id
   uT: number; // updated time
-  del?: boolean;
+  del: boolean;
 }
 
 export interface AnnounceMeta {

@@ -45,6 +45,7 @@ const createAnnounce = async (
     users: { [uid]: { own: true } },
     mid,
     uT: admin.firestore.FieldValue.serverTimestamp(),
+    del: false,
   };
 
   const firestore = adminApp.firestore();

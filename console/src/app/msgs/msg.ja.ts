@@ -56,7 +56,7 @@ export const msgs = {
         done: '更新しました',
       },
       deletion: {
-        toggle: 'アナウンスの削除',
+        guide: 'アナウンスの削除',
         desc: 'アナウンスを削除します。この操作は元に戻せません。',
         btn: (s: string) => {
           return `"${s}"を削除する`;

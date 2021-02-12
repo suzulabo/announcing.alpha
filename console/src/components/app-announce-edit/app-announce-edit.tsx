@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 import { href } from 'stencil-router-v2';
@@ -22,6 +22,9 @@ export class AppAnnounceEdit {
   @State()
   saving = false;
 
+  @State()
+  showDeletion = false;
+
   private handleInput = {
     name: (ev: Event) => {
       this.values = { ...this.values, name: (ev.currentTarget as HTMLInputElement).value };
@@ -43,6 +46,20 @@ export class AppAnnounceEdit {
         this.values.desc,
         this.values.link,
       );
+      this.app.pushRoute('/');
+    } finally {
+      this.saving = false;
+    }
+  };
+
+  private handleDeletionToggleClick = () => {
+    this.showDeletion = !this.showDeletion;
+  };
+
+  private handleDeletionClick = async () => {
+    this.saving = true;
+    try {
+      await this.app.deleteAnnounce(this.announceID.toUpperCase());
       this.app.pushRoute('/');
     } finally {
       this.saving = false;
@@ -92,6 +109,17 @@ export class AppAnnounceEdit {
           {this.app.msgs.announce.edit.form.btn}
         </button>
         <a {...href('/')}>{this.app.msgs.common.back}</a>
+        <button class="clear deletion-toggle" onClick={this.handleDeletionToggleClick}>
+          {this.app.msgs.announce.edit.deletion.guide}
+        </button>
+        {this.showDeletion && (
+          <Fragment>
+            <div>{this.app.msgs.announce.edit.deletion.desc}</div>
+            <button onClick={this.handleDeletionClick}>
+              {this.app.msgs.announce.edit.deletion.btn(this.announce.name)}
+            </button>
+          </Fragment>
+        )}
         {this.saving && <ap-loading />}
       </Host>
     );

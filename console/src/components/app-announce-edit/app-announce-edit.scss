@@ -10,4 +10,9 @@ app-announce-edit {
   > * {
     margin: 20px 0;
   }
+
+  .deletion-toggle {
+    align-self: flex-end;
+    opacity: 0.6;
+  }
 }
