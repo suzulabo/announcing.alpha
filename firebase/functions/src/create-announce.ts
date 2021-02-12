@@ -20,19 +20,20 @@ const createAnnounce = async (
   if (!uid) {
     throw new Error('missing uid');
   }
-  if (!params.name) {
+  const { name, desc } = params;
+  if (!name) {
     throw new Error('missing name');
   }
-  if (params.name.length > 50) {
+  if (name.length > 50) {
     throw new Error('name is too long');
   }
-  if (params.desc && params.desc.length > 500) {
+  if (desc && desc.length > 500) {
     throw new Error('desc is too long');
   }
 
   const dataMeta: AnnounceMeta_FS = {
-    name: params.name.trim(),
-    ...(!!params.desc && { desc: params.desc.trim() }),
+    name,
+    ...(!!desc && { desc }),
     cT: admin.firestore.FieldValue.serverTimestamp(),
   };
 

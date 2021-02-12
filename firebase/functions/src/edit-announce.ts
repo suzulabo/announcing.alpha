@@ -20,25 +20,26 @@ const editAnnounce = async (
   if (!uid) {
     throw new Error('missing uid');
   }
-  if (!params.id) {
+
+  const { id, name, desc, link } = params;
+  if (!id) {
     throw new Error('missing id');
   }
-  if (!params.name) {
+  if (!name) {
     throw new Error('missing name');
   }
-  if (params.name.length > 50) {
+  if (name.length > 50) {
     throw new Error('name is too long');
   }
-  if (params.desc && params.desc.length > 500) {
+  if (desc && desc.length > 500) {
     throw new Error('desc is too long');
   }
-  if (params.link && params.link.length > 500) {
+  if (link && link.length > 500) {
     throw new Error('link is too long');
   }
 
   const firestore = adminApp.firestore();
 
-  const { name, desc, link } = params;
   const newMeta: AnnounceMeta_FS = {
     name,
     ...(!!desc && { desc }),
@@ -52,12 +53,16 @@ const editAnnounce = async (
     uT: admin.firestore.FieldValue.serverTimestamp(),
   };
 
-  console.log('newMeta', params.id, newMeta);
+  console.log('newMeta', id, newMeta);
 
-  const docRef = firestore.doc(`announces/${params.id}`).withConverter(converters.announce);
+  const docRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
   const curData = (await docRef.get()).data();
   if (!curData) {
-    console.log('no data', params.id);
+    console.log('no data', id);
+    return;
+  }
+  if (!curData.users[uid]?.own) {
+    console.log('not owner', id, uid);
     return;
   }
   if (curData.mid == newMetaID) {
@@ -66,8 +71,8 @@ const editAnnounce = async (
   }
 
   const batch = firestore.batch();
-  batch.create(firestore.doc(`announces/${params.id}/meta/${newMetaID}`), newMeta);
+  batch.create(firestore.doc(`announces/${id}/meta/${newMetaID}`), newMeta);
   batch.update(docRef, updateData);
-  batch.delete(firestore.doc(`announces/${params.id}/meta/${curData.mid}`));
+  batch.delete(firestore.doc(`announces/${id}/meta/${curData.mid}`));
   await batch.commit();
 };

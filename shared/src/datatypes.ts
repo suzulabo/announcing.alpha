@@ -29,15 +29,19 @@ export interface Device {
 }
 
 export interface CreateAnnounceParams {
-  name: string;
+  name?: string;
   desc?: string;
 }
 
 export interface EditAnnounceParams {
-  id: string;
-  name: string;
+  id?: string;
+  name?: string;
   desc?: string;
   link?: string;
+}
+
+export interface DeleteAnnounceParams {
+  id?: string;
 }
 
 export type NotificationMode = 'disabled' | 'always' | 'hours';
