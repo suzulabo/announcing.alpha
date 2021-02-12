@@ -155,12 +155,19 @@ export class AppFirebase {
       .where(`users.${uid}.own`, '==', true)
       .where(`del`, '==', false)
       .limit(ANNOUNCES_LIMIT);
-    this.announcesListener = q.onSnapshot(qs => {
-      if (qs.metadata.hasPendingWrites) {
-        return;
-      }
-      cb();
-    });
+    this.announcesListener = q.onSnapshot(
+      qs => {
+        if (qs.metadata.hasPendingWrites) {
+          return;
+        }
+        cb();
+      },
+      err => {
+        // TODO: ERROR
+        console.error(err);
+        this.announcesListener = undefined;
+      },
+    );
   }
 
   async getAnnounce(id: string) {
