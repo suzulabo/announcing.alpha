@@ -61,6 +61,10 @@ const editAnnounce = async (
     console.log('no data', id);
     return;
   }
+  if (curData.del) {
+    console.log('deleted', id);
+    return;
+  }
   if (!curData.users[uid]?.own) {
     console.log('not owner', id, uid);
     return;
