@@ -7,6 +7,7 @@ import {
   DeleteAnnounceParams,
   EditAnnounceParams,
   PostConverter,
+  UserConverter,
 } from 'announsing-shared';
 import firebase from 'firebase/app';
 import 'firebase/auth';
@@ -14,15 +15,13 @@ import 'firebase/firestore';
 import 'firebase/functions';
 import { AppMsg } from './msg';
 
-const ANNOUNCES_LIMIT = 10;
-
 import FieldValue = firebase.firestore.FieldValue;
-//import Timestamp = firebase.firestore.Timestamp;
 
 export const converters = {
   announce: new AnnounceConverter<FieldValue>(),
   announceMeta: new AnnounceMetaConverter<FieldValue>(),
   post: new PostConverter<FieldValue>(),
+  user: new UserConverter<FieldValue>(),
 };
 
 const getCacheFirst = async <T>(docRef: firebase.firestore.DocumentReference<T>) => {
@@ -130,44 +129,54 @@ export class AppFirebase {
     return this.callFunc<void>('deleteAnnounce', params);
   }
 
-  async cachedAnnounces() {
-    const uid = this.user.uid;
-    const q = this.firestore
-      .collection('announces')
-      .withConverter(converters.announce)
-      .where(`users.${uid}.own`, '==', true)
-      .where(`del`, '==', false);
-    const qs = await q.get({ source: 'cache' });
-    return qs.docs.map(v => {
-      return { id: v.id, ...v.data() };
-    });
-  }
+  private listeners = (() => {
+    const l = new Set<string>();
 
-  listenAnnounces(cb: () => void) {
-    if (this.announcesListener) {
+    const add = (p: string, cb: () => void) => {
+      if (l.has(p)) {
+        return;
+      }
+
+      const unsubscribe = this.firestore.doc(p).onSnapshot(
+        () => {
+          cb();
+        },
+        err => {
+          console.warn(err);
+          unsubscribe();
+          l.delete(p);
+        },
+      );
+      l.add(p);
+    };
+
+    return { add };
+  })();
+
+  listenUser(cb: () => void) {
+    if (!this.user) {
       return;
     }
 
-    const uid = this.user.uid;
-    const q = this.firestore
-      .collection('announces')
-      .withConverter(converters.announce)
-      .where(`users.${uid}.own`, '==', true)
-      .where(`del`, '==', false)
-      .limit(ANNOUNCES_LIMIT);
-    this.announcesListener = q.onSnapshot(
-      qs => {
-        if (qs.metadata.hasPendingWrites) {
-          return;
-        }
-        cb();
-      },
-      err => {
-        // TODO: ERROR
-        console.error(err);
-        this.announcesListener = undefined;
-      },
-    );
+    this.listeners.add(`users/${this.user.uid}`, async () => {
+      const user = await this.getUser();
+      if (!user || !user.announces) {
+        return;
+      }
+      for (const a of user.announces) {
+        this.listeners.add(`announces/${a}`, cb);
+      }
+      cb();
+    });
+  }
+
+  async getUser() {
+    if (!this.user) {
+      return;
+    }
+
+    const docRef = this.firestore.doc(`users/${this.user.uid}`).withConverter(converters.user);
+    return getCacheFirst(docRef);
   }
 
   async getAnnounce(id: string) {

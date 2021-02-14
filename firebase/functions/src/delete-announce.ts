@@ -1,7 +1,9 @@
-import { DeleteAnnounceParams } from 'announsing-shared';
+import { Announce, DeleteAnnounceParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
+import { EventContext } from 'firebase-functions/lib/cloud-functions';
+import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { Announce_FS, converters } from './firestore';
+import { User_FS } from './firestore';
 
 export const callDeleteAnnounce = async (
   params: DeleteAnnounceParams,
@@ -28,20 +30,44 @@ const deleteAnnounce = async (
 
   const firestore = adminApp.firestore();
 
-  const docRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
-  const curData = (await docRef.get()).data();
-  if (!curData) {
-    console.log('no data', id);
-    return;
-  }
-  if (!curData.users[uid]?.own) {
-    console.log('not owner', id, uid);
-    return;
-  }
+  const owners = await firestore.collection('users').where('announces', 'array-contains', id).get();
 
-  const updateData: Partial<Announce_FS> = {
-    del: true,
-    uT: admin.firestore.FieldValue.serverTimestamp(),
-  };
-  await docRef.update(updateData);
+  const batch = firestore.batch();
+  let isOwner = false;
+  for (const d of owners.docs) {
+    if (d.id == uid) {
+      isOwner = true;
+    }
+    batch.update(d.ref, { announces: admin.firestore.FieldValue.arrayRemove(id) } as User_FS);
+  }
+  if (!isOwner) {
+    console.warn('not owner', uid, id);
+    return;
+  }
+  batch.delete(firestore.doc(`announces/${id}`));
+
+  await batch.commit();
+};
+
+export const firestoreDeleteAnnounce = async (
+  qs: QueryDocumentSnapshot,
+  _context: EventContext,
+  adminApp: admin.app.App,
+): Promise<void> => {
+  const id = qs.id;
+  const announceData = qs.data() as Announce;
+
+  const posts = announceData.posts ? announceData.posts.map(v => `announces/${id}/posts/${v}`) : [];
+  const pathes = [...posts.reverse(), `announces/${id}/meta/${announceData.mid}`];
+
+  const firestore = adminApp.firestore();
+
+  while (pathes.length > 0) {
+    const c = pathes.splice(0, 500);
+    const batch = firestore.batch();
+    for (const p of c) {
+      batch.delete(firestore.doc(p));
+    }
+    await batch.commit();
+  }
 };

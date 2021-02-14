@@ -1,6 +1,11 @@
-import { AnnounceConverter, AnnounceMetaConverter, PostConverter } from 'announsing-shared';
-import * as admin from 'firebase-admin';
+import {
+  AnnounceConverter,
+  AnnounceMetaConverter,
+  PostConverter,
+  UserConverter,
+} from 'announsing-shared';
 import * as crypto from 'crypto';
+import * as admin from 'firebase-admin';
 
 import FieldValue = admin.firestore.FieldValue;
 
@@ -8,11 +13,13 @@ export const converters = {
   announce: new AnnounceConverter<FieldValue>(),
   announceMeta: new AnnounceMetaConverter<FieldValue>(),
   post: new PostConverter<FieldValue>(),
+  user: new UserConverter<FieldValue>(),
 };
 
 export type Announce_FS = AnnounceConverter<FieldValue>['fsType'];
 export type AnnounceMeta_FS = AnnounceMetaConverter<FieldValue>['fsType'];
 export type Post_FS = PostConverter<FieldValue>['fsType'];
+export type User_FS = UserConverter<FieldValue>['fsType'];
 
 const serialize = (...args: (string | undefined)[]) => {
   return args

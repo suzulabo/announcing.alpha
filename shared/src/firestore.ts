@@ -1,5 +1,5 @@
 import { Merge } from 'type-fest';
-import { Announce, AnnounceMeta, Post } from './datatypes';
+import { Announce, AnnounceMeta, Post, User } from './datatypes';
 
 type Timestamp = {
   toMillis: () => number;
@@ -11,6 +11,7 @@ type Announce_FS<TFieldValue> = Merge<
 >;
 type AnnounceMeta_FS<TFieldValue> = Merge<AnnounceMeta, { cT: Timestamp | TFieldValue }>;
 type Post_FS<TFieldValue> = Merge<Post, { pT: Timestamp | TFieldValue }>;
+type User_FS<TFieldValue> = Merge<User, { announces: string[] | TFieldValue }>;
 
 abstract class ConverterBase<T, U> {
   fsType!: U;
@@ -59,5 +60,11 @@ export class PostConverter<TFieldValue> extends ConverterBase<Post, Post_FS<TFie
       ...data,
       pT: (data.pT as Timestamp).toMillis(),
     };
+  }
+}
+
+export class UserConverter<TFieldValue> extends ConverterBase<User, User_FS<TFieldValue>> {
+  fromFirebaseImpl(data: User_FS<TFieldValue>) {
+    return { announces: data.announces as string[] };
   }
 }

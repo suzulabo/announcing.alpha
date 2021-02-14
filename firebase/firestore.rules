@@ -5,40 +5,16 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    match /announces/{id} {
-      // console user
-      allow list: if resource.data.users[request.auth.uid] != null;
-    	allow update: if resource.data.users[request.auth.uid] != null &&
-        request.resource.data.uT == request.time;
-      
-      // client user
-      allow get: if request.auth.uid != null;
-      allow list: if resource.data.id in request.auth.token.dp.announces.list;
-
-      // sub collections
-      function getAnnounce() {
-        return getAfter(/databases/$(database)/documents/announces/$(id)).data;
-      }
-
-      match /meta/{metaID} {
-        allow create: if getAnnounce().users[request.auth.uid] != null &&
-          getAnnounce().mid == metaID;
-        allow delete: if getAnnounce().users[request.auth.uid] != null &&
-          getAnnounce().mid != metaID;
-        allow get: if request.auth.uid != null;
-      }
-
-      match /posts/{postID} {
-        allow create: if getAnnounce().users[request.auth.uid] != null &&
-          postID in getAnnounce().posts;
-        allow delete: if getAnnounce().users[request.auth.uid] != null &&
-          !(postID in getAnnounce().posts);
-        allow get: if request.auth.uid != null;
-      }
+    match /users/{id} {
+      allow get: if request.auth.uid == id;
     }
 
-    match /devices/{id} {
-    	allow read: if  resource.data.uid == request.auth.uid;
+    match /announces/{id} {
+      allow get: if request.auth.uid != null;
+
+      match /meta/{metaID} {
+        allow get: if request.auth.uid != null;
+      }
     }
   }
 }

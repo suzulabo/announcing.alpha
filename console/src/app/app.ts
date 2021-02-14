@@ -70,8 +70,8 @@ export class App {
     return this.appFirebase.callDeleteAnnounce({ id });
   }
 
-  private async toAnnounceState(a: Announce) {
-    const meta = await this.appFirebase.getAnnounceMeta(a.id, a.mid);
+  private async toAnnounceState(id: string, a: Announce): Promise<AnnounceState> {
+    const meta = await this.appFirebase.getAnnounceMeta(id, a.mid);
     if (!meta) {
       return;
     }
@@ -79,7 +79,7 @@ export class App {
     const postsData = [] as PostState[];
     if (a.posts) {
       for (const postID of a.posts) {
-        const post = await this.appFirebase.getPost(a.id, postID);
+        const post = await this.appFirebase.getPost(id, postID);
         if (post) {
           postsData.push({ ...post, id: postID });
         }
@@ -90,37 +90,42 @@ export class App {
       return v2.pT - v1.pT;
     });
 
-    return { ...a, ...meta, postsData } as AnnounceState;
+    return { id, ...a, ...meta, postsData };
   }
 
-  private async listenAnnounces() {
-    await this.appFirebase.listenAnnounces(async () => {
-      const docs = await this.appFirebase.cachedAnnounces();
-      docs.sort((v1, v2) => {
-        return v2.uT - v1.uT;
-      });
+  private listenUser() {
+    this.appFirebase.listenUser(async () => {
+      const user = await this.appFirebase.getUser();
+      if (!user || !user.announces) {
+        return;
+      }
 
       const as = [] as AnnounceState[];
-      for (const doc of docs) {
-        const v = await this.toAnnounceState(doc);
+      for (const id of user.announces) {
+        const announce = await this.appFirebase.getAnnounce(id);
+        const v = await this.toAnnounceState(id, announce);
         if (v) {
           as.push(v);
         }
       }
+
+      as.sort((v1, v2) => {
+        return v2.uT - v1.uT;
+      });
 
       this.appState.updateAnnounces(as);
     });
   }
 
   getAnnounces() {
-    void this.listenAnnounces();
+    this.listenUser();
     return this.appState.state.announces;
   }
 
   async getAnnounceState(id: string) {
     const a = await this.appFirebase.getAnnounce(id);
     if (a) {
-      return await this.toAnnounceState(a);
+      return await this.toAnnounceState(id, a);
     }
   }
 }

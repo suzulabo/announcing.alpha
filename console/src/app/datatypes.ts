@@ -5,5 +5,6 @@ export interface PostState extends Post {
 }
 
 export interface AnnounceState extends Announce, AnnounceMeta {
+  id: string;
   postsData: PostState[];
 }

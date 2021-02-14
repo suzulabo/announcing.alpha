@@ -40,6 +40,19 @@ const editAnnounce = async (
 
   const firestore = adminApp.firestore();
 
+  {
+    const userRef = firestore.doc(`users/${uid}`).withConverter(converters.user);
+    const userData = (await userRef.get()).data();
+    if (!userData) {
+      console.warn('no user', uid);
+      return;
+    }
+    if (!userData.announces || userData.announces.indexOf(id) < 0) {
+      console.warn('not owner', uid, id);
+      return;
+    }
+  }
+
   const newMeta: AnnounceMeta_FS = {
     name,
     ...(!!desc && { desc }),
@@ -48,35 +61,25 @@ const editAnnounce = async (
   };
   const newMetaID = announceMetaHash(newMeta);
 
-  const updateData: Partial<Announce_FS> = {
+  const updateAnnounce: Partial<Announce_FS> = {
     mid: newMetaID,
     uT: admin.firestore.FieldValue.serverTimestamp(),
   };
 
-  console.log('newMeta', id, newMeta);
-
-  const docRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
-  const curData = (await docRef.get()).data();
-  if (!curData) {
+  const announceRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
+  const announceData = (await announceRef.get()).data();
+  if (!announceData) {
     console.log('no data', id);
     return;
   }
-  if (curData.del) {
-    console.log('deleted', id);
-    return;
-  }
-  if (!curData.users[uid]?.own) {
-    console.log('not owner', id, uid);
-    return;
-  }
-  if (curData.mid == newMetaID) {
-    console.log('same meta', curData.mid, newMetaID);
+  if (announceData.mid == newMetaID) {
+    console.log('same meta', announceData.mid, newMetaID);
     return;
   }
 
   const batch = firestore.batch();
   batch.create(firestore.doc(`announces/${id}/meta/${newMetaID}`), newMeta);
-  batch.update(docRef, updateData);
-  batch.delete(firestore.doc(`announces/${id}/meta/${curData.mid}`));
+  batch.update(announceRef, updateAnnounce);
+  batch.delete(firestore.doc(`announces/${id}/meta/${announceData.mid}`));
   await batch.commit();
 };

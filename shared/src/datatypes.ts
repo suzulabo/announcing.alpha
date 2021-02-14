@@ -7,12 +7,9 @@ export interface Post {
 }
 
 export interface Announce {
-  id: string;
-  users: { [key: string]: { own: boolean } };
   posts?: string[];
   mid: string; // meta id
   uT: number; // updated time
-  del: boolean;
 }
 
 export interface AnnounceMeta {
@@ -21,6 +18,10 @@ export interface AnnounceMeta {
   link?: string;
   icon?: Uint8Array;
   cT: number; // created time
+}
+
+export interface User {
+  announces?: string[];
 }
 
 export interface Device {
