@@ -10,8 +10,8 @@ service cloud.firestore {
     }
 
     match /announces/{id} {
-      allow get: true;
-      
+      allow get: if true;
+
       match /meta/{metaID} {
         allow get: if request.auth.uid != null;
       }
