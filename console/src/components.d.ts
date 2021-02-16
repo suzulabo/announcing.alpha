@@ -8,7 +8,7 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { App } from "src/app/app";
 export namespace Components {
     interface ApIcon {
-        "icon": 'github' | 'google';
+        "icon": 'github' | 'google' | 'image' | 'trash';
     }
     interface ApLoading {
     }
@@ -83,7 +83,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface ApIcon {
-        "icon"?: 'github' | 'google';
+        "icon"?: 'github' | 'google' | 'image' | 'trash';
     }
     interface ApLoading {
     }

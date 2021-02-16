@@ -15,7 +15,10 @@ export class AppAnnounceEdit {
   announceID: string;
 
   @State()
-  values = { name: '', desc: '', link: '' };
+  values = { name: '', desc: '', link: '', icon: '' };
+
+  @State()
+  icon: string = '';
 
   private announce: AnnounceState;
 
@@ -34,6 +37,29 @@ export class AppAnnounceEdit {
     },
     link: (ev: Event) => {
       this.values = { ...this.values, link: (ev.currentTarget as HTMLInputElement).value };
+    },
+  };
+
+  private handleIcon = {
+    fileInput: null as HTMLInputElement,
+    ref: (el: HTMLInputElement) => {
+      this.handleIcon.fileInput = el;
+    },
+    click: () => {
+      this.handleIcon.fileInput.click();
+    },
+    change: () => {
+      if (this.icon) {
+        URL.revokeObjectURL(this.icon);
+      }
+      this.icon = URL.createObjectURL(this.handleIcon.fileInput.files[0]);
+      this.handleIcon.fileInput.value = '';
+    },
+    delete: () => {
+      if (this.icon) {
+        URL.revokeObjectURL(this.icon);
+        this.icon = undefined;
+      }
     },
   };
 
@@ -73,7 +99,7 @@ export class AppAnnounceEdit {
     }
 
     this.announce = as;
-    this.values = { name: as.name, desc: as.desc, link: as.link };
+    this.values = { name: as.name, desc: as.desc, link: as.link, icon: as.icon };
   }
 
   render() {
@@ -86,9 +112,27 @@ export class AppAnnounceEdit {
       this.values.desc != this.announce.desc ||
       this.values.link != this.announce.link;
 
+    const iconImg = this.icon;
+
     return (
       <Host>
         <header>{this.app.msgs.announce.edit.title}</header>
+        <div class={{ 'icon': true, 'no-icon': !iconImg }} onClick={this.handleIcon.click}>
+          {iconImg && <img src={iconImg} />}
+          {!iconImg && <span>{this.app.msgs.announce.edit.form.icon}</span>}
+          <ap-icon icon="image" />
+          <input
+            type="file"
+            accept="image/*"
+            ref={this.handleIcon.ref}
+            onChange={this.handleIcon.change}
+          />
+        </div>
+        {iconImg && (
+          <button class="icon-del clear" onClick={this.handleIcon.delete}>
+            <ap-icon icon="trash" />
+          </button>
+        )}
         <input
           placeholder={this.app.msgs.announce.edit.form.name}
           value={this.values.name}

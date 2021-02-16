@@ -16,7 +16,7 @@ export interface AnnounceMeta {
   name: string;
   desc?: string;
   link?: string;
-  icon?: Uint8Array;
+  icon?: string;
   cT: number; // created time
 }
 
