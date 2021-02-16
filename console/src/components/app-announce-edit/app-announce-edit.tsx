@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
+import { resizeImage } from 'src/utils/image';
 import { href } from 'stencil-router-v2';
 
 @Component({
@@ -48,11 +49,12 @@ export class AppAnnounceEdit {
     click: () => {
       this.handleIcon.fileInput.click();
     },
-    change: () => {
+    change: async () => {
       if (this.icon) {
         URL.revokeObjectURL(this.icon);
       }
-      this.icon = URL.createObjectURL(this.handleIcon.fileInput.files[0]);
+
+      this.icon = await resizeImage(this.handleIcon.fileInput.files[0], 200, 200);
       this.handleIcon.fileInput.value = '';
     },
     delete: () => {
