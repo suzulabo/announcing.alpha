@@ -42,6 +42,13 @@ export class App {
     this.router.push(path);
   }
 
+  set loading(v: boolean) {
+    this.appState.updateLoading(v);
+  }
+  get loading() {
+    return this.appState.state.loading;
+  }
+
   get msgs() {
     return this.appMsg.msgs;
   }

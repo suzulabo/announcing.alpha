@@ -24,9 +24,6 @@ export class AppAnnounceEdit {
   private announce: AnnounceState;
 
   @State()
-  saving = false;
-
-  @State()
   showDeletion = false;
 
   private handleInput = {
@@ -54,7 +51,12 @@ export class AppAnnounceEdit {
         URL.revokeObjectURL(this.icon);
       }
 
-      this.icon = await resizeImage(this.handleIcon.fileInput.files[0], 200, 200);
+      this.app.loading = true;
+      try {
+        this.icon = await resizeImage(this.handleIcon.fileInput.files[0], 200, 200);
+      } finally {
+        this.app.loading = false;
+      }
       this.handleIcon.fileInput.value = '';
     },
     delete: () => {
@@ -66,7 +68,7 @@ export class AppAnnounceEdit {
   };
 
   private handleSubmitClick = async () => {
-    this.saving = true;
+    this.app.loading = true;
     try {
       await this.app.editAnnounce(
         this.announceID.toUpperCase(),
@@ -76,7 +78,7 @@ export class AppAnnounceEdit {
       );
       this.app.pushRoute('/');
     } finally {
-      this.saving = false;
+      this.app.loading = false;
     }
   };
 
@@ -85,12 +87,12 @@ export class AppAnnounceEdit {
   };
 
   private handleDeletionClick = async () => {
-    this.saving = true;
+    this.app.loading = true;
     try {
       await this.app.deleteAnnounce(this.announceID.toUpperCase());
       this.app.pushRoute('/');
     } finally {
-      this.saving = false;
+      this.app.loading = false;
     }
   };
 
@@ -166,7 +168,6 @@ export class AppAnnounceEdit {
             </button>
           </Fragment>
         )}
-        {this.saving && <ap-loading />}
       </Host>
     );
   }

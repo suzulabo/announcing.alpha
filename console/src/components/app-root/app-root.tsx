@@ -86,6 +86,7 @@ export class AppRoot {
             </a>
           </div>
         </footer>
+        <ap-loading class={{ show: this.app.loading }} />
       </Host>
     );
   }

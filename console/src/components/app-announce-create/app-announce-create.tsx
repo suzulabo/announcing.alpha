@@ -13,9 +13,6 @@ export class AppAnnounceCreate {
   @State()
   values = { name: '', desc: '' };
 
-  @State()
-  saving = false;
-
   private handleInput = {
     name: (ev: Event) => {
       this.values = { ...this.values, name: (ev.currentTarget as HTMLInputElement).value };
@@ -26,12 +23,12 @@ export class AppAnnounceCreate {
   };
 
   private handleSubmitClick = async () => {
-    this.saving = true;
+    this.app.loading = true;
     try {
       await this.app.createAnnounce(this.values.name, this.values.desc);
       this.app.pushRoute('/');
     } finally {
-      this.saving = false;
+      this.app.loading = false;
     }
   };
 
@@ -54,7 +51,6 @@ export class AppAnnounceCreate {
           {this.app.msgs.announce.create.form.btn}
         </button>
         <a {...href('/')}>{this.app.msgs.common.back}</a>
-        {this.saving && <ap-loading />}
       </Host>
     );
   }
