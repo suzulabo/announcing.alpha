@@ -24,6 +24,10 @@ export interface User {
   announces?: string[];
 }
 
+export interface Image {
+  d: Uint8Array;
+}
+
 export interface Device {
   fcmToken: string;
   signKey: string;
@@ -39,6 +43,8 @@ export interface EditAnnounceParams {
   name?: string;
   desc?: string;
   link?: string;
+  icon?: string;
+  newIcon?: string;
 }
 
 export interface DeleteAnnounceParams {

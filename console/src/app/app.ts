@@ -69,8 +69,15 @@ export class App {
     return this.appFirebase.callCreateAnnounce({ name, desc });
   }
 
-  editAnnounce(id: string, name: string, desc: string, link: string) {
-    return this.appFirebase.callEditAnnounce({ id, name, desc, link });
+  editAnnounce(
+    id: string,
+    name: string,
+    desc: string,
+    link: string,
+    icon: string,
+    newIcon: string,
+  ) {
+    return this.appFirebase.callEditAnnounce({ id, name, desc, link, icon, newIcon });
   }
 
   deleteAnnounce(id: string) {

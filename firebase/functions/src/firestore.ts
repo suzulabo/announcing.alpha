@@ -39,7 +39,7 @@ const toHash = (...args: (string | undefined)[]) => {
 };
 
 export const announceMetaHash = (v: AnnounceMeta_FS) => {
-  return toHash(v.name, v.desc, v.link);
+  return toHash(v.name, v.desc, v.link, v.icon);
 };
 
 // testing

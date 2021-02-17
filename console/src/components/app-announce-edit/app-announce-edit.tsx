@@ -19,7 +19,7 @@ export class AppAnnounceEdit {
   values = { name: '', desc: '', link: '', icon: '' };
 
   @State()
-  icon: string = '';
+  icon: string;
 
   private announce: AnnounceState;
 
@@ -47,10 +47,6 @@ export class AppAnnounceEdit {
       this.handleIcon.fileInput.click();
     },
     change: async () => {
-      if (this.icon) {
-        URL.revokeObjectURL(this.icon);
-      }
-
       this.app.loading = true;
       try {
         this.icon = await resizeImage(this.handleIcon.fileInput.files[0], 200, 200);
@@ -60,10 +56,7 @@ export class AppAnnounceEdit {
       this.handleIcon.fileInput.value = '';
     },
     delete: () => {
-      if (this.icon) {
-        URL.revokeObjectURL(this.icon);
-        this.icon = undefined;
-      }
+      this.icon = undefined;
     },
   };
 
@@ -75,6 +68,8 @@ export class AppAnnounceEdit {
         this.values.name,
         this.values.desc,
         this.values.link,
+        this.values.icon,
+        this.icon?.split(',')[1],
       );
       this.app.pushRoute('/');
     } finally {
@@ -114,7 +109,8 @@ export class AppAnnounceEdit {
     const modified =
       this.values.name != this.announce.name ||
       this.values.desc != this.announce.desc ||
-      this.values.link != this.announce.link;
+      this.values.link != this.announce.link ||
+      !!this.icon;
 
     const iconImg = this.icon;
 

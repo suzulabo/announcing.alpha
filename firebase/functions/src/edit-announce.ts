@@ -1,7 +1,8 @@
-import { EditAnnounceParams } from 'announsing-shared';
+import { EditAnnounceParams, fromBase64 } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { announceMetaHash, AnnounceMeta_FS, Announce_FS, converters } from './firestore';
+import { toMD5Base62 } from './utils';
 
 export const callEditAnnounce = async (
   params: EditAnnounceParams,
@@ -21,7 +22,7 @@ const editAnnounce = async (
     throw new Error('missing uid');
   }
 
-  const { id, name, desc, link } = params;
+  const { id, name, desc, link, icon, newIcon } = params;
   if (!id) {
     throw new Error('missing id');
   }
@@ -57,8 +58,22 @@ const editAnnounce = async (
     name,
     ...(!!desc && { desc }),
     ...(!!link && { link }),
+    ...(!!icon && { icon }),
     cT: admin.firestore.FieldValue.serverTimestamp(),
   };
+
+  if (newIcon) {
+    const img = fromBase64(newIcon);
+    const newIconID = toMD5Base62(img);
+
+    const imgRef = firestore.doc(`images/${newIconID}`);
+    const doc = await imgRef.get();
+    if (!doc.exists) {
+      await imgRef.create({ d: img });
+    }
+    newMeta.icon = newIconID;
+  }
+
   const newMetaID = announceMetaHash(newMeta);
 
   const updateAnnounce: Partial<Announce_FS> = {
