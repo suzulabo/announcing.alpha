@@ -1,7 +1,8 @@
-import { autoID, CreateAnnounceParams } from 'announsing-shared';
+import { CreateAnnounceParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { announceMetaHash, AnnounceMeta_FS, Announce_FS, User_FS } from './firestore';
+import { autoID } from './utils';
 
 export const callCreateAnnounce = async (
   params: CreateAnnounceParams,

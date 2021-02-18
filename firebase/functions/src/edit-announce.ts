@@ -1,4 +1,4 @@
-import { EditAnnounceParams, fromBase64 } from 'announsing-shared';
+import { EditAnnounceParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { announceMetaHash, AnnounceMeta_FS, Announce_FS, converters } from './firestore';
@@ -63,7 +63,7 @@ const editAnnounce = async (
   };
 
   if (newIcon) {
-    const img = fromBase64(newIcon);
+    const img = Buffer.from(newIcon, 'base64');
     const newIconID = toMD5Base62(img);
 
     const imgRef = firestore.doc(`images/${newIconID}`);
