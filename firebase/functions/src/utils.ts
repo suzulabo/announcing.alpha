@@ -4,7 +4,7 @@ import nacl from 'tweetnacl';
 
 const bs62 = bsx('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
-export const toMD5Base62 = (v: Buffer) => {
+export const toMD5Base62 = (v: Buffer | string) => {
   const md5 = crypto.createHash('md5');
   return bs62.encode(md5.update(v).digest());
 };

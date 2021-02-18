@@ -4,8 +4,8 @@ import {
   PostConverter,
   UserConverter,
 } from 'announsing-shared';
-import * as crypto from 'crypto';
 import * as admin from 'firebase-admin';
+import { toMD5Base62 } from './utils';
 
 import FieldValue = admin.firestore.FieldValue;
 
@@ -28,18 +28,8 @@ const serialize = (...args: (string | undefined)[]) => {
     .replace(/\0+$/, '');
 };
 
-const toHash = (...args: (string | undefined)[]) => {
-  const md5 = crypto.createHash('md5');
-  return md5
-    .update(serialize(...args))
-    .digest('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '.')
-    .substr(0, 8);
-};
-
 export const announceMetaHash = (v: AnnounceMeta_FS) => {
-  return toHash(v.name, v.desc, v.link, v.icon);
+  return toMD5Base62(serialize(v.name, v.desc, v.link, v.icon)).substr(0, 8);
 };
 
 // testing
