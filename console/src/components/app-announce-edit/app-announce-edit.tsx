@@ -96,6 +96,7 @@ export class AppAnnounceEdit {
     const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
     if (!as) {
       this.app.pushRoute('/');
+      return;
     }
 
     this.announce = as;

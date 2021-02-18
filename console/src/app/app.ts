@@ -142,6 +142,11 @@ export class App {
   }
 
   async getAnnounceState(id: string) {
+    const user = await this.appFirebase.getUser();
+    if (!user.announces || user.announces.indexOf(id) < 0) {
+      return;
+    }
+
     const a = await this.appFirebase.getAnnounce(id);
     if (a) {
       return await this.toAnnounceState(id, a);
