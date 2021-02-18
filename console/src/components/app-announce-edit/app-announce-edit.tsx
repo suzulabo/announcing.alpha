@@ -57,6 +57,7 @@ export class AppAnnounceEdit {
     },
     delete: () => {
       this.icon = undefined;
+      this.values = { ...this.values, icon: undefined };
     },
   };
 
@@ -110,9 +111,10 @@ export class AppAnnounceEdit {
       this.values.name != this.announce.name ||
       this.values.desc != this.announce.desc ||
       this.values.link != this.announce.link ||
+      this.values.icon != this.announce.icon ||
       !!this.icon;
 
-    const iconImg = this.icon;
+    const iconImg = this.icon || (this.values.icon ? this.announce.iconData : null);
 
     return (
       <Host>

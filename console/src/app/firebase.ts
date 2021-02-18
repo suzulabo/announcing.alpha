@@ -197,4 +197,11 @@ export class AppFirebase {
       .withConverter(converters.post);
     return getCacheFirst(docRef);
   }
+
+  async getImage(id: string) {
+    const docRef = this.firestore.doc(`images/${id}`);
+    const doc = await getCacheFirst(docRef);
+    const data = doc.d as firebase.firestore.Blob;
+    return `data:image/jpeg;base64,${data.toBase64()}`;
+  }
 }

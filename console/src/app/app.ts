@@ -104,7 +104,12 @@ export class App {
       return v2.pT - v1.pT;
     });
 
-    return { id, ...a, ...meta, postsData };
+    let iconData: string;
+    if (meta.icon) {
+      iconData = await this.appFirebase.getImage(meta.icon);
+    }
+
+    return { id, ...a, ...meta, postsData, iconData };
   }
 
   private listenUser() {

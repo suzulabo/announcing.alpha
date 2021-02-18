@@ -9,6 +9,10 @@ service cloud.firestore {
       allow get: if request.auth.uid == id;
     }
 
+    match /images/{id} {
+      allow get: if request.auth.uid != null;
+    }
+
     match /announces/{id} {
       allow get: if true;
 
