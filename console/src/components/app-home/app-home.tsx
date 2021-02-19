@@ -22,7 +22,7 @@ export class AppHome {
           <span class="name">{v.name}</span>
           <span class="desc">{v.desc}</span>
           <div class="buttons">
-            <a {...href(`/a/${v.id}/posts`)}>{this.app.msgs.home.announces.postBtn}</a>
+            <a {...href(`/a/${v.id}/p`)}>{this.app.msgs.home.announces.postBtn}</a>
             <a {...href(`/a/${v.id}/edit`)}>{this.app.msgs.home.announces.editBtn}</a>
           </div>
         </div>

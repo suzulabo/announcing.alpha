@@ -64,36 +64,10 @@ export const msgs = {
         confirm: 'アナウンスを削除します。よろしいですか？',
       },
     },
-    post: {
+  },
+  post: {
+    home: {
       title: '投稿',
-      editBtn: '編集',
-      deleteBtn: '削除',
-      import: '投稿を読み込む',
-      form: {
-        title: 'タイトル',
-        body: '本文',
-        link: 'リンク',
-        image: '画像',
-        imagePlaceholder: '画像のURL',
-        published: '公開日時',
-        postBtn: '投稿する',
-        confirm: '投稿します。よろしいですか？',
-        done: '投稿しました',
-      },
-      delete: {
-        confirm: '投稿を削除します。よろしいですか？',
-        done: '削除しました',
-      },
-    },
-    import: {
-      title: '投稿の読み込み',
-      form: {
-        url: 'URL',
-        confirm: '投稿を読み込みます。よろしいですか？',
-        preview: 'プレビュー',
-        btn: '読み込み',
-        done: '投稿を読み込みました',
-      },
     },
   },
 };

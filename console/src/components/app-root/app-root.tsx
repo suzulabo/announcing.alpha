@@ -65,6 +65,7 @@ export class AppRoot {
               {this.renderRoute('app-home', '/')}
               {this.renderRoute('app-announce-create', '/a/create')}
               {this.renderRoute('app-announce-edit', match('/a/:announceID/edit'))}
+              {this.renderRoute('app-posts', match('/a/:announceID/p'))}
               <Route path="/signin" to="/"></Route>
             </Fragment>
           )}
