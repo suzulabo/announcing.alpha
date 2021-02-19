@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 
@@ -32,7 +32,12 @@ export class AppPosts {
 
     return (
       <Host>
-        <header>{this.app.msgs.post.home.title}</header>
+        {!this.announce.posts && (
+          <Fragment>
+            <div>{this.app.msgs.post.home.noPosts}</div>
+            <a href={`f`}>{this.app.msgs.post.home.newPost}</a>
+          </Fragment>
+        )}
       </Host>
     );
   }

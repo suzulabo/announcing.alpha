@@ -38,6 +38,9 @@ const editAnnounce = async (
   if (link && link.length > 500) {
     throw new Error('link is too long');
   }
+  if (newIcon && newIcon.length > 1024 * 1024) {
+    throw new Error('newIcon is too long');
+  }
 
   const firestore = adminApp.firestore();
 

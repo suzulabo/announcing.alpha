@@ -5,6 +5,7 @@ import { callCreateAnnounce } from './create-announce';
 import { callDeleteAnnounce, firestoreDeleteAnnounce } from './delete-announce';
 import { callEditAnnounce } from './edit-announce';
 import { httpsGetData } from './get-data';
+import { callPutPost } from './put-post';
 
 const adminApp = initializeApp();
 const appEnv = new AppEnv().env;
@@ -19,6 +20,9 @@ export const editAnnounce = region.https.onCall(async (data, context) => {
 });
 export const deleteAnnounce = region.https.onCall(async (data, context) => {
   return callDeleteAnnounce(data, context, adminApp);
+});
+export const putPost = region.https.onCall(async (data, context) => {
+  return callPutPost(data, context, adminApp);
 });
 
 export const getData = region.https.onRequest(async (req, res) => {

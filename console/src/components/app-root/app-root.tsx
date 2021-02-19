@@ -64,6 +64,7 @@ export class AppRoot {
       renderRoute('app-announce-create', '/a/create'),
       renderRoute('app-announce-edit', match('/a/:announceID/edit')),
       renderRoute('app-posts', match('/a/:announceID/p')),
+      renderRoute('app-post-form', match('/a/:announceID/f')),
       <Route path="/signin" to="/"></Route>,
     ];
 

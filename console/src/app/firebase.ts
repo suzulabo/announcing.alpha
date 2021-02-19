@@ -7,6 +7,7 @@ import {
   DeleteAnnounceParams,
   EditAnnounceParams,
   PostConverter,
+  PutPostParams,
   UserConverter,
 } from 'announsing-shared';
 import firebase from 'firebase/app';
@@ -127,6 +128,10 @@ export class AppFirebase {
 
   async callDeleteAnnounce(params: DeleteAnnounceParams) {
     return this.callFunc<void>('deleteAnnounce', params);
+  }
+
+  async callPutPost(params: PutPostParams) {
+    return this.callFunc<void>('putPost', params);
   }
 
   private listeners = (() => {

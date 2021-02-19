@@ -22,6 +22,12 @@ export namespace Components {
     interface AppHome {
         "app": App;
     }
+    interface AppPostForm {
+        "announceID": string;
+        "app": App;
+        "postID": string;
+        "values": { title?: string; body?: string; link?: string; img?: string };
+    }
     interface AppPosts {
         "announceID": string;
         "app": App;
@@ -63,6 +69,12 @@ declare global {
         prototype: HTMLAppHomeElement;
         new (): HTMLAppHomeElement;
     };
+    interface HTMLAppPostFormElement extends Components.AppPostForm, HTMLStencilElement {
+    }
+    var HTMLAppPostFormElement: {
+        prototype: HTMLAppPostFormElement;
+        new (): HTMLAppPostFormElement;
+    };
     interface HTMLAppPostsElement extends Components.AppPosts, HTMLStencilElement {
     }
     var HTMLAppPostsElement: {
@@ -87,6 +99,7 @@ declare global {
         "app-announce-create": HTMLAppAnnounceCreateElement;
         "app-announce-edit": HTMLAppAnnounceEditElement;
         "app-home": HTMLAppHomeElement;
+        "app-post-form": HTMLAppPostFormElement;
         "app-posts": HTMLAppPostsElement;
         "app-root": HTMLAppRootElement;
         "app-signin": HTMLAppSigninElement;
@@ -108,6 +121,12 @@ declare namespace LocalJSX {
     interface AppHome {
         "app"?: App;
     }
+    interface AppPostForm {
+        "announceID"?: string;
+        "app"?: App;
+        "postID"?: string;
+        "values"?: { title?: string; body?: string; link?: string; img?: string };
+    }
     interface AppPosts {
         "announceID"?: string;
         "app"?: App;
@@ -123,6 +142,7 @@ declare namespace LocalJSX {
         "app-announce-create": AppAnnounceCreate;
         "app-announce-edit": AppAnnounceEdit;
         "app-home": AppHome;
+        "app-post-form": AppPostForm;
         "app-posts": AppPosts;
         "app-root": AppRoot;
         "app-signin": AppSignin;
@@ -137,6 +157,7 @@ declare module "@stencil/core" {
             "app-announce-create": LocalJSX.AppAnnounceCreate & JSXBase.HTMLAttributes<HTMLAppAnnounceCreateElement>;
             "app-announce-edit": LocalJSX.AppAnnounceEdit & JSXBase.HTMLAttributes<HTMLAppAnnounceEditElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
+            "app-post-form": LocalJSX.AppPostForm & JSXBase.HTMLAttributes<HTMLAppPostFormElement>;
             "app-posts": LocalJSX.AppPosts & JSXBase.HTMLAttributes<HTMLAppPostsElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "app-signin": LocalJSX.AppSignin & JSXBase.HTMLAttributes<HTMLAppSigninElement>;

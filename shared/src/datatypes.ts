@@ -51,6 +51,15 @@ export interface DeleteAnnounceParams {
   id?: string;
 }
 
+export interface PutPostParams {
+  id?: string;
+  title?: string;
+  body?: string;
+  link?: string;
+  imgData?: string;
+  editID?: string;
+}
+
 export type NotificationMode = 'disabled' | 'always' | 'hours';
 
 export interface RegisterNotificationParams {

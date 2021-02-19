@@ -80,6 +80,10 @@ export class App {
     return this.appFirebase.callEditAnnounce({ id, name, desc, link, icon, newIcon });
   }
 
+  putPost(id: string, title: string, body: string, link: string, imgData: string, editID: string) {
+    return this.appFirebase.callPutPost({ id, title, body, link, imgData, editID });
+  }
+
   deleteAnnounce(id: string) {
     return this.appFirebase.callDeleteAnnounce({ id });
   }

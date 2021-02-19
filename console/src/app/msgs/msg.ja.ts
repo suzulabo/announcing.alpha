@@ -67,7 +67,16 @@ export const msgs = {
   },
   post: {
     home: {
-      title: '投稿',
+      title: (s: string) => `${s}の投稿`,
+      noPosts: 'お知らせが投稿されていません',
+      newPost: 'お知らせを投稿する',
+    },
+    form: {
+      title: 'タイトル',
+      body: '本文',
+      lnik: 'リンク',
+      img: '画像',
+      btn: '投稿する',
     },
   },
 };
