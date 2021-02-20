@@ -32,10 +32,6 @@ export const announceMetaHash = (v: AnnounceMeta_FS) => {
   return toMD5Base62(serialize(v.name, v.desc, v.link, v.icon)).substr(0, 8);
 };
 
-export const postHash = (v: Post_FS) => {
-  return toMD5Base62(serialize(v.title, v.body, v.link, v.img)).substr(0, 8);
-};
-
 export const checkOwner = async (firestore: admin.firestore.Firestore, uid: string, id: string) => {
   const userRef = firestore.doc(`users/${uid}`).withConverter(converters.user);
   const userData = (await userRef.get()).data();

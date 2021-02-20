@@ -1,7 +1,7 @@
 import { Build } from '@stencil/core';
 import { Announce } from 'announsing-shared';
 import { Router } from 'stencil-router-v2';
-import { AnnounceState, PostState } from './datatypes';
+import { AnnounceState } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
@@ -94,26 +94,12 @@ export class App {
       return;
     }
 
-    const postsData = [] as PostState[];
-    if (a.posts) {
-      for (const postID of a.posts) {
-        const post = await this.appFirebase.getPost(id, postID);
-        if (post) {
-          postsData.push({ ...post, id: postID });
-        }
-      }
-    }
-
-    postsData.sort((v1, v2) => {
-      return v2.pT - v1.pT;
-    });
-
     let iconData: string;
     if (meta.icon) {
       iconData = await this.appFirebase.getImage(meta.icon);
     }
 
-    return { id, ...a, ...meta, postsData, iconData };
+    return { id, ...a, ...meta, iconData };
   }
 
   private listenUser() {
@@ -146,6 +132,7 @@ export class App {
   }
 
   async getAnnounceState(id: string) {
+    this.listenUser();
     const user = await this.appFirebase.getUser();
     if (!user.announces || user.announces.indexOf(id) < 0) {
       return;
@@ -155,5 +142,9 @@ export class App {
     if (a) {
       return await this.toAnnounceState(id, a);
     }
+  }
+
+  getPost(id: string, postID: string) {
+    return this.appFirebase.getPost(id, postID);
   }
 }

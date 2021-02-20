@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 import { href } from 'stencil-router-v2';
@@ -17,7 +17,7 @@ export class AppPostForm {
   @Prop()
   postID: string;
 
-  @Prop()
+  @State()
   values: { title?: string; body?: string; link?: string; img?: string };
 
   private announce: AnnounceState;
@@ -57,7 +57,7 @@ export class AppPostForm {
         null,
         null,
       );
-      this.app.pushRoute('/');
+      this.app.pushRoute('p');
     } finally {
       this.app.loading = false;
     }

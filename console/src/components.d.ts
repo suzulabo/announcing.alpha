@@ -26,7 +26,6 @@ export namespace Components {
         "announceID": string;
         "app": App;
         "postID": string;
-        "values": { title?: string; body?: string; link?: string; img?: string };
     }
     interface AppPosts {
         "announceID": string;
@@ -125,7 +124,6 @@ declare namespace LocalJSX {
         "announceID"?: string;
         "app"?: App;
         "postID"?: string;
-        "values"?: { title?: string; body?: string; link?: string; img?: string };
     }
     interface AppPosts {
         "announceID"?: string;

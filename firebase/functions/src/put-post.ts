@@ -1,7 +1,8 @@
 import { PutPostParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { Announce_FS, checkOwner, converters, postHash, Post_FS, storeImage } from './firestore';
+import { Announce_FS, checkOwner, converters, Post_FS, storeImage } from './firestore';
+import { incString } from './incstring';
 
 export const callPutPost = async (
   params: PutPostParams,
@@ -60,14 +61,7 @@ const putPost = async (
     pT: admin.firestore.FieldValue.serverTimestamp(),
   };
 
-  const postID = postHash(postData);
-
   if (editID) {
-    if (postID == editID) {
-      console.log('duplicate post', id, postID);
-      return;
-    }
-
     const postRef = firestore.doc(`announces/${id}/posts/${editID}`).withConverter(converters.post);
     const data = (await postRef.get()).data();
     if (!data) {
@@ -83,11 +77,9 @@ const putPost = async (
       console.log('no data', id);
       return;
     }
+
+    const postID = incString.next(announceData.pid);
     const posts = announceData.posts || [];
-    if (posts.indexOf(postID) >= 0) {
-      console.log('duplicate post', id, postID);
-      return;
-    }
 
     if (imgData) {
       const imgID = await storeImage(firestore, imgData);
@@ -108,6 +100,7 @@ const putPost = async (
 
     {
       const updateData: Partial<Announce_FS> = {
+        pid: postID,
         posts,
         uT: admin.firestore.FieldValue.serverTimestamp(),
       };

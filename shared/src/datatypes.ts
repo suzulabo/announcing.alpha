@@ -7,8 +7,9 @@ export interface Post {
 }
 
 export interface Announce {
-  posts?: string[];
   mid: string; // meta id
+  posts?: string[];
+  pid?: string; // (current) post id
   uT: number; // updated time
 }
 
