@@ -1,7 +1,6 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
-import { resizeImage } from 'src/utils/image';
 import { href } from 'stencil-router-v2';
 
 @Component({
@@ -16,10 +15,7 @@ export class AppAnnounceEdit {
   announceID: string;
 
   @State()
-  values = { name: '', desc: '', link: '', icon: '' };
-
-  @State()
-  icon: string;
+  values: { name?: string; desc?: string; link?: string; icon?: string; iconData?: string };
 
   private announce: AnnounceState;
 
@@ -38,27 +34,8 @@ export class AppAnnounceEdit {
     },
   };
 
-  private handleIcon = {
-    fileInput: null as HTMLInputElement,
-    ref: (el: HTMLInputElement) => {
-      this.handleIcon.fileInput = el;
-    },
-    click: () => {
-      this.handleIcon.fileInput.click();
-    },
-    change: async () => {
-      this.app.loading = true;
-      try {
-        this.icon = await resizeImage(this.handleIcon.fileInput.files[0], 200, 200);
-      } finally {
-        this.app.loading = false;
-      }
-      this.handleIcon.fileInput.value = '';
-    },
-    delete: () => {
-      this.icon = undefined;
-      this.values = { ...this.values, icon: undefined };
-    },
+  private handleImageChange = (ev: CustomEvent<string>) => {
+    this.values = { ...this.values, icon: undefined, iconData: ev.detail };
   };
 
   private handleSubmitClick = async () => {
@@ -70,7 +47,7 @@ export class AppAnnounceEdit {
         this.values.desc,
         this.values.link,
         this.values.icon,
-        this.icon?.split(',')[1],
+        this.values.icon ? undefined : this.values.iconData?.split(',')[1],
       );
       this.app.pushRoute('/');
     } finally {
@@ -100,7 +77,13 @@ export class AppAnnounceEdit {
     }
 
     this.announce = as;
-    this.values = { name: as.name, desc: as.desc, link: as.link, icon: as.icon };
+    this.values = {
+      name: as.name,
+      desc: as.desc,
+      link: as.link,
+      icon: as.icon,
+      iconData: as.iconData,
+    };
   }
 
   render() {
@@ -113,29 +96,18 @@ export class AppAnnounceEdit {
       this.values.desc != this.announce.desc ||
       this.values.link != this.announce.link ||
       this.values.icon != this.announce.icon ||
-      !!this.icon;
-
-    const iconImg = this.icon || (this.values.icon ? this.announce.iconData : null);
+      this.values.iconData != this.announce.iconData;
 
     return (
       <Host>
         <header>{this.app.msgs.announce.edit.title}</header>
-        <div class={{ 'icon': true, 'no-icon': !iconImg }} onClick={this.handleIcon.click}>
-          {iconImg && <img src={iconImg} />}
-          {!iconImg && <span>{this.app.msgs.announce.edit.form.icon}</span>}
-          <ap-icon icon="image" />
-          <input
-            type="file"
-            accept="image/*"
-            ref={this.handleIcon.ref}
-            onChange={this.handleIcon.change}
-          />
-        </div>
-        {iconImg && (
-          <button class="icon-del clear" onClick={this.handleIcon.delete}>
-            <ap-icon icon="trash" />
-          </button>
-        )}
+        <ap-image-input
+          app={this.app}
+          label={this.app.msgs.announce.edit.form.icon}
+          data={this.values.iconData}
+          resizeRect={{ width: 200, height: 200 }}
+          onChange={this.handleImageChange}
+        />
         <input
           placeholder={this.app.msgs.announce.edit.form.name}
           value={this.values.name}
