@@ -10,4 +10,9 @@ app-post-form {
   > * {
     margin: 10px 0;
   }
+
+  ap-image-input {
+    --img-max-width: 600px;
+    --img-max-height: 200px;
+  }
 }

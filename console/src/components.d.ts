@@ -10,6 +10,12 @@ export namespace Components {
     interface ApIcon {
         "icon": 'github' | 'google' | 'image' | 'trash';
     }
+    interface ApImageInput {
+        "app": App;
+        "data": string;
+        "label": string;
+        "resizeRect": { width: number; height: number };
+    }
     interface ApLoading {
     }
     interface AppAnnounceCreate {
@@ -43,6 +49,12 @@ declare global {
     var HTMLApIconElement: {
         prototype: HTMLApIconElement;
         new (): HTMLApIconElement;
+    };
+    interface HTMLApImageInputElement extends Components.ApImageInput, HTMLStencilElement {
+    }
+    var HTMLApImageInputElement: {
+        prototype: HTMLApImageInputElement;
+        new (): HTMLApImageInputElement;
     };
     interface HTMLApLoadingElement extends Components.ApLoading, HTMLStencilElement {
     }
@@ -94,6 +106,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "ap-icon": HTMLApIconElement;
+        "ap-image-input": HTMLApImageInputElement;
         "ap-loading": HTMLApLoadingElement;
         "app-announce-create": HTMLAppAnnounceCreateElement;
         "app-announce-edit": HTMLAppAnnounceEditElement;
@@ -107,6 +120,13 @@ declare global {
 declare namespace LocalJSX {
     interface ApIcon {
         "icon"?: 'github' | 'google' | 'image' | 'trash';
+    }
+    interface ApImageInput {
+        "app"?: App;
+        "data"?: string;
+        "label"?: string;
+        "onChange"?: (event: CustomEvent<string>) => void;
+        "resizeRect"?: { width: number; height: number };
     }
     interface ApLoading {
     }
@@ -136,6 +156,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "ap-icon": ApIcon;
+        "ap-image-input": ApImageInput;
         "ap-loading": ApLoading;
         "app-announce-create": AppAnnounceCreate;
         "app-announce-edit": AppAnnounceEdit;
@@ -151,6 +172,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
+            "ap-image-input": LocalJSX.ApImageInput & JSXBase.HTMLAttributes<HTMLApImageInputElement>;
             "ap-loading": LocalJSX.ApLoading & JSXBase.HTMLAttributes<HTMLApLoadingElement>;
             "app-announce-create": LocalJSX.AppAnnounceCreate & JSXBase.HTMLAttributes<HTMLAppAnnounceCreateElement>;
             "app-announce-edit": LocalJSX.AppAnnounceEdit & JSXBase.HTMLAttributes<HTMLAppAnnounceEditElement>;

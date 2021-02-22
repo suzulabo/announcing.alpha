@@ -18,7 +18,7 @@ export class AppPostForm {
   postID: string;
 
   @State()
-  values: { title?: string; body?: string; link?: string; img?: string };
+  values: { title?: string; body?: string; link?: string; img?: string; imgData?: string };
 
   private announce: AnnounceState;
 
@@ -44,6 +44,9 @@ export class AppPostForm {
     link: (ev: Event) => {
       this.values = { ...this.values, link: (ev.currentTarget as HTMLInputElement).value };
     },
+    img: (ev: CustomEvent<string>) => {
+      this.values = { ...this.values, imgData: ev.detail };
+    },
   };
 
   private handleSubmitClick = async () => {
@@ -54,7 +57,7 @@ export class AppPostForm {
         this.values.title,
         this.values.body,
         this.values.link,
-        null,
+        this.values.imgData?.split(',')[1],
         null,
       );
       this.app.pushRoute('p');
@@ -72,6 +75,12 @@ export class AppPostForm {
 
     return (
       <Host>
+        <ap-image-input
+          app={this.app}
+          resizeRect={{ width: 800, height: 800 }}
+          data={this.values.imgData}
+          onChange={this.handleInput.img}
+        />
         <input
           placeholder={this.app.msgs.post.form.title}
           value={this.values.title}
