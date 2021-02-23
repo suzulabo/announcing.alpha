@@ -48,10 +48,26 @@ export class AppPosts {
     for (const postID of posts) {
       const post = await this.app.getPost(id, postID);
       if (!post) {
-        rendered.push(<div>no post data</div>);
-      } else {
-        rendered.push(<div class="post-box">{post.title}</div>);
+        rendered.push(<div class="post">no post data</div>);
+        continue;
       }
+      const imgData = post.img ? await this.app.getImage(post.img) : null;
+
+      rendered.push(
+        <div class="post">
+          {imgData && <img src={imgData} />}
+          <div class="content">
+            <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
+            <span class="title">{post.title}</span>
+            <div class="body">{post.body}</div>
+            {post.link && (
+              <a class="link" href={post.link} target="_blank" rel="noopener">
+                {post.link}
+              </a>
+            )}
+          </div>
+        </div>,
+      );
     }
 
     this.renderedPosts = [...this.renderedPosts, ...rendered];

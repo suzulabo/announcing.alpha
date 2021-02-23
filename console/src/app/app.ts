@@ -147,4 +147,8 @@ export class App {
   getPost(id: string, postID: string) {
     return this.appFirebase.getPost(id, postID);
   }
+
+  getImage(id: string) {
+    return this.appFirebase.getImage(id);
+  }
 }
