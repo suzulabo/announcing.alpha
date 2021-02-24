@@ -106,7 +106,7 @@ export class AppAnnounceEdit {
           label={this.app.msgs.announce.edit.form.icon}
           data={this.values.iconData}
           resizeRect={{ width: 200, height: 200 }}
-          onChange={this.handleImageChange}
+          onImageChange={this.handleImageChange}
         />
         <input
           placeholder={this.app.msgs.announce.edit.form.name}

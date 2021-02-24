@@ -20,7 +20,7 @@ export class ApImageInput {
   data: string;
 
   @Event()
-  change: EventEmitter<string>;
+  imageChange: EventEmitter<string>;
 
   private handlers = {
     fileInput: null as HTMLInputElement,
@@ -38,14 +38,14 @@ export class ApImageInput {
           this.resizeRect.width,
           this.resizeRect.height,
         );
-        this.change.emit(newData);
+        this.imageChange.emit(newData);
       } finally {
         this.app.loading = false;
       }
       this.handlers.fileInput.value = '';
     },
     delete: () => {
-      this.change.emit(null);
+      this.imageChange.emit(null);
     },
   };
 

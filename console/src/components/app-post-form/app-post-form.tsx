@@ -79,7 +79,7 @@ export class AppPostForm {
           app={this.app}
           resizeRect={{ width: 800, height: 800 }}
           data={this.values.imgData}
-          onChange={this.handleInput.img}
+          onImageChange={this.handleInput.img}
         />
         <input
           placeholder={this.app.msgs.post.form.title}
