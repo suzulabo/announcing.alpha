@@ -17,41 +17,45 @@ app-posts {
     border-radius: 10px;
     width: 100%;
     max-width: 400px;
-    overflow: hidden;
 
-    img {
-      display: block;
-      max-width: 100%;
-      max-height: 300px;
-      object-fit: contain;
-      margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+
+    > * {
+      margin: 5px 0;
     }
 
-    div.content {
-      display: flex;
-      flex-direction: column;
-      padding: 10px;
+    line-height: 1.3;
 
-      > * {
-        margin: 5px 0;
-      }
+    .date {
+      color: var(--light-color);
+      font-size: 0.95rem;
+    }
+    .title {
+      font-size: 1.05rem;
+    }
+    .body {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
+    &.skeleton {
       .date {
-        color: var(--light-color);
-        font-size: 0.95rem;
+        background-color: var(--bk-skeleton-color);
+        height: 1em;
+        width: 10em;
       }
       .title {
-        font-size: 1.05rem;
+        background-color: var(--bk-skeleton-color);
+        height: 1em;
+        width: 20em;
       }
       .body {
-        border-top: 1px dashed var(--border-color);
-        padding-top: 10px;
-      }
-      .link {
-        border-top: 1px dashed var(--border-color);
-        padding-top: 10px;
-        font-size: 0.9rem;
-        word-break: break-all;
+        background-color: var(--bk-skeleton-color);
+        height: 1em;
+        width: 95%;
       }
     }
   }

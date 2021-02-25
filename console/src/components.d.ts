@@ -125,7 +125,7 @@ declare namespace LocalJSX {
         "app"?: App;
         "data"?: string;
         "label"?: string;
-        "onChange"?: (event: CustomEvent<string>) => void;
+        "onImageChange"?: (event: CustomEvent<string>) => void;
         "resizeRect"?: { width: number; height: number };
     }
     interface ApLoading {
