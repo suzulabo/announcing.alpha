@@ -1,6 +1,5 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { href } from 'stencil-router-v2';
 
 @Component({
   tag: 'app-announce-create',
@@ -50,7 +49,7 @@ export class AppAnnounceCreate {
         <button disabled={!this.values.name} onClick={this.handleSubmitClick}>
           {this.app.msgs.announce.create.form.btn}
         </button>
-        <a {...href('/')}>{this.app.msgs.common.back}</a>
+        <a {...this.app.backHref('/')}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }

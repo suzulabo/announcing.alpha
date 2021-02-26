@@ -1,7 +1,6 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
-import { href } from 'stencil-router-v2';
 
 @Component({
   tag: 'app-announce-edit',
@@ -127,7 +126,7 @@ export class AppAnnounceEdit {
         <button disabled={!this.values.name || !modified} onClick={this.handleSubmitClick}>
           {this.app.msgs.announce.edit.form.btn}
         </button>
-        <a {...href('/')}>{this.app.msgs.common.back}</a>
+        <a {...this.app.backHref('/')}>{this.app.msgs.common.back}</a>
         <button class="clear deletion-toggle" onClick={this.handleDeletionToggleClick}>
           {this.app.msgs.announce.edit.deletion.guide}
         </button>

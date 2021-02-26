@@ -1,7 +1,6 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
-import { href } from 'stencil-router-v2';
 
 @Component({
   tag: 'app-post-form',
@@ -103,7 +102,7 @@ export class AppPostForm {
         <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
           {this.app.msgs.post.form.btn}
         </button>
-        <a {...href('p')}>{this.app.msgs.common.back}</a>
+        <a {...this.app.backHref('p')}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }
