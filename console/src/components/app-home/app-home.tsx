@@ -1,6 +1,5 @@
 import { Component, h, Host, Prop } from '@stencil/core';
 import { App } from 'src/app/app';
-import { href } from 'stencil-router-v2';
 
 @Component({
   tag: 'app-home',
@@ -22,8 +21,8 @@ export class AppHome {
           <span class="name">{v.name}</span>
           <span class="desc">{v.desc}</span>
           <div class="buttons">
-            <a {...href(`/a/${v.id}/p`)}>{this.app.msgs.home.announces.postBtn}</a>
-            <a {...href(`/a/${v.id}/edit`)}>{this.app.msgs.home.announces.editBtn}</a>
+            <a {...this.app.href(`/a/${v.id}/p`)}>{this.app.msgs.home.announces.postBtn}</a>
+            <a {...this.app.href(`/a/${v.id}/edit`)}>{this.app.msgs.home.announces.editBtn}</a>
           </div>
         </div>
       );
@@ -34,7 +33,7 @@ export class AppHome {
     return (
       <Host>
         <div class="announces-grid">{this.renderAnnounces()}</div>
-        <a {...href('/a/create')}>+</a>
+        <a {...this.app.href('/a/create')}>+</a>
         <button class="clear" onClick={this.handleSignOutClick}>
           {this.app.msgs.home.signOut}
         </button>

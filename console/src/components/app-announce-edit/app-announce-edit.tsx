@@ -126,7 +126,7 @@ export class AppAnnounceEdit {
         <button disabled={!this.values.name || !modified} onClick={this.handleSubmitClick}>
           {this.app.msgs.announce.edit.form.btn}
         </button>
-        <a {...this.app.backHref('/')}>{this.app.msgs.common.back}</a>
+        <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
         <button class="clear deletion-toggle" onClick={this.handleDeletionToggleClick}>
           {this.app.msgs.announce.edit.deletion.guide}
         </button>

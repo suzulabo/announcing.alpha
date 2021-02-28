@@ -1,6 +1,5 @@
 import { Build } from '@stencil/core';
 import { Announce } from 'announsing-shared';
-import { href, Router } from 'stencil-router-v2';
 import { AnnounceState } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
@@ -20,7 +19,6 @@ export class App {
     private appMsg: AppMsg,
     private appFirebase: AppFirebase,
     private appState: AppState,
-    private router: Router,
   ) {
     const state = history.state || {};
     history.replaceState({ ...state, firstView: true }, null);
@@ -41,25 +39,31 @@ export class App {
     document.title = v;
   }
 
-  backHref(p: string) {
+  href(p: string, back?: boolean) {
     return {
       href: p,
       onClick: (ev: MouseEvent) => {
         // https://github.com/ionic-team/stencil-router-v2/blob/master/src/router.ts
         if (!ev.metaKey && !ev.ctrlKey && ev.which != 2 && ev.button != 1) {
-          if (history.state?.firstView) {
-            href(p).onClick(ev);
-          } else {
-            ev.preventDefault();
+          ev.preventDefault();
+          if (back && !history.state?.firstView) {
             history.back();
+          } else {
+            this.pushRoute(p);
           }
         }
       },
     };
   }
 
+  redirectRoute(path: string) {
+    history.replaceState(history.state, null, path);
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }
+
   pushRoute(path: string) {
-    this.router.push(path);
+    history.pushState(null, null, path);
+    window.dispatchEvent(new PopStateEvent('popstate'));
   }
 
   set loading(v: boolean) {

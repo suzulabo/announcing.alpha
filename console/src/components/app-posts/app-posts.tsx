@@ -1,7 +1,6 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
-import { href } from 'stencil-router-v2';
 
 @Component({
   tag: 'app-posts',
@@ -104,7 +103,12 @@ export class AppPosts {
     }
 
     return (
-      <a {...href(`p/${postID}`)} key={`post-${postID}`} class="post" ref={this.handleRef.observe}>
+      <a
+        {...this.app.href(`p/${postID}`)}
+        key={`post-${postID}`}
+        class="post"
+        ref={this.handleRef.observe}
+      >
         <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
         <span class="title">{post.title}</span>
         <hr />
@@ -129,12 +133,12 @@ export class AppPosts {
         {noPosts && (
           <Fragment>
             <div>{this.app.msgs.post.home.noPosts}</div>
-            <a {...href('f')}>{this.app.msgs.post.home.newPost}</a>
+            <a {...this.app.href('f')}>{this.app.msgs.post.home.newPost}</a>
           </Fragment>
         )}
         {!noPosts && (
           <Fragment>
-            <a class="button" {...href('f')}>
+            <a class="button" {...this.app.href('f')}>
               +
             </a>
             {this.renderedPosts}

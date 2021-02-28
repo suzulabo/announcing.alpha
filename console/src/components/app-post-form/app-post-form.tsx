@@ -102,7 +102,7 @@ export class AppPostForm {
         <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
           {this.app.msgs.post.form.btn}
         </button>
-        <a {...this.app.backHref('p')}>{this.app.msgs.common.back}</a>
+        <a {...this.app.href('p', true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }

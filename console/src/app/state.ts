@@ -7,7 +7,11 @@ interface State {
   announces: AnnounceState[];
 }
 
-const store = createStore<State>({ loading: false, signIn: false, announces: [] });
+const store = createStore<State>({
+  loading: false,
+  signIn: false,
+  announces: [],
+});
 
 export class AppState {
   readonly state = store.state as Readonly<State>;

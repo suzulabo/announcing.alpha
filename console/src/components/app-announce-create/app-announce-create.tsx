@@ -49,7 +49,7 @@ export class AppAnnounceCreate {
         <button disabled={!this.values.name} onClick={this.handleSubmitClick}>
           {this.app.msgs.announce.create.form.btn}
         </button>
-        <a {...this.app.backHref('/')}>{this.app.msgs.common.back}</a>
+        <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }

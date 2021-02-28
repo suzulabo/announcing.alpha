@@ -46,7 +46,7 @@ export class AppPost {
         <hr />
         <span>{this.post.body}</span>
         {this.post.link && <a href={this.post.link}></a>}
-        <a {...this.app.backHref('../p')}>{this.app.msgs.common.back}</a>
+        <a {...this.app.href('../p', true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }

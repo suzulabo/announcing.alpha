@@ -1,13 +1,15 @@
-import { Component, h, Host } from '@stencil/core';
+import { Component, forceUpdate, h, Host, Listen } from '@stencil/core';
 import { AppEnv } from 'announsing-shared';
 import { App } from 'src/app/app';
 import { AppFirebase } from 'src/app/firebase';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
-import { createRouter, match, Route } from 'stencil-router-v2';
-import { RoutePath } from 'stencil-router-v2/dist/types';
 
-const Router = createRouter();
+interface MatchPathResult {
+  tag?: string;
+  params?: { [k: string]: string };
+  to?: string;
+}
 
 @Component({
   tag: 'app-root',
@@ -16,97 +18,90 @@ const Router = createRouter();
 export class AppRoot {
   private app: App;
 
+  private rendering = false;
+  private needUpdate = false;
+
+  @Listen('popstate', { target: 'window' })
+  handlePopState() {
+    if (!this.rendering) {
+      forceUpdate(this);
+    } else {
+      this.needUpdate = true;
+    }
+  }
+
+  componentWillRender() {
+    this.rendering = true;
+  }
+
+  componentDidRender() {
+    if (this.needUpdate) {
+      this.needUpdate = false;
+      forceUpdate(this);
+    }
+    this.rendering = false;
+  }
+
   componentWillLoad() {
     const appEnv = new AppEnv();
     const appMsg = new AppMsg();
     const appFirebase = new AppFirebase(appEnv, appMsg);
     const appState = new AppState();
-    this.app = new App(appMsg, appFirebase, appState, Router);
+    this.app = new App(appMsg, appFirebase, appState);
     return this.app.init();
   }
 
-  componentWillRender() {
-    /* TODO
-    switch (Router.activePath) {
-      case '/keygen':
-        this.app.setTitle(this.app.msgs.keygen.title + suffix);
-        break;
-      case '/encrypt':
-        this.app.setTitle(this.app.msgs.encrypt.title + suffix);
-        break;
-      case '/decrypt':
-        this.app.setTitle(this.app.msgs.decrypt.title + suffix);
-        break;
-      case '/usage':
-        this.app.setTitle(this.app.msgs.usage.title + suffix);
-        break;
-      default:
-        this.app.setTitle(this.app.msgs.home.title + suffix);
-        break;
-    }
-    */
-  }
-
-  private _renderItems: { signedIn: any; notSignedIn: any; footer: any };
-  private get renderItems() {
-    if (this._renderItems) {
-      return this._renderItems;
-    }
-    const renderRoute = (Tag: string, path: RoutePath) => {
-      const handleRender = (params: { [k: string]: string }) => {
-        for (const [k, v] of Object.entries(params)) {
-          params[k] = v.toUpperCase();
+  private matchPath(p: string): MatchPathResult {
+    {
+      if (!this.app.isSignIn) {
+        if (p == '/signin') {
+          return {
+            tag: 'app-signin',
+          };
+        } else {
+          return {
+            to: '/signin',
+          };
         }
-        return <Tag app={this.app} class="page" {...params}></Tag>;
-      };
+      }
+    }
 
-      // eslint-disable-next-line react/jsx-no-bind
-      return <Route path={path} render={handleRender} />;
+    if (p == '/a/create') {
+      return { tag: 'app-announce-create' };
+    }
+
+    if (p == '/') {
+      return { tag: 'app-home' };
+    }
+
+    return {
+      to: '/',
     };
-
-    const signedIn = [
-      renderRoute('app-home', '/'),
-      renderRoute('app-announce-create', '/a/create'),
-      renderRoute('app-announce-edit', match('/a/:announceID/edit')),
-      renderRoute('app-post', match('/a/:announceID/p/:postID')),
-      renderRoute('app-posts', match('/a/:announceID/p')),
-      renderRoute('app-post-form', match('/a/:announceID/f')),
-      <Route path="/signin" to="/"></Route>,
-    ];
-
-    const notSignedIn = [
-      renderRoute('app-signin', '/signin'),
-      <Route path={/.*/} to="/signin"></Route>,
-    ];
-
-    const footer = (
-      <footer>
-        <div class="title">{this.app.msgs.footer.title}</div>
-        <div class="copy">&copy;suzulabo</div>
-        <div class="build-info">Version: {this.app.buildInfo.src}</div>
-        <div class="build-info">Built at {new Date(this.app.buildInfo.time).toISOString()}</div>
-        <div class="github">
-          <a href="https://github.com/suzulabo/announsing">
-            <ap-icon icon="github" />
-          </a>
-        </div>
-      </footer>
-    );
-
-    this._renderItems = { signedIn, notSignedIn, footer };
-    return this._renderItems;
   }
 
   render() {
-    const signIn = this.app.isSignIn;
+    const m = this.matchPath(location.pathname);
+    if (m.to) {
+      this.app.redirectRoute(m.to);
+      return;
+    }
+
+    const Tag = m.tag;
 
     return (
       <Host>
-        <Router.Switch>
-          {signIn && this.renderItems.signedIn}
-          {!signIn && this.renderItems.notSignedIn}
-        </Router.Switch>
-        {this.renderItems.footer}
+        <Tag class="page" app={this.app} {...m.params} />
+        <footer>
+          <div class="title">{this.app.msgs.footer.title}</div>
+          <div class="copy">&copy;suzulabo</div>
+          <div class="build-info">Version: {this.app.buildInfo.src}</div>
+          <div class="build-info">Built at {new Date(this.app.buildInfo.time).toISOString()}</div>
+          <div class="github">
+            <a href="https://github.com/suzulabo/announsing">
+              <ap-icon icon="github" />
+            </a>
+          </div>
+        </footer>
         <ap-loading class={{ show: this.app.loading }} />
       </Host>
     );
