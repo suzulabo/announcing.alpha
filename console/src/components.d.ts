@@ -28,6 +28,11 @@ export namespace Components {
     interface AppHome {
         "app": App;
     }
+    interface AppPost {
+        "announceID": string;
+        "app": App;
+        "postID": string;
+    }
     interface AppPostForm {
         "announceID": string;
         "app": App;
@@ -80,6 +85,12 @@ declare global {
         prototype: HTMLAppHomeElement;
         new (): HTMLAppHomeElement;
     };
+    interface HTMLAppPostElement extends Components.AppPost, HTMLStencilElement {
+    }
+    var HTMLAppPostElement: {
+        prototype: HTMLAppPostElement;
+        new (): HTMLAppPostElement;
+    };
     interface HTMLAppPostFormElement extends Components.AppPostForm, HTMLStencilElement {
     }
     var HTMLAppPostFormElement: {
@@ -111,6 +122,7 @@ declare global {
         "app-announce-create": HTMLAppAnnounceCreateElement;
         "app-announce-edit": HTMLAppAnnounceEditElement;
         "app-home": HTMLAppHomeElement;
+        "app-post": HTMLAppPostElement;
         "app-post-form": HTMLAppPostFormElement;
         "app-posts": HTMLAppPostsElement;
         "app-root": HTMLAppRootElement;
@@ -140,6 +152,11 @@ declare namespace LocalJSX {
     interface AppHome {
         "app"?: App;
     }
+    interface AppPost {
+        "announceID"?: string;
+        "app"?: App;
+        "postID"?: string;
+    }
     interface AppPostForm {
         "announceID"?: string;
         "app"?: App;
@@ -161,6 +178,7 @@ declare namespace LocalJSX {
         "app-announce-create": AppAnnounceCreate;
         "app-announce-edit": AppAnnounceEdit;
         "app-home": AppHome;
+        "app-post": AppPost;
         "app-post-form": AppPostForm;
         "app-posts": AppPosts;
         "app-root": AppRoot;
@@ -177,6 +195,7 @@ declare module "@stencil/core" {
             "app-announce-create": LocalJSX.AppAnnounceCreate & JSXBase.HTMLAttributes<HTMLAppAnnounceCreateElement>;
             "app-announce-edit": LocalJSX.AppAnnounceEdit & JSXBase.HTMLAttributes<HTMLAppAnnounceEditElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
+            "app-post": LocalJSX.AppPost & JSXBase.HTMLAttributes<HTMLAppPostElement>;
             "app-post-form": LocalJSX.AppPostForm & JSXBase.HTMLAttributes<HTMLAppPostFormElement>;
             "app-posts": LocalJSX.AppPosts & JSXBase.HTMLAttributes<HTMLAppPostsElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;

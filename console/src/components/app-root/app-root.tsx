@@ -53,16 +53,22 @@ export class AppRoot {
       return this._renderItems;
     }
     const renderRoute = (Tag: string, path: RoutePath) => {
-      return (
-        // eslint-disable-next-line react/jsx-no-bind
-        <Route path={path} render={params => <Tag app={this.app} class="page" {...params}></Tag>} />
-      );
+      const handleRender = (params: { [k: string]: string }) => {
+        for (const [k, v] of Object.entries(params)) {
+          params[k] = v.toUpperCase();
+        }
+        return <Tag app={this.app} class="page" {...params}></Tag>;
+      };
+
+      // eslint-disable-next-line react/jsx-no-bind
+      return <Route path={path} render={handleRender} />;
     };
 
     const signedIn = [
       renderRoute('app-home', '/'),
       renderRoute('app-announce-create', '/a/create'),
       renderRoute('app-announce-edit', match('/a/:announceID/edit')),
+      renderRoute('app-post', match('/a/:announceID/p/:postID')),
       renderRoute('app-posts', match('/a/:announceID/p')),
       renderRoute('app-post-form', match('/a/:announceID/f')),
       <Route path="/signin" to="/"></Route>,

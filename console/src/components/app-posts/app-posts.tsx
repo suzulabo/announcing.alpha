@@ -72,48 +72,6 @@ export class AppPosts {
     this.iob?.disconnect();
   }
 
-  /*
-  private async loadPosts() {
-    if (!this.announce.posts) {
-      return;
-    }
-
-    const id = this.announceID.toUpperCase();
-    const posts = this.announce.posts
-      .reverse()
-      .slice(this.renderedPosts.length, this.renderedPosts.length + PAGE_SIZE);
-
-    const rendered = [];
-
-    for (const postID of posts) {
-      const post = await this.app.getPost(id, postID);
-      if (!post) {
-        rendered.push(<div class="post">no post data</div>);
-        continue;
-      }
-      const imgData = post.img ? await this.app.getImage(post.img) : null;
-
-      rendered.push(
-        <div class="post">
-          {imgData && <img src={imgData} />}
-          <div class="content">
-            <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
-            <span class="title">{post.title}</span>
-            <div class="body">{post.body}</div>
-            {post.link && (
-              <a class="link" href={post.link} target="_blank" rel="noopener">
-                {post.link}
-              </a>
-            )}
-          </div>
-        </div>,
-      );
-    }
-
-    this.renderedPosts = [...this.renderedPosts, ...rendered];
-  }
-  */
-
   private handleRef = {
     observe: (el: HTMLElement) => {
       this.iob.observe(el);
@@ -125,7 +83,7 @@ export class AppPosts {
 
   private renderSkeletonPost(postID: string) {
     return (
-      <div
+      <a
         key={`post-${postID}`}
         class="post skeleton"
         ref={this.handleRef.observe}
@@ -135,7 +93,7 @@ export class AppPosts {
         <span class="title"></span>
         <hr />
         <div class="body"></div>
-      </div>
+      </a>
     );
   }
 
@@ -146,12 +104,12 @@ export class AppPosts {
     }
 
     return (
-      <div key={`post-${postID}`} class="post" ref={this.handleRef.observe}>
+      <a {...href(`p/${postID}`)} key={`post-${postID}`} class="post" ref={this.handleRef.observe}>
         <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
         <span class="title">{post.title}</span>
         <hr />
         <div class="body">{post.body}</div>
-      </div>
+      </a>
     );
   }
 
