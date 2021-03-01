@@ -18,7 +18,7 @@ export class AppRoot {
   private app: App;
 
   @State()
-  reload: object;
+  path: string;
 
   @Listen('popstate', { target: 'window' })
   handlePopState() {
@@ -28,7 +28,7 @@ export class AppRoot {
       return;
     }
 
-    this.reload = {};
+    this.path = location.pathname;
   }
 
   async componentWillLoad() {
