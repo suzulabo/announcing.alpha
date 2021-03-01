@@ -24,7 +24,7 @@ export class AppPostForm {
   async componentWillLoad() {
     const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
     if (!as) {
-      this.app.pushRoute('p');
+      this.app.pushRoute(`/${this.announceID}/${this.postID}`);
       return;
     }
 
@@ -59,7 +59,7 @@ export class AppPostForm {
         this.values.imgData?.split(',')[1],
         null,
       );
-      this.app.pushRoute('p');
+      this.app.pushRoute(`/${this.announceID}`);
     } finally {
       this.app.loading = false;
     }
@@ -102,7 +102,9 @@ export class AppPostForm {
         <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
           {this.app.msgs.post.form.btn}
         </button>
-        <a {...this.app.href('p', true)}>{this.app.msgs.common.back}</a>
+        <a {...this.app.href(`/${this.announceID}/${this.postID}`, true)}>
+          {this.app.msgs.common.back}
+        </a>
       </Host>
     );
   }

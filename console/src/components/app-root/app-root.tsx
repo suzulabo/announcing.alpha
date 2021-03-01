@@ -61,9 +61,11 @@ export class AppRoot {
 
   private staticRouteMap = new Map([
     ['/signin', 'app-signin'],
-    ['/a/create', 'app-announce-create'],
+    ['/create', 'app-announce-create'],
     ['/', 'app-home'],
   ]);
+  private announceIDPattern = /^[A-Z0-9]{12}$/;
+  private postIDPattern = /^[a-zA-Z0-9]+$/;
 
   private getRoute(): MatchPathResult {
     const p = location.pathname;
@@ -75,28 +77,44 @@ export class AppRoot {
       }
     }
 
-    const l = p.split('/');
-    l.shift();
-    {
-      if (l[0] == 'a') {
-        const [, announceID, page, postID] = l;
-        switch (page) {
-          case 'edit':
-            return { tag: 'app-announce-edit', params: { announceID } };
-          case 'p':
-            if (postID) {
-              return { tag: 'app-post', params: { announceID, postID } };
-            }
-            return { tag: 'app-posts', params: { announceID } };
-          case 'f':
-            return { tag: 'app-post-form', params: { announceID } };
+    b: {
+      const l = p.split('/');
+      l.shift();
+      if (l.length > 3) {
+        break b;
+      }
+
+      const [announceID, postID, postEdit] = l;
+      if (!this.announceIDPattern.test(announceID)) {
+        break b;
+      }
+
+      if (!!postEdit) {
+        if (postEdit == 'edit_') {
+          return { tag: 'app-post-form', params: { announceID, postID } };
         }
+        break b;
+      }
+
+      if (!!postID) {
+        if (postID == 'edit_') {
+          return { tag: 'app-announce-edit', params: { announceID } };
+        }
+        if (postID == 'post_') {
+          return { tag: 'app-post-form', params: { announceID } };
+        }
+        if (this.postIDPattern.test(postID)) {
+          return { tag: 'app-post', params: { announceID, postID } };
+        }
+      } else {
+        return { tag: 'app-posts', params: { announceID } };
       }
     }
   }
 
   render() {
     const m = this.getRoute();
+    console.log(m);
 
     return (
       <Host>

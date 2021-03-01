@@ -21,8 +21,8 @@ export class AppHome {
           <span class="name">{v.name}</span>
           <span class="desc">{v.desc}</span>
           <div class="buttons">
-            <a {...this.app.href(`/a/${v.id}/p`)}>{this.app.msgs.home.announces.postBtn}</a>
-            <a {...this.app.href(`/a/${v.id}/edit`)}>{this.app.msgs.home.announces.editBtn}</a>
+            <a {...this.app.href(`/${v.id}`)}>{this.app.msgs.home.announces.postBtn}</a>
+            <a {...this.app.href(`/${v.id}/edit_`)}>{this.app.msgs.home.announces.editBtn}</a>
           </div>
         </div>
       );
@@ -33,7 +33,7 @@ export class AppHome {
     return (
       <Host>
         <div class="announces-grid">{this.renderAnnounces()}</div>
-        <a {...this.app.href('/a/create')}>+</a>
+        <a {...this.app.href('/create')}>+</a>
         <button class="clear" onClick={this.handleSignOutClick}>
           {this.app.msgs.home.signOut}
         </button>

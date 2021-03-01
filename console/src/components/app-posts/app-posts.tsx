@@ -104,7 +104,7 @@ export class AppPosts {
 
     return (
       <a
-        {...this.app.href(`p/${postID}`)}
+        {...this.app.href(`${this.announceID}/${postID}`)}
         key={`post-${postID}`}
         class="post"
         ref={this.handleRef.observe}
@@ -133,12 +133,12 @@ export class AppPosts {
         {noPosts && (
           <Fragment>
             <div>{this.app.msgs.post.home.noPosts}</div>
-            <a {...this.app.href('f')}>{this.app.msgs.post.home.newPost}</a>
+            <a {...this.app.href(`${this.announceID}/post_`)}>{this.app.msgs.post.home.newPost}</a>
           </Fragment>
         )}
         {!noPosts && (
           <Fragment>
-            <a class="button" {...this.app.href('f')}>
+            <a class="button" {...this.app.href(`${this.announceID}/post_`)}>
               +
             </a>
             {this.renderedPosts}

@@ -23,14 +23,14 @@ export class AppPost {
   async componentWillLoad() {
     const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
     if (!as) {
-      this.app.pushRoute('../p');
+      this.app.pushRoute(`/${this.announceID}`);
       return;
     }
     this.announce = as;
 
     this.post = await this.app.getPost(this.announceID, this.postID);
     if (!this.post) {
-      this.app.pushRoute('../p');
+      this.app.pushRoute(`/${this.announceID}`);
       return;
     }
   }
@@ -46,7 +46,7 @@ export class AppPost {
         <hr />
         <span>{this.post.body}</span>
         {this.post.link && <a href={this.post.link}></a>}
-        <a {...this.app.href('../p', true)}>{this.app.msgs.common.back}</a>
+        <a {...this.app.href(`/${this.announceID}`, true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }
