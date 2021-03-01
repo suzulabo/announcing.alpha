@@ -22,6 +22,10 @@ app-root {
     padding: 15px 0;
     text-align: center;
 
+    a {
+      text-decoration: none !important;
+    }
+
     .build-info {
       margin-top: 5px;
       font-size: 0.8rem;
