@@ -81,8 +81,9 @@ export class App {
     return this.appState.state.signIn;
   }
 
-  signOut() {
-    return this.appFirebase.signOut();
+  async signOut() {
+    await this.appFirebase.signOut();
+    this.appState.updateSignIn(this.appFirebase.user != null);
   }
 
   signInGoogle() {
