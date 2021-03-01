@@ -74,6 +74,25 @@ export class AppRoot {
         return { tag: t };
       }
     }
+
+    const l = p.split('/');
+    l.shift();
+    {
+      if (l[0] == 'a') {
+        const [, announceID, page, postID] = l;
+        switch (page) {
+          case 'edit':
+            return { tag: 'app-announce-edit', params: { announceID } };
+          case 'p':
+            if (postID) {
+              return { tag: 'app-post', params: { announceID, postID } };
+            }
+            return { tag: 'app-posts', params: { announceID } };
+          case 'f':
+            return { tag: 'app-post-form', params: { announceID } };
+        }
+      }
+    }
   }
 
   render() {
