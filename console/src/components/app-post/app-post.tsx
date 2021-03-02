@@ -42,9 +42,9 @@ export class AppPost {
 
     return (
       <Host>
-        <span>{this.post.title}</span>
+        <span class="title">{this.post.title}</span>
         <hr />
-        <span>{this.post.body}</span>
+        <span class="body">{this.post.body}</span>
         {this.post.link && <a href={this.post.link}></a>}
         <a {...this.app.href(`/${this.announceID}`, true)}>{this.app.msgs.common.back}</a>
       </Host>
