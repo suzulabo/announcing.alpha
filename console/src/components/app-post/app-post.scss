@@ -22,4 +22,10 @@ app-post {
   .body {
     white-space: pre-line;
   }
+
+  .buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+  }
 }

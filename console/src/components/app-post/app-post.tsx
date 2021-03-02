@@ -46,6 +46,12 @@ export class AppPost {
         <hr />
         <span class="body">{this.post.body}</span>
         {this.post.link && <a href={this.post.link}></a>}
+        <div class="buttons">
+          <a {...this.app.href(`/${this.announceID}/${this.postID}/edit_`)}>
+            {this.app.msgs.post.edit}
+          </a>
+          <a>{this.app.msgs.post.delete}</a>
+        </div>
         <a {...this.app.href(`/${this.announceID}`, true)}>{this.app.msgs.common.back}</a>
       </Host>
     );

@@ -78,5 +78,8 @@ export const msgs = {
       img: '画像',
       btn: '投稿する',
     },
+
+    edit: '編集',
+    delete: '削除',
   },
 };
