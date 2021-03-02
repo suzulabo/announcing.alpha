@@ -78,5 +78,6 @@ export const msgs = {
   post: {
     edit: '編集',
     delete: '削除',
+    deleteConfirm: 'お知らせを削除します。よろしいですか？',
   },
 };

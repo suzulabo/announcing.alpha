@@ -18,6 +18,8 @@ export namespace Components {
     }
     interface ApLoading {
     }
+    interface ApModal {
+    }
     interface AppAnnounceCreate {
         "app": App;
     }
@@ -66,6 +68,12 @@ declare global {
     var HTMLApLoadingElement: {
         prototype: HTMLApLoadingElement;
         new (): HTMLApLoadingElement;
+    };
+    interface HTMLApModalElement extends Components.ApModal, HTMLStencilElement {
+    }
+    var HTMLApModalElement: {
+        prototype: HTMLApModalElement;
+        new (): HTMLApModalElement;
     };
     interface HTMLAppAnnounceCreateElement extends Components.AppAnnounceCreate, HTMLStencilElement {
     }
@@ -119,6 +127,7 @@ declare global {
         "ap-icon": HTMLApIconElement;
         "ap-image-input": HTMLApImageInputElement;
         "ap-loading": HTMLApLoadingElement;
+        "ap-modal": HTMLApModalElement;
         "app-announce-create": HTMLAppAnnounceCreateElement;
         "app-announce-edit": HTMLAppAnnounceEditElement;
         "app-home": HTMLAppHomeElement;
@@ -141,6 +150,9 @@ declare namespace LocalJSX {
         "resizeRect"?: { width: number; height: number };
     }
     interface ApLoading {
+    }
+    interface ApModal {
+        "onClose"?: (event: CustomEvent<any>) => void;
     }
     interface AppAnnounceCreate {
         "app"?: App;
@@ -175,6 +187,7 @@ declare namespace LocalJSX {
         "ap-icon": ApIcon;
         "ap-image-input": ApImageInput;
         "ap-loading": ApLoading;
+        "ap-modal": ApModal;
         "app-announce-create": AppAnnounceCreate;
         "app-announce-edit": AppAnnounceEdit;
         "app-home": AppHome;
@@ -192,6 +205,7 @@ declare module "@stencil/core" {
             "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
             "ap-image-input": LocalJSX.ApImageInput & JSXBase.HTMLAttributes<HTMLApImageInputElement>;
             "ap-loading": LocalJSX.ApLoading & JSXBase.HTMLAttributes<HTMLApLoadingElement>;
+            "ap-modal": LocalJSX.ApModal & JSXBase.HTMLAttributes<HTMLApModalElement>;
             "app-announce-create": LocalJSX.AppAnnounceCreate & JSXBase.HTMLAttributes<HTMLAppAnnounceCreateElement>;
             "app-announce-edit": LocalJSX.AppAnnounceEdit & JSXBase.HTMLAttributes<HTMLAppAnnounceEditElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
