@@ -114,7 +114,6 @@ export class AppRoot {
 
   render() {
     const m = this.getRoute();
-    console.log(m);
 
     return (
       <Host>

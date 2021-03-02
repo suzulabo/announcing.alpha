@@ -19,14 +19,19 @@ app-post {
     border-top: 1px dashed var(--border-color);
   }
 
+  .title {
+    font-size: 1.1rem;
+  }
   .body {
     white-space: pre-line;
   }
 
-  .buttons {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
+  div.edit {
+    margin-top: 30px;
+    align-self: flex-end;
+    a {
+      margin-left: 40px;
+    }
   }
 
   .delete-modal {
@@ -40,6 +45,8 @@ app-post {
     text-align: center;
     .buttons {
       margin-top: 40px;
+      display: flex;
+      justify-content: space-around;
     }
   }
 }

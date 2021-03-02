@@ -38,12 +38,22 @@ export class AppPost {
     }
   }
 
-  private handleDelete = () => {
+  private handleDelete = (ev: Event) => {
+    ev.preventDefault();
     this.showDelete = true;
   };
 
   private handleDeleteModalClose = () => {
     this.showDelete = false;
+  };
+
+  private handleDeleteClick = () => {
+    this.showDelete = false;
+    this.app.loading = true;
+    try {
+    } finally {
+      this.app.loading = false;
+    }
   };
 
   render() {
@@ -58,11 +68,13 @@ export class AppPost {
         <span class="body">{this.post.body}</span>
         {this.post.link && <a href={this.post.link}></a>}
         <a {...this.app.href(`/${this.announceID}`, true)}>{this.app.msgs.common.back}</a>
-        <div class="buttons">
+        <div class="edit">
           <a {...this.app.href(`/${this.announceID}/${this.postID}/edit_`)}>
             {this.app.msgs.post.edit}
           </a>
-          <a onClick={this.handleDelete}>{this.app.msgs.post.delete}</a>
+          <a href="#" onClick={this.handleDelete}>
+            {this.app.msgs.post.delete}
+          </a>
         </div>
         {this.showDelete && (
           <ap-modal onClose={this.handleDeleteModalClose}>
@@ -70,7 +82,7 @@ export class AppPost {
               <div>{this.app.msgs.post.deleteConfirm}</div>
               <div class="buttons">
                 <button onClick={this.handleDeleteModalClose}>{this.app.msgs.common.cancel}</button>
-                <button>{this.app.msgs.common.ok}</button>
+                <button onClick={this.handleDeleteClick}>{this.app.msgs.common.ok}</button>
               </div>
             </div>
           </ap-modal>
