@@ -99,42 +99,41 @@ export class AppAnnounceEdit {
 
     return (
       <Host>
-        <header>{this.app.msgs.announce.edit.title}</header>
         <ap-image-input
           app={this.app}
-          label={this.app.msgs.announce.edit.form.icon}
+          label={this.app.msgs.announceEdit.form.icon}
           data={this.values.iconData}
           resizeRect={{ width: 200, height: 200 }}
           onImageChange={this.handleImageChange}
         />
         <input
-          placeholder={this.app.msgs.announce.edit.form.name}
+          placeholder={this.app.msgs.announceEdit.form.name}
           value={this.values.name}
           onInput={this.handleInput.name}
         />
         <textarea
-          placeholder={this.app.msgs.announce.edit.form.desc}
+          placeholder={this.app.msgs.announceEdit.form.desc}
           onInput={this.handleInput.desc}
         >
           {this.values.desc}
         </textarea>
         <input
-          placeholder={this.app.msgs.announce.edit.form.link}
+          placeholder={this.app.msgs.announceEdit.form.link}
           value={this.values.link}
           onInput={this.handleInput.link}
         />
         <button disabled={!this.values.name || !modified} onClick={this.handleSubmitClick}>
-          {this.app.msgs.announce.edit.form.btn}
+          {this.app.msgs.announceEdit.form.btn}
         </button>
         <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
         <button class="clear deletion-toggle" onClick={this.handleDeletionToggleClick}>
-          {this.app.msgs.announce.edit.deletion.guide}
+          {this.app.msgs.announceEdit.deletion.guide}
         </button>
         {this.showDeletion && (
           <Fragment>
-            <div>{this.app.msgs.announce.edit.deletion.desc}</div>
+            <div>{this.app.msgs.announceEdit.deletion.desc}</div>
             <button onClick={this.handleDeletionClick}>
-              {this.app.msgs.announce.edit.deletion.btn(this.announce.name)}
+              {this.app.msgs.announceEdit.deletion.btn(this.announce.name)}
             </button>
           </Fragment>
         )}

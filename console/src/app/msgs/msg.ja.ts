@@ -33,52 +33,49 @@ export const msgs = {
       editBtn: '設定',
     },
   },
-  announce: {
-    create: {
-      title: '新規登録',
-      form: {
-        name: 'アナウンス名',
-        desc: '紹介文',
-        confirm: '新しいアナウンスを登録します。よろしいですか？',
-        btn: 'アナウンスを作成',
-        done: '登録しました',
-      },
-    },
-    edit: {
-      title: 'アナウンス編集',
-      form: {
-        name: 'アナウンス名',
-        desc: '紹介文',
-        link: 'ウェブサイト',
-        icon: 'アイコン画像',
-        iconPlaceholder: '画像のURLを入力してください',
-        btn: '更新',
-        done: '更新しました',
-      },
-      deletion: {
-        guide: 'アナウンスの削除',
-        desc: 'アナウンスを削除します。この操作は元に戻せません。',
-        btn: (s: string) => {
-          return `"${s}"を削除する`;
-        },
-        confirm: 'アナウンスを削除します。よろしいですか？',
-      },
+  announceCreate: {
+    title: '新規登録',
+    form: {
+      name: 'アナウンス名',
+      desc: '紹介文',
+      confirm: '新しいアナウンスを登録します。よろしいですか？',
+      btn: 'アナウンスを作成',
+      done: '登録しました',
     },
   },
-  post: {
-    home: {
-      title: (s: string) => `${s}の投稿`,
-      noPosts: 'お知らせが投稿されていません',
-      newPost: 'お知らせを投稿する',
-    },
+  announceEdit: {
+    title: 'アナウンス編集',
     form: {
-      title: 'タイトル',
-      body: '本文',
-      lnik: 'リンク',
-      img: '画像',
-      btn: '投稿する',
+      name: 'アナウンス名',
+      desc: '紹介文',
+      link: 'ウェブサイト',
+      icon: 'アイコン画像',
+      iconPlaceholder: '画像のURLを入力してください',
+      btn: '更新',
+      done: '更新しました',
     },
-
+    deletion: {
+      guide: 'アナウンスの削除',
+      desc: 'アナウンスを削除します。この操作は元に戻せません。',
+      btn: (s: string) => {
+        return `"${s}"を削除する`;
+      },
+      confirm: 'アナウンスを削除します。よろしいですか？',
+    },
+  },
+  posts: {
+    title: (s: string) => `${s}の投稿`,
+    noPosts: 'お知らせが投稿されていません',
+    newPost: 'お知らせを投稿する',
+  },
+  postForm: {
+    title: 'タイトル',
+    body: '本文',
+    lnik: 'リンク',
+    img: '画像',
+    btn: '投稿する',
+  },
+  post: {
     edit: '編集',
     delete: '削除',
   },

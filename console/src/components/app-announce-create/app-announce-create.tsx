@@ -34,20 +34,19 @@ export class AppAnnounceCreate {
   render() {
     return (
       <Host>
-        <header>{this.app.msgs.announce.create.title}</header>
         <input
-          placeholder={this.app.msgs.announce.create.form.name}
+          placeholder={this.app.msgs.announceCreate.form.name}
           value={this.values.name}
           onInput={this.handleInput.name}
         />
         <textarea
-          placeholder={this.app.msgs.announce.create.form.desc}
+          placeholder={this.app.msgs.announceCreate.form.desc}
           onInput={this.handleInput.desc}
         >
           {this.values.desc}
         </textarea>
         <button disabled={!this.values.name} onClick={this.handleSubmitClick}>
-          {this.app.msgs.announce.create.form.btn}
+          {this.app.msgs.announceCreate.form.btn}
         </button>
         <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
       </Host>

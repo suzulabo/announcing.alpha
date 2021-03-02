@@ -132,8 +132,8 @@ export class AppPosts {
       <Host>
         {noPosts && (
           <Fragment>
-            <div>{this.app.msgs.post.home.noPosts}</div>
-            <a {...this.app.href(`${this.announceID}/post_`)}>{this.app.msgs.post.home.newPost}</a>
+            <div>{this.app.msgs.posts.noPosts}</div>
+            <a {...this.app.href(`${this.announceID}/post_`)}>{this.app.msgs.posts.newPost}</a>
           </Fragment>
         )}
         {!noPosts && (

@@ -81,26 +81,26 @@ export class AppPostForm {
           onImageChange={this.handleInput.img}
         />
         <input
-          placeholder={this.app.msgs.post.form.title}
+          placeholder={this.app.msgs.postForm.title}
           value={this.values.title}
           maxLength={50}
           onInput={this.handleInput.title}
         />
         <textarea
-          placeholder={this.app.msgs.post.form.body}
+          placeholder={this.app.msgs.postForm.body}
           maxLength={500}
           onInput={this.handleInput.body}
         >
           {this.values.body}
         </textarea>
         <input
-          placeholder={this.app.msgs.post.form.lnik}
+          placeholder={this.app.msgs.postForm.lnik}
           value={this.values.link}
           maxLength={500}
           onInput={this.handleInput.link}
         />
         <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
-          {this.app.msgs.post.form.btn}
+          {this.app.msgs.postForm.btn}
         </button>
         <a {...this.app.href(`/${this.announceID}/${this.postID}`, true)}>
           {this.app.msgs.common.back}
