@@ -5,6 +5,7 @@ import {
   AppEnv,
   CreateAnnounceParams,
   DeleteAnnounceParams,
+  DeletePostParams,
   EditAnnounceParams,
   PostConverter,
   PutPostParams,
@@ -132,6 +133,10 @@ export class AppFirebase {
 
   async callPutPost(params: PutPostParams) {
     return this.callFunc<void>('putPost', params);
+  }
+
+  async callDeletePost(params: DeletePostParams) {
+    return this.callFunc<void>('deletePost', params);
   }
 
   private listeners = (() => {

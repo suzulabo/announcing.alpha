@@ -3,6 +3,7 @@ import { initializeApp } from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { callCreateAnnounce } from './create-announce';
 import { callDeleteAnnounce, firestoreDeleteAnnounce } from './delete-announce';
+import { callDeletePost } from './delete-post';
 import { callEditAnnounce } from './edit-announce';
 import { httpsGetAnnounceData, httpsGetImageData } from './get-data';
 import { callPutPost } from './put-post';
@@ -23,6 +24,9 @@ export const deleteAnnounce = region.https.onCall(async (data, context) => {
 });
 export const putPost = region.https.onCall(async (data, context) => {
   return callPutPost(data, context, adminApp);
+});
+export const deletePost = region.https.onCall(async (data, context) => {
+  return callDeletePost(data, context, adminApp);
 });
 
 export const getAnnounceData = region.https.onRequest(async (req, res) => {

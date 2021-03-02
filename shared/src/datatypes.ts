@@ -61,6 +61,11 @@ export interface PutPostParams {
   editID?: string;
 }
 
+export interface DeletePostParams {
+  id?: string;
+  postID?: string;
+}
+
 export type NotificationMode = 'disabled' | 'always' | 'hours';
 
 export interface RegisterNotificationParams {

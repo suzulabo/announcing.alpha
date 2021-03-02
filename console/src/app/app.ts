@@ -46,11 +46,7 @@ export class App {
         // https://github.com/ionic-team/stencil-router-v2/blob/master/src/router.ts
         if (!ev.metaKey && !ev.ctrlKey && ev.which != 2 && ev.button != 1) {
           ev.preventDefault();
-          if (back && !history.state?.firstView) {
-            history.back();
-          } else {
-            this.pushRoute(p);
-          }
+          this.pushRoute(p, back);
         }
       },
     };
@@ -61,9 +57,13 @@ export class App {
     window.dispatchEvent(new PopStateEvent('popstate'));
   }
 
-  pushRoute(path: string) {
-    history.pushState(null, null, path);
-    window.dispatchEvent(new PopStateEvent('popstate'));
+  pushRoute(path: string, back?: boolean) {
+    if (back && !history.state?.firstView) {
+      history.back();
+    } else {
+      history.pushState(null, null, path);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
   }
 
   set loading(v: boolean) {
@@ -111,6 +111,10 @@ export class App {
 
   deleteAnnounce(id: string) {
     return this.appFirebase.callDeleteAnnounce({ id });
+  }
+
+  deletePost(id: string, postID: string) {
+    return this.appFirebase.callDeletePost({ id, postID });
   }
 
   private async toAnnounceState(id: string, a: Announce): Promise<AnnounceState> {

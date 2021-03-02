@@ -26,14 +26,14 @@ export class AppPost {
   async componentWillLoad() {
     const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
     if (!as) {
-      this.app.pushRoute(`/${this.announceID}`);
+      this.app.pushRoute(`/${this.announceID}`, true);
       return;
     }
     this.announce = as;
 
     this.post = await this.app.getPost(this.announceID, this.postID);
     if (!this.post) {
-      this.app.pushRoute(`/${this.announceID}`);
+      this.app.pushRoute(`/${this.announceID}`, true);
       return;
     }
   }
@@ -47,10 +47,12 @@ export class AppPost {
     this.showDelete = false;
   };
 
-  private handleDeleteClick = () => {
+  private handleDeleteClick = async () => {
     this.showDelete = false;
     this.app.loading = true;
     try {
+      await this.app.deletePost(this.announceID, this.postID);
+      this.app.pushRoute(`/${this.announceID}`, true);
     } finally {
       this.app.loading = false;
     }
