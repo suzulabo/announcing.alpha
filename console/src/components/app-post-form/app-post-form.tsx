@@ -20,17 +20,42 @@ export class AppPostForm {
   values: { title?: string; body?: string; link?: string; img?: string; imgData?: string };
 
   private announce: AnnounceState;
+  //private post: Post;
+
+  private backPath: string;
 
   async componentWillLoad() {
+    this.backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
+
     const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
     if (!as) {
-      this.app.pushRoute(`/${this.announceID}/${this.postID}`);
+      this.app.pushRoute(this.backPath, true);
       return;
     }
 
     this.announce = as;
 
-    this.values = {};
+    if (!this.postID) {
+      this.values = {};
+      return;
+    }
+
+    if (!as.posts?.includes(this.postID)) {
+      this.app.pushRoute(this.backPath, true);
+      return;
+    }
+
+    const post = await this.app.getPost(this.announceID, this.postID);
+    if (!post) {
+      this.app.pushRoute(this.backPath, true);
+      return;
+    }
+    //this.post = post;
+    this.values = { ...post };
+
+    if (post.img) {
+      this.values.imgData = await this.app.getImage(post.img);
+    }
   }
 
   private handleInput = {
@@ -57,9 +82,9 @@ export class AppPostForm {
         this.values.body,
         this.values.link,
         this.values.imgData?.split(',')[1],
-        null,
+        this.postID,
       );
-      this.app.pushRoute(`/${this.announceID}`);
+      this.app.pushRoute(this.backPath);
     } finally {
       this.app.loading = false;
     }
@@ -102,9 +127,7 @@ export class AppPostForm {
         <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
           {this.app.msgs.postForm.btn}
         </button>
-        <a {...this.app.href(`/${this.announceID}/${this.postID}`, true)}>
-          {this.app.msgs.common.back}
-        </a>
+        <a {...this.app.href(this.backPath, true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }
