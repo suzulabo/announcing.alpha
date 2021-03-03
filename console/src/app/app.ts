@@ -20,9 +20,6 @@ export class App {
     private appFirebase: AppFirebase,
     private appState: AppState,
   ) {
-    const state = history.state || {};
-    history.replaceState({ ...state, firstView: true }, null);
-
     if (Build.isDev) {
       this.clientSite = `http://${location.hostname}:3371`;
     } else {
@@ -37,6 +34,11 @@ export class App {
 
   setTitle(v: string) {
     document.title = v;
+  }
+
+  storeBeforeRoute(p: string) {
+    const state = history.state || {};
+    history.replaceState({ ...state, beforeRoute: p }, null);
   }
 
   href(p: string, back?: boolean) {
@@ -58,7 +60,7 @@ export class App {
   }
 
   pushRoute(path: string, back?: boolean) {
-    if (back && !history.state?.firstView) {
+    if (back && history.state?.beforeRoute == path) {
       history.back();
     } else {
       history.pushState(null, null, path);

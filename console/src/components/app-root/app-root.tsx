@@ -28,7 +28,11 @@ export class AppRoot {
       return;
     }
 
-    this.path = location.pathname;
+    const p = location.pathname;
+    if (this.path && this.path != p) {
+      this.app.storeBeforeRoute(this.path);
+    }
+    this.path = p;
   }
 
   async componentWillLoad() {
