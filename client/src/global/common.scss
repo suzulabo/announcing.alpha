@@ -1,0 +1,114 @@
+@import '~destyle.css/destyle.css';
+
+.firebase-emulator-warning {
+  display: none;
+}
+
+html {
+  --color: black;
+  --light-color: #484848;
+  --border-color: black;
+  --post-border-color: #888888;
+  --placeholder-color: rgba(0, 0, 0, 0.7);
+
+  --bk-color: white;
+  --button-hover-bk-color: #eeeeee;
+  --bk-modal-color: rgba(0, 0, 0, 0.7);
+  --bk-skeleton-color: #aaaaaa;
+}
+
+html,
+body {
+  background-color: var(--bk-color);
+  font-size: 15px;
+  height: 100%;
+}
+
+html,
+textarea,
+input {
+  font-family: sans-serif;
+  color: var(--color);
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
+
+input,
+textarea {
+  font-size: 16px;
+
+  border: none;
+  width: 100%;
+
+  border-bottom: 1px solid black;
+  padding-bottom: 5px;
+
+  &::placeholder {
+    color: var(--placeholder-color);
+    font-style: italic;
+  }
+
+  &:focus {
+    border-width: 2px;
+    padding-bottom: 4px;
+  }
+}
+
+textarea {
+  resize: none;
+  height: 5em;
+}
+
+a {
+  &:not(.button) {
+    text-decoration: underline;
+  }
+}
+
+button,
+.button {
+  display: inline-block;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 20px;
+  text-align: center;
+
+  &:disabled {
+    opacity: 0.3;
+  }
+  &:hover:not(:disabled) {
+    background-color: var(--button-hover-bk-color);
+  }
+  &:active {
+    position: relative;
+    top: 1px;
+    left: 1px;
+  }
+
+  &.icon {
+    border: none;
+    border-radius: 2px;
+    padding: 4px;
+    margin: 0;
+    font-size: 1.4rem;
+    &:hover {
+      background-color: inherit;
+    }
+  }
+
+  &.clear {
+    border: none;
+    padding: 10px;
+  }
+
+  &.full-width {
+    width: 100%;
+  }
+}

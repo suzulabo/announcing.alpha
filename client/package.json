@@ -1,5 +1,5 @@
 {
-  "name": "announsing-console",
+  "name": "announsing-client",
   "private": true,
   "scripts": {
     "build": "rm -rf www && stencil build",
@@ -13,13 +13,11 @@
     "@stencil/core": "^2.4.0",
     "@stencil/sass": "^1.4.1",
     "@stencil/store": "^1.4.1",
-    "@types/pica": "^5.1.2",
     "announsing-shared": "file:shared",
     "bootstrap-icons": "^1.4.0",
     "date-fns": "^2.18.0",
     "destyle.css": "^2.0.2",
     "firebase": "^8.2.9",
-    "intersection-observer": "^0.12.0",
-    "pica": "^6.1.1"
+    "intersection-observer": "^0.12.0"
   }
 }

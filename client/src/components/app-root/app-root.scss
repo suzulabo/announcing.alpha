@@ -1,0 +1,40 @@
+@import '../../global/common.scss';
+
+app-root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .page {
+    flex-grow: 1;
+    padding: 10px;
+
+    header {
+      font-size: 1.2rem;
+    }
+  }
+
+  footer {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    border-top: 1px dotted var(--border-color);
+    margin: 10px 10px 0;
+    padding: 15px 0;
+    text-align: center;
+
+    a {
+      text-decoration: none !important;
+    }
+
+    .build-info {
+      margin-top: 5px;
+      font-size: 0.8rem;
+      opacity: 0.5;
+    }
+
+    .github {
+      margin-top: 5px;
+      font-size: 1.4rem;
+    }
+  }
+}
