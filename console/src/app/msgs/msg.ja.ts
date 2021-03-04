@@ -15,7 +15,7 @@ export const msgs = {
     },
   },
   footer: {
-    title: 'announsing\u266A',
+    title: 'Announsing\u266A Console',
   },
   signIn: {
     title: 'ログイン',
