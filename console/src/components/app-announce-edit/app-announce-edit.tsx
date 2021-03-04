@@ -44,7 +44,7 @@ export class AppAnnounceEdit {
     this.app.loading = true;
     try {
       await this.app.editAnnounce(
-        this.announceID.toUpperCase(),
+        this.announceID,
         this.values.name,
         this.values.desc,
         this.values.link,
@@ -73,7 +73,7 @@ export class AppAnnounceEdit {
     this.showDeleteConfirm = false;
     this.app.loading = true;
     try {
-      await this.app.deleteAnnounce(this.announceID.toUpperCase());
+      await this.app.deleteAnnounce(this.announceID);
       this.app.pushRoute('/');
     } finally {
       this.app.loading = false;
@@ -81,7 +81,7 @@ export class AppAnnounceEdit {
   };
 
   async componentWillLoad() {
-    const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
+    const as = await this.app.getAnnounceState(this.announceID);
     if (!as) {
       this.app.pushRoute('/');
       return;

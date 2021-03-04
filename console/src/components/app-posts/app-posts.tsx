@@ -48,7 +48,7 @@ export class AppPosts {
   };
 
   async componentWillLoad() {
-    const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
+    const as = await this.app.getAnnounceState(this.announceID);
     if (!as) {
       this.app.pushRoute('/');
       return;
@@ -59,7 +59,7 @@ export class AppPosts {
     this.iob = new IntersectionObserver(this.iobCallback, {});
 
     this.postsMap = new Map();
-    const posts = [...this.announce.posts].reverse();
+    const posts = [...(this.announce.posts || [])].reverse();
     for (const v of posts) {
       this.postsMap.set(v, { loaded: false, el: this.renderSkeletonPost(v) });
     }
@@ -97,7 +97,7 @@ export class AppPosts {
   }
 
   private async renderPost(postID: string) {
-    const post = await this.app.getPost(this.announceID.toUpperCase(), postID);
+    const post = await this.app.getPost(this.announceID, postID);
     if (!post) {
       return <div class="post">no post data: [{postID}]</div>;
     }

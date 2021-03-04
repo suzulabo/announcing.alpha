@@ -27,7 +27,7 @@ export class AppPostForm {
   async componentWillLoad() {
     this.backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
 
-    const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
+    const as = await this.app.getAnnounceState(this.announceID);
     if (!as) {
       this.app.pushRoute(this.backPath, true);
       return;
@@ -77,7 +77,7 @@ export class AppPostForm {
     this.app.loading = true;
     try {
       await this.app.putPost(
-        this.announceID.toUpperCase(),
+        this.announceID,
         this.values.title,
         this.values.body,
         this.values.link,

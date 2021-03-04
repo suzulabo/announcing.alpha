@@ -24,7 +24,7 @@ export class AppPost {
   private post: Post;
 
   async componentWillLoad() {
-    const as = await this.app.getAnnounceState(this.announceID.toUpperCase());
+    const as = await this.app.getAnnounceState(this.announceID);
     if (!as) {
       this.app.pushRoute(`/${this.announceID}`, true);
       return;
