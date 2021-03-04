@@ -21,6 +21,9 @@ export class AppAnnounceEdit {
   @State()
   showDeletion = false;
 
+  @State()
+  showDeleteConfirm = false;
+
   private handleInput = {
     name: (ev: Event) => {
       this.values = { ...this.values, name: (ev.currentTarget as HTMLInputElement).value };
@@ -58,7 +61,16 @@ export class AppAnnounceEdit {
     this.showDeletion = !this.showDeletion;
   };
 
-  private handleDeletionClick = async () => {
+  private handleDeletionClick = () => {
+    this.showDeleteConfirm = true;
+  };
+
+  private handleDeleteModalClose = () => {
+    this.showDeleteConfirm = false;
+  };
+
+  private handleDeleteClick = async () => {
+    this.showDeleteConfirm = false;
     this.app.loading = true;
     try {
       await this.app.deleteAnnounce(this.announceID.toUpperCase());
@@ -136,6 +148,17 @@ export class AppAnnounceEdit {
               {this.app.msgs.announceEdit.deletion.btn(this.announce.name)}
             </button>
           </Fragment>
+        )}
+        {this.showDeleteConfirm && (
+          <ap-modal>
+            <div class="delete-modal">
+              <div>{this.app.msgs.announceEdit.deletion.confirm}</div>
+              <div class="buttons">
+                <button onClick={this.handleDeleteModalClose}>{this.app.msgs.common.cancel}</button>
+                <button onClick={this.handleDeleteClick}>{this.app.msgs.common.ok}</button>
+              </div>
+            </div>
+          </ap-modal>
         )}
       </Host>
     );
