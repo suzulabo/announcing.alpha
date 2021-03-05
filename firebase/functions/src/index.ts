@@ -5,7 +5,7 @@ import { callCreateAnnounce } from './create-announce';
 import { callDeleteAnnounce, firestoreDeleteAnnounce } from './delete-announce';
 import { callDeletePost } from './delete-post';
 import { callEditAnnounce } from './edit-announce';
-import { httpsGetAnnounceData, httpsGetImageData } from './get-data';
+import { httpsGetAnnounceMetaData, httpsGetAnnouncePostData, httpsGetImageData } from './get-data';
 import { callPutPost } from './put-post';
 
 const adminApp = initializeApp();
@@ -29,9 +29,18 @@ export const deletePost = region.https.onCall(async (data, context) => {
   return callDeletePost(data, context, adminApp);
 });
 
-export const getAnnounceData = region.https.onRequest(async (req, res) => {
+export const getAnnounceMetaData = region.https.onRequest(async (req, res) => {
   try {
-    await httpsGetAnnounceData(req, res, adminApp);
+    await httpsGetAnnounceMetaData(req, res, adminApp);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+export const getAnnouncePostData = region.https.onRequest(async (req, res) => {
+  try {
+    await httpsGetAnnouncePostData(req, res, adminApp);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);

@@ -3,27 +3,50 @@ import { Request, Response } from 'firebase-functions';
 import { converters } from './firestore';
 
 const cacheControl = 'public, max-age=31556952, s-maxage=86400, immutable';
-const announcePattern = /^\/dt\/a\/([0-9A-Z]{12})\/(m|p)\/([0-9A-Za-z]{1,8})$/;
-const imagePattern = /^\/dt\/i\/([0-9A-Za-z]{22})$/;
+const announceMetaPattern = new RegExp('^/announce/([a-zA-Z0-9]{12})/meta/([a-zA-Z0-9]{8})$');
+const announcePostPattern = new RegExp('^/announce/([a-zA-Z0-9]{12})/post/([a-zA-Z0-9]{1,8})$');
+const imagePattern = new RegExp('^/image/([a-zA-Z0-9]{22})$');
 
-export const httpsGetAnnounceData = async (
+export const httpsGetAnnounceMetaData = async (
   req: Request,
   res: Response,
   adminApp: admin.app.App,
 ) => {
-  console.log(req.path);
-  const m = announcePattern.exec(req.path);
+  const m = announceMetaPattern.exec(req.path);
   if (!m) {
     res.sendStatus(400);
     return;
   }
-  const [, id, _sub, subId] = m;
-  const sub = _sub == 'm' ? 'meta' : 'posts';
-  const converter: admin.firestore.FirestoreDataConverter<unknown> =
-    _sub == 'm' ? converters.announceMeta : converters.post;
+  const [, id, metaID] = m;
 
   const firestore = admin.firestore();
-  const docRef = firestore.doc(`announces/${id}/${sub}/${subId}`).withConverter(converter);
+  const docRef = firestore
+    .doc(`announces/${id}/meta/${metaID}`)
+    .withConverter(converters.announceMeta);
+  const data = (await docRef.get()).data();
+  if (!data) {
+    res.sendStatus(404);
+    return;
+  }
+
+  res.setHeader('Cache-Control', cacheControl);
+  res.json(data);
+};
+
+export const httpsGetAnnouncePostData = async (
+  req: Request,
+  res: Response,
+  adminApp: admin.app.App,
+) => {
+  const m = announcePostPattern.exec(req.path);
+  if (!m) {
+    res.sendStatus(400);
+    return;
+  }
+  const [, id, postID] = m;
+
+  const firestore = admin.firestore();
+  const docRef = firestore.doc(`announces/${id}/posts/${postID}`).withConverter(converters.post);
   const data = (await docRef.get()).data();
   if (!data) {
     res.sendStatus(404);

@@ -8,6 +8,24 @@
   },
   "hosting": [
     {
+      "target": "api",
+      "public": "api",
+      "rewrites": [
+        {
+          "regex": "^/announce/[a-zA-Z0-9]{12}/meta/[a-zA-Z0-9]{8}$",
+          "function": "getAnnounceMetaData"
+        },
+        {
+          "regex": "^/announce/[a-zA-Z0-9]{12}/post/[a-zA-Z0-9]{1,8}$",
+          "function": "getAnnouncePostData"
+        },
+        {
+          "regex": "^/image/[a-zA-Z0-9]{22}$",
+          "function": "getImageData"
+        }
+      ]
+    },
+    {
       "target": "console",
       "public": "console",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
