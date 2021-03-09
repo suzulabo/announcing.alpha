@@ -4,7 +4,7 @@
   "scripts": {
     "func.build": "npm --prefix ./functions run build",
     "func.build.watch": "npm --prefix ./functions run build.watch",
-    "serve": "firebase emulators:start",
+    "serve": "firebase emulators:start --import=./emu-data --export-on-exit",
     "start": "run-p func.build.watch serve",
     "deploy": "firebase deploy"
   },

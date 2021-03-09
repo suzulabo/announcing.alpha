@@ -68,3 +68,4 @@ node_modules/
 .firebaserc
 console/
 client/
+emu-data/
