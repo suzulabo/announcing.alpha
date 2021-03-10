@@ -5,6 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { App } from "src/app/app";
 export namespace Components {
     interface ApIcon {
         "icon": 'github' | 'google' | 'image' | 'trash';
@@ -12,6 +13,14 @@ export namespace Components {
     interface ApLoading {
     }
     interface ApModal {
+    }
+    interface AppHome {
+        "app": App;
+    }
+    interface AppPost {
+        "announceID": string;
+        "app": App;
+        "postID": string;
     }
     interface AppRoot {
     }
@@ -35,6 +44,18 @@ declare global {
         prototype: HTMLApModalElement;
         new (): HTMLApModalElement;
     };
+    interface HTMLAppHomeElement extends Components.AppHome, HTMLStencilElement {
+    }
+    var HTMLAppHomeElement: {
+        prototype: HTMLAppHomeElement;
+        new (): HTMLAppHomeElement;
+    };
+    interface HTMLAppPostElement extends Components.AppPost, HTMLStencilElement {
+    }
+    var HTMLAppPostElement: {
+        prototype: HTMLAppPostElement;
+        new (): HTMLAppPostElement;
+    };
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
     }
     var HTMLAppRootElement: {
@@ -45,6 +66,8 @@ declare global {
         "ap-icon": HTMLApIconElement;
         "ap-loading": HTMLApLoadingElement;
         "ap-modal": HTMLApModalElement;
+        "app-home": HTMLAppHomeElement;
+        "app-post": HTMLAppPostElement;
         "app-root": HTMLAppRootElement;
     }
 }
@@ -57,12 +80,22 @@ declare namespace LocalJSX {
     interface ApModal {
         "onClose"?: (event: CustomEvent<any>) => void;
     }
+    interface AppHome {
+        "app"?: App;
+    }
+    interface AppPost {
+        "announceID"?: string;
+        "app"?: App;
+        "postID"?: string;
+    }
     interface AppRoot {
     }
     interface IntrinsicElements {
         "ap-icon": ApIcon;
         "ap-loading": ApLoading;
         "ap-modal": ApModal;
+        "app-home": AppHome;
+        "app-post": AppPost;
         "app-root": AppRoot;
     }
 }
@@ -73,6 +106,8 @@ declare module "@stencil/core" {
             "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
             "ap-loading": LocalJSX.ApLoading & JSXBase.HTMLAttributes<HTMLApLoadingElement>;
             "ap-modal": LocalJSX.ApModal & JSXBase.HTMLAttributes<HTMLApModalElement>;
+            "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
+            "app-post": LocalJSX.AppPost & JSXBase.HTMLAttributes<HTMLAppPostElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
         }
     }
