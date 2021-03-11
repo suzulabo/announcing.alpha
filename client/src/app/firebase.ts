@@ -60,8 +60,41 @@ export class AppFirebase {
       console.warn('enablePersistence', err);
     }
   }
+
+  private listeners = (() => {
+    const l = new Set<string>();
+
+    const add = (p: string, cb?: () => void) => {
+      if (l.has(p)) {
+        return;
+      }
+
+      return new Promise<void>((resovle, reject) => {
+        const unsubscribe = this.firestore.doc(p).onSnapshot(
+          () => {
+            resovle();
+            if (cb) {
+              cb();
+            }
+          },
+          err => {
+            console.warn(err);
+            unsubscribe();
+            l.delete(p);
+            reject();
+          },
+        );
+        l.add(p);
+      });
+    };
+
+    return { add };
+  })();
+
   async getAnnounce(id: string) {
-    const docRef = this.firestore.doc(`announces/${id}`).withConverter(converters.announce);
+    const p = `announces/${id}`;
+    await this.listeners.add(p);
+    const docRef = this.firestore.doc(p).withConverter(converters.announce);
     return getCacheFirst(docRef);
   }
 }
