@@ -65,8 +65,6 @@ export class AppFirebase {
     this.auth.useEmulator(`http://${location.hostname}:9099`);
   }
 
-  private announcesListener: () => void = null;
-
   async init() {
     if (this._firebaseApp) {
       return;
@@ -106,10 +104,6 @@ export class AppFirebase {
   }
 
   async signOut() {
-    if (this.announcesListener) {
-      this.announcesListener();
-      this.announcesListener = null;
-    }
     await this.auth.signOut();
   }
 
