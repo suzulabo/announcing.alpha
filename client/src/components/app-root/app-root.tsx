@@ -38,7 +38,7 @@ export class AppRoot {
   async componentWillLoad() {
     const appEnv = new AppEnv();
     const appMsg = new AppMsg();
-    const appFirebase = new AppFirebase(appEnv, appMsg);
+    const appFirebase = new AppFirebase(appEnv);
     const appState = new AppState();
     this.app = new App(appMsg, appFirebase, appState);
     await this.app.init();
@@ -82,7 +82,7 @@ export class AppRoot {
           return { tag: 'app-post', params: { announceID, postID } };
         }
       } else {
-        return { tag: 'app-posts', params: { announceID } };
+        return { tag: 'app-announce', params: { announceID } };
       }
     }
   }

@@ -1,6 +1,5 @@
 import { Build } from '@stencil/core';
-import { Announce } from 'announsing-shared';
-import { AnnounceState } from './datatypes';
+import { AnnounceMeta } from 'announsing-shared';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
@@ -13,7 +12,7 @@ const BUILD_INFO = {
 export class App {
   readonly buildInfo = BUILD_INFO;
 
-  readonly clientSite: string;
+  private apiSite: string;
 
   constructor(
     private appMsg: AppMsg,
@@ -21,15 +20,14 @@ export class App {
     private appState: AppState,
   ) {
     if (Build.isDev) {
-      this.clientSite = `http://${location.hostname}:3371`;
+      this.apiSite = `http://${location.hostname}:5000`;
     } else {
-      this.clientSite = location.origin.replace('console', 'client');
+      this.apiSite = location.origin.replace('console', 'api');
     }
   }
 
   async init() {
     await this.appFirebase.init();
-    this.appState.updateSignIn(this.appFirebase.user != null);
   }
 
   setTitle(v: string) {
@@ -79,107 +77,16 @@ export class App {
     return this.appMsg.msgs;
   }
 
-  get isSignIn() {
-    return this.appState.state.signIn;
+  getAnnounce(id: string) {
+    return this.appFirebase.getAnnounce(id);
   }
 
-  async signOut() {
-    await this.appFirebase.signOut();
-    this.appState.updateSignIn(this.appFirebase.user != null);
+  private async fetchApi<T>(p: string) {
+    const res = await fetch(`${this.apiSite}/${p}`);
+    return (await res.json()) as T;
   }
 
-  signInGoogle() {
-    return this.appFirebase.signInGoogle();
-  }
-
-  createAnnounce(name: string, desc: string) {
-    return this.appFirebase.callCreateAnnounce({ name, desc });
-  }
-
-  editAnnounce(
-    id: string,
-    name: string,
-    desc: string,
-    link: string,
-    icon: string,
-    newIcon: string,
-  ) {
-    return this.appFirebase.callEditAnnounce({ id, name, desc, link, icon, newIcon });
-  }
-
-  putPost(id: string, title: string, body: string, link: string, imgData: string, editID: string) {
-    return this.appFirebase.callPutPost({ id, title, body, link, imgData, editID });
-  }
-
-  deleteAnnounce(id: string) {
-    return this.appFirebase.callDeleteAnnounce({ id });
-  }
-
-  deletePost(id: string, postID: string) {
-    return this.appFirebase.callDeletePost({ id, postID });
-  }
-
-  private async toAnnounceState(id: string, a: Announce): Promise<AnnounceState> {
-    const meta = await this.appFirebase.getAnnounceMeta(id, a.mid);
-    if (!meta) {
-      return;
-    }
-
-    let iconData: string;
-    if (meta.icon) {
-      iconData = await this.appFirebase.getImage(meta.icon);
-    }
-
-    return { id, ...a, ...meta, iconData };
-  }
-
-  private listenUser() {
-    this.appFirebase.listenUser(async () => {
-      const user = await this.appFirebase.getUser();
-      if (!user || !user.announces) {
-        return;
-      }
-
-      const as = [] as AnnounceState[];
-      for (const id of user.announces) {
-        const announce = await this.appFirebase.getAnnounce(id);
-        const v = await this.toAnnounceState(id, announce);
-        if (v) {
-          as.push(v);
-        }
-      }
-
-      as.sort((v1, v2) => {
-        return v2.uT - v1.uT;
-      });
-
-      this.appState.updateAnnounces(as);
-    });
-  }
-
-  getAnnounces() {
-    this.listenUser();
-    return this.appState.state.announces;
-  }
-
-  async getAnnounceState(id: string) {
-    this.listenUser();
-    const user = await this.appFirebase.getUser();
-    if (!user.announces || user.announces.indexOf(id) < 0) {
-      return;
-    }
-
-    const a = await this.appFirebase.getAnnounce(id);
-    if (a) {
-      return await this.toAnnounceState(id, a);
-    }
-  }
-
-  getPost(id: string, postID: string) {
-    return this.appFirebase.getPost(id, postID);
-  }
-
-  getImage(id: string) {
-    return this.appFirebase.getImage(id);
+  fetchAnnounceMeta(id: string, metaID: string) {
+    return this.fetchApi<AnnounceMeta>(`announce/${id}/meta/${metaID}`);
   }
 }
