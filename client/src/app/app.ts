@@ -89,4 +89,8 @@ export class App {
   fetchAnnounceMeta(id: string, metaID: string) {
     return this.fetchApi<AnnounceMeta>(`announce/${id}/meta/${metaID}`);
   }
+
+  getImageURI(id: string) {
+    return `${this.apiSite}/image/${id}`;
+  }
 }

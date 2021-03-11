@@ -18,4 +18,7 @@ export const msgs = {
     title: 'Announsing\u266A',
   },
   home: {},
+  announce: {
+    noPosts: 'お知らせはまだありません',
+  },
 };
