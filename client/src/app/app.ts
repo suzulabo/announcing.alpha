@@ -1,5 +1,5 @@
 import { Build } from '@stencil/core';
-import { AnnounceMeta } from 'announsing-shared';
+import { AnnounceMeta, Post } from 'announsing-shared';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
@@ -88,6 +88,10 @@ export class App {
 
   fetchAnnounceMeta(id: string, metaID: string) {
     return this.fetchApi<AnnounceMeta>(`announce/${id}/meta/${metaID}`);
+  }
+
+  fetchPost(id: string, postID: string) {
+    return this.fetchApi<Post>(`announce/${id}/post/${postID}`);
   }
 
   getImageURI(id: string) {
