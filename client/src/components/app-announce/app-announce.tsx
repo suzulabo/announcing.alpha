@@ -109,8 +109,6 @@ export class AppAnnounce {
       >
         <span class="date"></span>
         <span class="title"></span>
-        <hr />
-        <div class="body"></div>
       </a>
     );
   }

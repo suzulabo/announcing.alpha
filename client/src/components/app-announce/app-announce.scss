@@ -55,11 +55,6 @@ app-announce {
     .title {
       font-size: 1.05rem;
     }
-    .body {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
 
     &.skeleton {
       .date {

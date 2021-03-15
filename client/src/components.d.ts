@@ -21,6 +21,11 @@ export namespace Components {
     interface AppHome {
         "app": App;
     }
+    interface AppPost {
+        "announceID": string;
+        "app": App;
+        "postID": string;
+    }
     interface AppRoot {
     }
 }
@@ -55,6 +60,12 @@ declare global {
         prototype: HTMLAppHomeElement;
         new (): HTMLAppHomeElement;
     };
+    interface HTMLAppPostElement extends Components.AppPost, HTMLStencilElement {
+    }
+    var HTMLAppPostElement: {
+        prototype: HTMLAppPostElement;
+        new (): HTMLAppPostElement;
+    };
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
     }
     var HTMLAppRootElement: {
@@ -67,6 +78,7 @@ declare global {
         "ap-modal": HTMLApModalElement;
         "app-announce": HTMLAppAnnounceElement;
         "app-home": HTMLAppHomeElement;
+        "app-post": HTMLAppPostElement;
         "app-root": HTMLAppRootElement;
     }
 }
@@ -86,6 +98,11 @@ declare namespace LocalJSX {
     interface AppHome {
         "app"?: App;
     }
+    interface AppPost {
+        "announceID"?: string;
+        "app"?: App;
+        "postID"?: string;
+    }
     interface AppRoot {
     }
     interface IntrinsicElements {
@@ -94,6 +111,7 @@ declare namespace LocalJSX {
         "ap-modal": ApModal;
         "app-announce": AppAnnounce;
         "app-home": AppHome;
+        "app-post": AppPost;
         "app-root": AppRoot;
     }
 }
@@ -106,6 +124,7 @@ declare module "@stencil/core" {
             "ap-modal": LocalJSX.ApModal & JSXBase.HTMLAttributes<HTMLApModalElement>;
             "app-announce": LocalJSX.AppAnnounce & JSXBase.HTMLAttributes<HTMLAppAnnounceElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
+            "app-post": LocalJSX.AppPost & JSXBase.HTMLAttributes<HTMLAppPostElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
         }
     }

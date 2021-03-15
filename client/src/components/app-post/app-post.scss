@@ -1,0 +1,29 @@
+app-post {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  > * {
+    margin: 10px 0;
+  }
+
+  .date {
+    color: var(--light-color);
+    font-size: 0.95rem;
+  }
+  .title {
+    font-size: 1.1rem;
+  }
+  .body {
+    line-height: 1.3;
+    white-space: pre-line;
+  }
+  img {
+    align-self: center;
+    max-width: 100%;
+    border-radius: 5px;
+  }
+}
