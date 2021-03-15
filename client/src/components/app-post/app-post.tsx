@@ -42,6 +42,9 @@ export class AppPost {
         <hr />
         <div class="body">{post.body}</div>
         {post.img && <img src={this.app.getImageURI(post.img)} />}
+        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
+          {this.app.msgs.common.back}
+        </a>
       </Host>
     );
   }
