@@ -130,14 +130,17 @@ export class AppAnnounce {
       >
         <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
         <span class="title">{post.title}</span>
-        <hr />
-        <div class="body">{post.body}</div>
       </a>
     );
   }
 
   private renderPosts() {
-    this.renderedPosts = [...this.postsMap.values()].map(v => v.el);
+    const l = [];
+    this.postsMap.forEach(v => {
+      l.push(v.el, <hr />);
+    });
+    l.pop();
+    this.renderedPosts = l;
   }
 
   render() {
