@@ -4,6 +4,7 @@ import { App } from 'src/app/app';
 import { AppFirebase } from 'src/app/firebase';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
+import { AppStorage } from 'src/app/storage';
 
 interface MatchPathResult {
   tag: string;
@@ -40,7 +41,8 @@ export class AppRoot {
     const appMsg = new AppMsg();
     const appFirebase = new AppFirebase(appEnv);
     const appState = new AppState();
-    this.app = new App(appMsg, appFirebase, appState);
+    const appStorage = new AppStorage();
+    this.app = new App(appMsg, appFirebase, appState, appStorage);
     await this.app.init();
     this.handlePopState();
   }

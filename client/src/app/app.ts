@@ -1,8 +1,10 @@
 import { Build } from '@stencil/core';
 import { AnnounceMeta, Post } from 'announsing-shared';
+import { Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
+import { AppStorage } from './storage';
 
 const BUILD_INFO = {
   src: '__BUILD_SRC__',
@@ -18,6 +20,7 @@ export class App {
     private appMsg: AppMsg,
     private appFirebase: AppFirebase,
     private appState: AppState,
+    private appStorage: AppStorage,
   ) {
     if (Build.isDev) {
       this.apiSite = `http://${location.hostname}:5000`;
@@ -96,5 +99,17 @@ export class App {
 
   getImageURI(id: string) {
     return `${this.apiSite}/image/${id}`;
+  }
+
+  getFollow(id: string) {
+    return this.appStorage.follows.get(id);
+  }
+
+  setFollow(id: string, follow: Follow) {
+    return this.appStorage.follows.set(id, follow);
+  }
+
+  async deleteFollow(id: string) {
+    await this.appStorage.follows.remove(id);
   }
 }

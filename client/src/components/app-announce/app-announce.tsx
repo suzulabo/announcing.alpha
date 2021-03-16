@@ -1,5 +1,6 @@
 import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
+import { Follow } from 'src/app/datatypes';
 
 const scrollPosMap = new Map<string, number>();
 
@@ -29,6 +30,9 @@ export class AppAnnounce {
   announce: { name: string; desc: string; link: string; icon: string; posts: string[] };
 
   @State()
+  follow: Follow;
+
+  @State()
   renderedPosts: any[];
 
   private postsMap: Map<string, { loaded: boolean; el: any }>;
@@ -46,6 +50,8 @@ export class AppAnnounce {
         icon: meta.icon,
         posts: announce.posts || [],
       };
+
+      this.follow = await this.app.getFollow(this.announceID);
 
       this.iob = new IntersectionObserver(this.iobCallback, {});
 
@@ -141,6 +147,17 @@ export class AppAnnounce {
     this.renderedPosts = l;
   }
 
+  private handleFollowClick = async () => {
+    const follow: Follow = { notify: { mode: 'disabled', hours: [] }, readTime: 0 };
+    await this.app.setFollow(this.announceID, follow);
+    this.follow = follow;
+  };
+
+  private handleFollowingClick = async () => {
+    await this.app.deleteFollow(this.announceID);
+    this.follow = undefined;
+  };
+
   render() {
     if (!this.announce) {
       return;
@@ -150,6 +167,11 @@ export class AppAnnounce {
 
     return (
       <Host>
+        {this.follow && (
+          <button class="following clear" onClick={this.handleFollowingClick}>
+            {this.app.msgs.announce.followingBtn}
+          </button>
+        )}
         {this.announce.icon && <img src={this.app.getImageURI(this.announce.icon)} />}
         <div class="name">{this.announce.name}</div>
         {this.announce.desc && <div class="desc">{this.announce.desc}</div>}
@@ -157,6 +179,9 @@ export class AppAnnounce {
           <a href={this.announce.link} rel="noopener">
             {this.announce.link}
           </a>
+        )}
+        {!this.follow && (
+          <button onClick={this.handleFollowClick}>{this.app.msgs.announce.followBtn}</button>
         )}
         <hr />
         {noPosts && <div>{this.app.msgs.announce.noPosts}</div>}

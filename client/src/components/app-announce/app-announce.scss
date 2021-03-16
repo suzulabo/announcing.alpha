@@ -32,6 +32,10 @@ app-announce {
     white-space: pre-line;
   }
 
+  button.following {
+    align-self: flex-end;
+  }
+
   .post {
     width: 100%;
     max-width: 400px;

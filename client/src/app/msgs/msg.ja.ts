@@ -20,5 +20,7 @@ export const msgs = {
   home: {},
   announce: {
     noPosts: 'お知らせはまだありません',
+    followBtn: 'フォローする',
+    followingBtn: 'フォロー中',
   },
 };
