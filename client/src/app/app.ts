@@ -112,4 +112,8 @@ export class App {
   async deleteFollow(id: string) {
     await this.appStorage.follows.remove(id);
   }
+
+  registerMessaging(id: string) {
+    return this.appFirebase.registerMessaging(id);
+  }
 }

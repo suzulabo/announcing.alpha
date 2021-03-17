@@ -1,4 +1,4 @@
-import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Listen, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
 
@@ -158,6 +158,10 @@ export class AppAnnounce {
     this.follow = undefined;
   };
 
+  private handleNotifyClick = async () => {
+    await this.app.registerMessaging(this.announceID);
+  };
+
   render() {
     if (!this.announce) {
       return;
@@ -168,9 +172,12 @@ export class AppAnnounce {
     return (
       <Host>
         {this.follow && (
-          <button class="following clear" onClick={this.handleFollowingClick}>
-            {this.app.msgs.announce.followingBtn}
-          </button>
+          <Fragment>
+            <button onClick={this.handleNotifyClick}>notify</button>
+            <button class="following clear" onClick={this.handleFollowingClick}>
+              {this.app.msgs.announce.followingBtn}
+            </button>
+          </Fragment>
         )}
         {this.announce.icon && <img src={this.app.getImageURI(this.announce.icon)} />}
         <div class="name">{this.announce.name}</div>

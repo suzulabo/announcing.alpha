@@ -11,6 +11,7 @@ export interface AppEnvironment {
     readonly measurementId: string;
   };
   readonly functionsRegion: string;
+  readonly vapidKey: string;
   readonly contact: string;
 }
 

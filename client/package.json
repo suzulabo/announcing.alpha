@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build": "rm -rf www && stencil build",
-    "start": "stencil build --dev --watch --serve",
+    "start": "stencil build --dev --watch --serve --service-worker",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watch",
     "generate": "stencil generate"
@@ -19,6 +19,7 @@
     "date-fns": "^2.18.0",
     "destyle.css": "^2.0.2",
     "firebase": "^8.2.9",
-    "intersection-observer": "^0.12.0"
+    "intersection-observer": "^0.12.0",
+    "workbox-build": "^4.3.1"
   }
 }

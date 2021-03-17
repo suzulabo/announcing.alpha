@@ -4,6 +4,7 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
+import 'firebase/messaging';
 
 import FieldValue = firebase.firestore.FieldValue;
 
@@ -32,6 +33,7 @@ const getCacheFirst = async <T>(docRef: firebase.firestore.DocumentReference<T>)
 export class AppFirebase {
   private functions: firebase.functions.Functions;
   private firestore: firebase.firestore.Firestore;
+  private messaging: firebase.messaging.Messaging;
 
   constructor(private appEnv: AppEnv, private _firebaseApp?: firebase.app.App) {}
 
@@ -52,6 +54,7 @@ export class AppFirebase {
     this._firebaseApp = firebase.initializeApp(this.appEnv.env.firebaseConfig);
     this.functions = this._firebaseApp.functions(this.appEnv.env.functionsRegion);
     this.firestore = this._firebaseApp.firestore();
+    this.messaging = this._firebaseApp.messaging();
     this.devonly_setEmulator();
 
     try {
@@ -96,5 +99,19 @@ export class AppFirebase {
     await this.listeners.add(p);
     const docRef = this.firestore.doc(p).withConverter(converters.announce);
     return getCacheFirst(docRef);
+  }
+
+  private async messageToken() {
+    const serviceWorkerRegistration = await navigator.serviceWorker.getRegistration();
+    const token = await this.messaging.getToken({
+      vapidKey: this.appEnv.env.vapidKey,
+      serviceWorkerRegistration,
+    });
+    return token;
+  }
+
+  async registerMessaging(id: string) {
+    const token = await this.messageToken();
+    console.log(token, id);
   }
 }

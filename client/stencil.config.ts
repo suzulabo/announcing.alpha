@@ -25,7 +25,7 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: null,
+      serviceWorker: { swSrc: 'src/sw.js' },
     },
   ],
   plugins: [
