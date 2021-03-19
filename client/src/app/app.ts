@@ -110,10 +110,16 @@ export class App {
   }
 
   async deleteFollow(id: string) {
+    await this.appFirebase.registerMessaging(id, 'disabled');
     await this.appStorage.follows.remove(id);
   }
 
-  registerMessaging(announceID: string, mode: NotificationMode, hours?: number[]) {
-    return this.appFirebase.registerMessaging(announceID, mode, hours);
+  async registerMessaging(announceID: string, mode: NotificationMode, hours?: number[]) {
+    const follow = await this.getFollow(announceID);
+    if (!follow && mode != 'disabled') {
+      return;
+    }
+    await this.appFirebase.registerMessaging(announceID, mode, hours);
+    await this.setFollow(announceID, { ...follow, notify: { mode, hours } });
   }
 }
