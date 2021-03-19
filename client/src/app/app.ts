@@ -114,7 +114,6 @@ export class App {
   }
 
   registerMessaging(announceID: string, mode: NotificationMode, hours?: number[]) {
-    console.log(mode);
     return this.appFirebase.registerMessaging(announceID, mode, hours);
   }
 }

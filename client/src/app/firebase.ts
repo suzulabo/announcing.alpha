@@ -129,7 +129,6 @@ export class AppFirebase {
       mode,
       hours,
     };
-    console.log(params);
     await this.callFunc<void>('registerNotification', params);
   }
 }
