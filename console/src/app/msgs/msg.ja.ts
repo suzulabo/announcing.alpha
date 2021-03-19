@@ -25,6 +25,7 @@ export const msgs = {
   },
   home: {
     title: 'Home',
+    createAnnounceBtn: 'アナウンスを作る',
     signOut: 'ログアウト',
     announces: {
       postCount: '投稿数',

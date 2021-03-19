@@ -83,7 +83,7 @@ button,
   &:disabled {
     opacity: 0.3;
   }
-  &:hover:not(:disabled) {
+  &:hover:not(:disabled):not(.anchor) {
     background-color: var(--button-hover-bk-color);
   }
   &:active {
@@ -106,6 +106,14 @@ button,
   &.clear {
     border: none;
     padding: 10px;
+  }
+
+  &.anchor {
+    border: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   &.full-width {

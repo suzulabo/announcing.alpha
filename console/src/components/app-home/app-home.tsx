@@ -33,8 +33,10 @@ export class AppHome {
     return (
       <Host>
         <div class="announces-grid">{this.renderAnnounces()}</div>
-        <a {...this.app.href('/create')}>+</a>
-        <button class="clear" onClick={this.handleSignOutClick}>
+        <a class="button" {...this.app.href('/create')}>
+          {this.app.msgs.home.createAnnounceBtn}
+        </a>
+        <button class="logout anchor" onClick={this.handleSignOutClick}>
           {this.app.msgs.home.signOut}
         </button>
       </Host>
