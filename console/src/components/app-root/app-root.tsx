@@ -126,7 +126,6 @@ export class AppRoot {
           <div class="title">
             <a {...this.app.href('/')}>{this.app.msgs.footer.title}</a>
           </div>
-          <div class="copy">&copy;suzulabo</div>
           <div class="build-info">Version: {this.app.buildInfo.src}</div>
           <div class="build-info">Built at {new Date(this.app.buildInfo.time).toISOString()}</div>
           <div class="github">
