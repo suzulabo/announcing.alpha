@@ -1,5 +1,10 @@
 import { Build } from '@stencil/core';
-import { AnnounceConverter, AppEnv } from 'announsing-shared';
+import {
+  AnnounceConverter,
+  AppEnv,
+  NotificationMode,
+  RegisterNotificationParams,
+} from 'announsing-shared';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
@@ -64,6 +69,12 @@ export class AppFirebase {
     }
   }
 
+  private async callFunc<T>(name: string, params: any): Promise<T> {
+    const f = this.functions.httpsCallable(name);
+    const res = await f(params);
+    return res.data as T;
+  }
+
   private listeners = (() => {
     const l = new Set<string>();
 
@@ -110,8 +121,15 @@ export class AppFirebase {
     return token;
   }
 
-  async registerMessaging(id: string) {
-    const token = await this.messageToken();
-    console.log(token, id);
+  async registerMessaging(announceID: string, mode: NotificationMode, hours?: number[]) {
+    const fcmToken = await this.messageToken();
+    const params: RegisterNotificationParams = {
+      fcmToken,
+      announceID,
+      mode,
+      hours,
+    };
+    console.log(params);
+    await this.callFunc<void>('registerNotification', params);
   }
 }

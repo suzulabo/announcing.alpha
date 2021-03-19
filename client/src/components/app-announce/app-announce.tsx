@@ -159,7 +159,8 @@ export class AppAnnounce {
   };
 
   private handleNotifyClick = async () => {
-    await this.app.registerMessaging(this.announceID);
+    console.log('check1');
+    await this.app.registerMessaging(this.announceID, 'always');
   };
 
   render() {

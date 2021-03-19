@@ -1,5 +1,5 @@
 import { Build } from '@stencil/core';
-import { AnnounceMeta, Post } from 'announsing-shared';
+import { AnnounceMeta, NotificationMode, Post } from 'announsing-shared';
 import { Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
@@ -113,7 +113,8 @@ export class App {
     await this.appStorage.follows.remove(id);
   }
 
-  registerMessaging(id: string) {
-    return this.appFirebase.registerMessaging(id);
+  registerMessaging(announceID: string, mode: NotificationMode, hours?: number[]) {
+    console.log(mode);
+    return this.appFirebase.registerMessaging(announceID, mode, hours);
   }
 }

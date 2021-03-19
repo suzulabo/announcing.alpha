@@ -8,6 +8,7 @@ import { callDeleteAnnounce, firestoreDeleteAnnounce } from './delete-announce';
 import { callDeletePost } from './delete-post';
 import { callEditAnnounce } from './edit-announce';
 import { httpsGetAnnounceMetaData, httpsGetAnnouncePostData, httpsGetImageData } from './get-data';
+import { callRegisterNotification } from './notification';
 import { callPutPost } from './put-post';
 
 const adminApp = initializeApp();
@@ -30,6 +31,9 @@ export const putPost = region.https.onCall(async (data, context) => {
 });
 export const deletePost = region.https.onCall(async (data, context) => {
   return callDeletePost(data, context, adminApp);
+});
+export const registerNotification = region.https.onCall(async (data, context) => {
+  return callRegisterNotification(data, context, adminApp);
 });
 
 type httpsHandler = (
