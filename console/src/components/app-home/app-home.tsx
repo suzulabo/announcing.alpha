@@ -9,8 +9,9 @@ export class AppHome {
   @Prop()
   app: App;
 
-  private handleSignOutClick = () => {
-    return this.app.signOut();
+  private handleSignOutClick = async () => {
+    await this.app.signOut();
+    this.app.redirectRoute('/signin');
   };
 
   private renderAnnounces() {
