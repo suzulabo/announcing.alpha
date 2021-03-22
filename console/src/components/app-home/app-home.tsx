@@ -33,6 +33,7 @@ export class AppHome {
   render() {
     return (
       <Host>
+        <ap-input />
         <div class="announces-grid">{this.renderAnnounces()}</div>
         <a class="button" {...this.app.href('/create')}>
           {this.app.msgs.home.createAnnounceBtn}

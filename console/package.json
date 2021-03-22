@@ -15,6 +15,7 @@
     "@stencil/store": "^1.4.1",
     "@types/pica": "^5.1.2",
     "announsing-shared": "file:shared",
+    "announsing-shared-ui": "file:shared-ui",
     "bootstrap-icons": "^1.4.0",
     "date-fns": "^2.18.0",
     "destyle.css": "^2.0.2",
