@@ -1,10 +1,10 @@
 import { Component, h, Host, Listen, State } from '@stencil/core';
-import { AppEnv } from 'announsing-shared';
 import { App } from 'src/app/app';
 import { AppFirebase } from 'src/app/firebase';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
 import { AppStorage } from 'src/app/storage';
+import { AppEnv } from 'src/shared';
 
 interface MatchPathResult {
   tag: string;

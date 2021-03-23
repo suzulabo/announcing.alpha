@@ -1,6 +1,6 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
-import { Post } from 'announsing-shared';
 import { App } from 'src/app/app';
+import { Post } from 'src/shared';
 
 @Component({
   tag: 'app-post',

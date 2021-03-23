@@ -1,5 +1,5 @@
 import { Build } from '@stencil/core';
-import { AnnounceMeta, NotificationMode, Post } from 'announsing-shared';
+import { AnnounceMeta, NotificationMode, Post } from 'src/shared';
 import { Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';

@@ -1,15 +1,15 @@
 import { Build } from '@stencil/core';
-import {
-  AnnounceConverter,
-  AppEnv,
-  NotificationMode,
-  RegisterNotificationParams,
-} from 'announsing-shared';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
 import 'firebase/messaging';
+import {
+  AnnounceConverter,
+  AppEnv,
+  NotificationMode,
+  RegisterNotificationParams,
+} from 'src/shared';
 
 import FieldValue = firebase.firestore.FieldValue;
 
