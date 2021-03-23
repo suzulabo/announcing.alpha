@@ -1,11 +1,22 @@
 {
   "name": "announsing-functions",
   "private": true,
+  "watch": {
+    "copy-shared": {
+      "patterns": [
+        "../../shared/src"
+      ],
+      "extensions": "ts,tsx,scss"
+    }
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "build.watch": "tsc -w -p tsconfig.build.json",
+    "build": "npm run copy-shared && tsc -p tsconfig.build.json",
+    "tsc.watch": "tsc -w -p tsconfig.build.json",
+    "build.watch": "run-p copy-shared.watch tsc.watch",
     "test": "jest",
     "test.watch": "jest --watch",
+    "copy-shared": "node copy-shared.js",
+    "copy-shared.watch": "npm-watch copy-shared",
     "logs": "firebase functions:log"
   },
   "engines": {
@@ -15,13 +26,15 @@
   "devDependencies": {
     "@types/cors": "^2.8.10",
     "@types/jest": "^26.0.20",
-    "announsing-shared": "file:shared",
     "base-x": "^3.0.8",
     "cors": "^2.8.5",
     "firebase-admin": "^9.5.0",
     "firebase-functions": "^3.13.0",
     "firebase-functions-test": "^0.2.3",
+    "fs-extra": "^9.1.0",
     "jest": "^26.6.3",
+    "npm-run-all": "^4.1.5",
+    "npm-watch": "^0.9.0",
     "ts-jest": "^26.4.4",
     "tweetnacl": "^1.0.3",
     "typescript": "^4.1.3"

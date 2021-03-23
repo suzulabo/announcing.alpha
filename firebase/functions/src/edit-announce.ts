@@ -1,7 +1,7 @@
-import { EditAnnounceParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { announceMetaHash, AnnounceMeta_FS, Announce_FS, converters } from './firestore';
+import { EditAnnounceParams } from './shared';
 import { toMD5Base62 } from './utils';
 
 export const callEditAnnounce = async (

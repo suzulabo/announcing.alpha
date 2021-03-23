@@ -1,6 +1,6 @@
-import { RegisterNotificationParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
+import { RegisterNotificationParams } from './shared';
 import { toMD5Base62 } from './utils';
 
 interface FcmToken {

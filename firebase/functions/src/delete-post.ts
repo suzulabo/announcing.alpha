@@ -1,7 +1,7 @@
-import { DeletePostParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { Announce_FS, checkOwner, converters } from './firestore';
+import { DeletePostParams } from './shared';
 
 export const callDeletePost = async (
   params: DeletePostParams,

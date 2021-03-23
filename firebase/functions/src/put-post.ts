@@ -1,8 +1,8 @@
-import { PutPostParams } from 'announsing-shared';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { Announce_FS, checkOwner, converters, Post_FS, storeImage } from './firestore';
 import { incString } from './incstring';
+import { PutPostParams } from './shared';
 
 export const callPutPost = async (
   params: PutPostParams,

@@ -1,10 +1,5 @@
-import {
-  AnnounceConverter,
-  AnnounceMetaConverter,
-  PostConverter,
-  UserConverter,
-} from 'announsing-shared';
 import * as admin from 'firebase-admin';
+import { AnnounceConverter, AnnounceMetaConverter, PostConverter, UserConverter } from './shared';
 import { toMD5Base62 } from './utils';
 
 import FieldValue = admin.firestore.FieldValue;

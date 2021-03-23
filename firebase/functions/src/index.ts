@@ -1,4 +1,3 @@
-import { AppEnv } from 'announsing-shared';
 import _cors from 'cors';
 import { initializeApp } from 'firebase-admin';
 import * as functions from 'firebase-functions';
@@ -10,6 +9,7 @@ import { callEditAnnounce } from './edit-announce';
 import { httpsGetAnnounceMetaData, httpsGetAnnouncePostData, httpsGetImageData } from './get-data';
 import { callRegisterNotification } from './notification';
 import { callPutPost } from './put-post';
+import { AppEnv } from './shared';
 
 const adminApp = initializeApp();
 const appEnv = new AppEnv().env;
