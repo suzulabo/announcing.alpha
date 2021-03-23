@@ -33,6 +33,7 @@ export const config: Config = {
     replace({
       __BUILD_SRC__: buildSrc(),
       __BUILT_TIME__: new Date().getTime().toString(),
+      preventAssignment: true,
     }),
   ],
   devServer: {
