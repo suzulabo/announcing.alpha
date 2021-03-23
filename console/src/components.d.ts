@@ -16,6 +16,8 @@ export namespace Components {
         "label": string;
         "resizeRect": { width: number; height: number };
     }
+    interface ApInput {
+    }
     interface ApLoading {
     }
     interface ApModal {
@@ -62,6 +64,12 @@ declare global {
     var HTMLApImageInputElement: {
         prototype: HTMLApImageInputElement;
         new (): HTMLApImageInputElement;
+    };
+    interface HTMLApInputElement extends Components.ApInput, HTMLStencilElement {
+    }
+    var HTMLApInputElement: {
+        prototype: HTMLApInputElement;
+        new (): HTMLApInputElement;
     };
     interface HTMLApLoadingElement extends Components.ApLoading, HTMLStencilElement {
     }
@@ -126,6 +134,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "ap-icon": HTMLApIconElement;
         "ap-image-input": HTMLApImageInputElement;
+        "ap-input": HTMLApInputElement;
         "ap-loading": HTMLApLoadingElement;
         "ap-modal": HTMLApModalElement;
         "app-announce-create": HTMLAppAnnounceCreateElement;
@@ -148,6 +157,8 @@ declare namespace LocalJSX {
         "label"?: string;
         "onImageChange"?: (event: CustomEvent<string>) => void;
         "resizeRect"?: { width: number; height: number };
+    }
+    interface ApInput {
     }
     interface ApLoading {
     }
@@ -186,6 +197,7 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "ap-icon": ApIcon;
         "ap-image-input": ApImageInput;
+        "ap-input": ApInput;
         "ap-loading": ApLoading;
         "ap-modal": ApModal;
         "app-announce-create": AppAnnounceCreate;
@@ -204,6 +216,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
             "ap-image-input": LocalJSX.ApImageInput & JSXBase.HTMLAttributes<HTMLApImageInputElement>;
+            "ap-input": LocalJSX.ApInput & JSXBase.HTMLAttributes<HTMLApInputElement>;
             "ap-loading": LocalJSX.ApLoading & JSXBase.HTMLAttributes<HTMLApLoadingElement>;
             "ap-modal": LocalJSX.ApModal & JSXBase.HTMLAttributes<HTMLApModalElement>;
             "app-announce-create": LocalJSX.AppAnnounceCreate & JSXBase.HTMLAttributes<HTMLAppAnnounceCreateElement>;
