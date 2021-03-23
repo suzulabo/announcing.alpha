@@ -1,0 +1,8 @@
+{
+  "name": "announsing-shared-ui",
+  "private": true,
+  "scripts": {},
+  "devDependencies": {
+    "@stencil/core": "^2.4.0"
+  }
+}
