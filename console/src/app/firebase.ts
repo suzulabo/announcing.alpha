@@ -10,7 +10,7 @@ import {
   PostConverter,
   PutPostParams,
   UserConverter,
-} from 'announsing-shared';
+} from 'src/shared';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';

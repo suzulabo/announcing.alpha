@@ -1,4 +1,4 @@
-import { Announce, AnnounceMeta } from 'announsing-shared';
+import { Announce, AnnounceMeta } from 'src/shared';
 
 export interface AnnounceState extends Announce, AnnounceMeta {
   id: string;

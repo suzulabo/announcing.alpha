@@ -1,5 +1,5 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
-import { Post } from 'announsing-shared';
+import { Post } from 'src/shared';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 

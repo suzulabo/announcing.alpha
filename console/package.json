@@ -4,13 +4,14 @@
   "watch": {
     "copy-shared": {
       "patterns": [
-        "../shared-ui/ap-components"
+        "../shared-ui/ap-components",
+        "../shared/src"
       ],
       "extensions": "ts,tsx,scss"
     }
   },
   "scripts": {
-    "build": "rm -rf www && stencil build",
+    "build": "rm -rf www && npm run copy-shared && stencil build",
     "serve": "stencil build --dev --watch --serve",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watch",
@@ -24,7 +25,6 @@
     "@stencil/sass": "^1.4.1",
     "@stencil/store": "^1.4.1",
     "@types/pica": "^5.1.2",
-    "announsing-shared": "file:shared",
     "bootstrap-icons": "^1.4.0",
     "date-fns": "^2.18.0",
     "destyle.css": "^2.0.2",

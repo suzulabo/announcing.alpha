@@ -1,5 +1,5 @@
 import { Build } from '@stencil/core';
-import { Announce } from 'announsing-shared';
+import { Announce } from 'src/shared';
 import { AnnounceState } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
