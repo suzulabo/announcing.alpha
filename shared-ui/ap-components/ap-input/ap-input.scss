@@ -1,0 +1,49 @@
+ap-input {
+  width: 100%;
+
+  div.label-box {
+    color: var(--light-color);
+
+    display: flex;
+    flex-direction: row;
+
+    span.label {
+      flex-grow: 1;
+    }
+    span.count {
+      visibility: hidden;
+    }
+  }
+
+  &:focus-within {
+    div.label-box {
+      span.label {
+        font-weight: bolder;
+      }
+      span.count {
+        visibility: visible;
+      }
+    }
+  }
+
+  input,
+  textarea {
+    font-size: 16px;
+    border: none;
+    width: 100%;
+    margin-top: 10px;
+
+    border-bottom: 1px solid var(--border-color);
+    padding: 5px;
+
+    &:focus {
+      border-bottom-width: 2px;
+      padding-bottom: 4px;
+    }
+  }
+
+  textarea {
+    resize: none;
+    height: 5em;
+  }
+}

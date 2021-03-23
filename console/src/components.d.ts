@@ -17,10 +17,16 @@ export namespace Components {
         "resizeRect": { width: number; height: number };
     }
     interface ApInput {
+        "label": string;
+        "maxLength": number;
+        "textarea": boolean;
+        "value": string;
     }
     interface ApLoading {
     }
     interface ApModal {
+    }
+    interface ApStyle {
     }
     interface AppAnnounceCreate {
         "app": App;
@@ -83,6 +89,12 @@ declare global {
         prototype: HTMLApModalElement;
         new (): HTMLApModalElement;
     };
+    interface HTMLApStyleElement extends Components.ApStyle, HTMLStencilElement {
+    }
+    var HTMLApStyleElement: {
+        prototype: HTMLApStyleElement;
+        new (): HTMLApStyleElement;
+    };
     interface HTMLAppAnnounceCreateElement extends Components.AppAnnounceCreate, HTMLStencilElement {
     }
     var HTMLAppAnnounceCreateElement: {
@@ -137,6 +149,7 @@ declare global {
         "ap-input": HTMLApInputElement;
         "ap-loading": HTMLApLoadingElement;
         "ap-modal": HTMLApModalElement;
+        "ap-style": HTMLApStyleElement;
         "app-announce-create": HTMLAppAnnounceCreateElement;
         "app-announce-edit": HTMLAppAnnounceEditElement;
         "app-home": HTMLAppHomeElement;
@@ -159,11 +172,17 @@ declare namespace LocalJSX {
         "resizeRect"?: { width: number; height: number };
     }
     interface ApInput {
+        "label"?: string;
+        "maxLength"?: number;
+        "textarea"?: boolean;
+        "value"?: string;
     }
     interface ApLoading {
     }
     interface ApModal {
         "onClose"?: (event: CustomEvent<any>) => void;
+    }
+    interface ApStyle {
     }
     interface AppAnnounceCreate {
         "app"?: App;
@@ -200,6 +219,7 @@ declare namespace LocalJSX {
         "ap-input": ApInput;
         "ap-loading": ApLoading;
         "ap-modal": ApModal;
+        "ap-style": ApStyle;
         "app-announce-create": AppAnnounceCreate;
         "app-announce-edit": AppAnnounceEdit;
         "app-home": AppHome;
@@ -219,6 +239,7 @@ declare module "@stencil/core" {
             "ap-input": LocalJSX.ApInput & JSXBase.HTMLAttributes<HTMLApInputElement>;
             "ap-loading": LocalJSX.ApLoading & JSXBase.HTMLAttributes<HTMLApLoadingElement>;
             "ap-modal": LocalJSX.ApModal & JSXBase.HTMLAttributes<HTMLApModalElement>;
+            "ap-style": LocalJSX.ApStyle & JSXBase.HTMLAttributes<HTMLApStyleElement>;
             "app-announce-create": LocalJSX.AppAnnounceCreate & JSXBase.HTMLAttributes<HTMLAppAnnounceCreateElement>;
             "app-announce-edit": LocalJSX.AppAnnounceEdit & JSXBase.HTMLAttributes<HTMLAppAnnounceEditElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;

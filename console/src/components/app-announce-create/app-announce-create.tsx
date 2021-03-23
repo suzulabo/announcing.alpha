@@ -14,10 +14,10 @@ export class AppAnnounceCreate {
 
   private handleInput = {
     name: (ev: Event) => {
-      this.values = { ...this.values, name: (ev.currentTarget as HTMLInputElement).value };
+      this.values = { ...this.values, name: (ev.target as HTMLInputElement).value };
     },
     desc: (ev: Event) => {
-      this.values = { ...this.values, desc: (ev.currentTarget as HTMLTextAreaElement).value };
+      this.values = { ...this.values, desc: (ev.target as HTMLTextAreaElement).value };
     },
   };
 
@@ -34,17 +34,19 @@ export class AppAnnounceCreate {
   render() {
     return (
       <Host>
-        <input
-          placeholder={this.app.msgs.announceCreate.form.name}
+        <ap-input
+          label={this.app.msgs.announceCreate.form.name}
           value={this.values.name}
+          maxLength={50}
           onInput={this.handleInput.name}
         />
-        <textarea
-          placeholder={this.app.msgs.announceCreate.form.desc}
+        <ap-input
+          textarea={true}
+          label={this.app.msgs.announceCreate.form.desc}
+          value={this.values.desc}
+          maxLength={500}
           onInput={this.handleInput.desc}
-        >
-          {this.values.desc}
-        </textarea>
+        />
         <button disabled={!this.values.name} onClick={this.handleSubmitClick}>
           {this.app.msgs.announceCreate.form.btn}
         </button>
