@@ -33,15 +33,23 @@ ap-input {
     width: 100%;
 
     border-bottom: 1px solid var(--border-color);
-    padding: 15px 5px;
+    padding: var(--padding);
 
     &:focus {
       border-bottom-width: 2px;
-      padding-bottom: 14px;
+      padding-bottom: var(--padding-bottom-focus);
     }
   }
 
+  input {
+    --padding: 15px 5px 10px;
+    --padding-bottom-focus: 9px;
+  }
+
   textarea {
+    --padding: 15px 5px;
+    --padding-bottom-focus: 14px;
+
     resize: none;
     min-height: 5em;
   }
