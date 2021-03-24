@@ -17,23 +17,26 @@ export class ApInput {
   @Prop()
   textarea: boolean;
 
+  componentDidLoad() {
+    this.autoGrow.run();
+  }
+
   private autoGrow = (() => {
     let el: HTMLTextAreaElement;
     const handleRef = (_el: HTMLTextAreaElement) => {
       el = _el;
-      this.autoGrow.run();
     };
     const handleInput = () => {
-      readTask(() => {
-        this.autoGrow.run();
-      });
+      this.autoGrow.run();
     };
     const run = () => {
       if (!el) {
         return;
       }
-      el.style.height = 'auto';
-      el.style.height = el.scrollHeight + 'px';
+      readTask(() => {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+      });
     };
 
     return { handleRef, handleInput, run };
@@ -46,7 +49,7 @@ export class ApInput {
           <div class="label-box">
             <span class="label">{this.label}</span>
             <span class="count">
-              ({this.value.length}/{this.maxLength})
+              ({this.value?.length || 0}/{this.maxLength})
             </span>
           </div>
           {!this.textarea && <input value={this.value} maxLength={this.maxLength} />}

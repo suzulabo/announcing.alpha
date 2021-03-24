@@ -26,13 +26,13 @@ export class AppAnnounceEdit {
 
   private handleInput = {
     name: (ev: Event) => {
-      this.values = { ...this.values, name: (ev.currentTarget as HTMLInputElement).value };
+      this.values = { ...this.values, name: (ev.target as HTMLInputElement).value };
     },
     desc: (ev: Event) => {
-      this.values = { ...this.values, desc: (ev.currentTarget as HTMLTextAreaElement).value };
+      this.values = { ...this.values, desc: (ev.target as HTMLTextAreaElement).value };
     },
     link: (ev: Event) => {
-      this.values = { ...this.values, link: (ev.currentTarget as HTMLInputElement).value };
+      this.values = { ...this.values, link: (ev.target as HTMLInputElement).value };
     },
   };
 
@@ -118,21 +118,24 @@ export class AppAnnounceEdit {
           resizeRect={{ width: 200, height: 200 }}
           onImageChange={this.handleImageChange}
         />
-        <input
-          placeholder={this.app.msgs.announceEdit.form.name}
+        <ap-input
+          label={this.app.msgs.announceEdit.form.name}
           value={this.values.name}
           onInput={this.handleInput.name}
+          maxLength={50}
         />
-        <textarea
-          placeholder={this.app.msgs.announceEdit.form.desc}
+        <ap-input
+          textarea={true}
+          label={this.app.msgs.announceEdit.form.desc}
+          value={this.values.desc}
           onInput={this.handleInput.desc}
-        >
-          {this.values.desc}
-        </textarea>
-        <input
-          placeholder={this.app.msgs.announceEdit.form.link}
+          maxLength={500}
+        />
+        <ap-input
+          label={this.app.msgs.announceEdit.form.link}
           value={this.values.link}
           onInput={this.handleInput.link}
+          maxLength={500}
         />
         <button disabled={!this.values.name || !modified} onClick={this.handleSubmitClick}>
           {this.app.msgs.announceEdit.form.btn}
