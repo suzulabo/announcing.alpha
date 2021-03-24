@@ -60,13 +60,13 @@ export class AppPostForm {
 
   private handleInput = {
     title: (ev: Event) => {
-      this.values = { ...this.values, title: (ev.currentTarget as HTMLInputElement).value };
+      this.values = { ...this.values, title: (ev.target as HTMLInputElement).value };
     },
     body: (ev: Event) => {
-      this.values = { ...this.values, body: (ev.currentTarget as HTMLTextAreaElement).value };
+      this.values = { ...this.values, body: (ev.target as HTMLTextAreaElement).value };
     },
     link: (ev: Event) => {
-      this.values = { ...this.values, link: (ev.currentTarget as HTMLInputElement).value };
+      this.values = { ...this.values, link: (ev.target as HTMLInputElement).value };
     },
     img: (ev: CustomEvent<string>) => {
       this.values = { ...this.values, imgData: ev.detail };
@@ -105,21 +105,21 @@ export class AppPostForm {
           data={this.values.imgData}
           onImageChange={this.handleInput.img}
         />
-        <input
-          placeholder={this.app.msgs.postForm.title}
+        <ap-input
+          label={this.app.msgs.postForm.title}
           value={this.values.title}
           maxLength={50}
           onInput={this.handleInput.title}
         />
-        <textarea
-          placeholder={this.app.msgs.postForm.body}
+        <ap-input
+          textarea={true}
+          label={this.app.msgs.postForm.body}
+          value={this.values.body}
           maxLength={500}
           onInput={this.handleInput.body}
-        >
-          {this.values.body}
-        </textarea>
-        <input
-          placeholder={this.app.msgs.postForm.lnik}
+        />
+        <ap-input
+          label={this.app.msgs.postForm.lnik}
           value={this.values.link}
           maxLength={500}
           onInput={this.handleInput.link}
