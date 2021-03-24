@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, h, Host, Prop, readTask } from '@stencil/core';
 
 @Component({
   tag: 'ap-input',
@@ -17,6 +17,28 @@ export class ApInput {
   @Prop()
   textarea: boolean;
 
+  private autoGrow = (() => {
+    let el: HTMLTextAreaElement;
+    const handleRef = (_el: HTMLTextAreaElement) => {
+      el = _el;
+      this.autoGrow.run();
+    };
+    const handleInput = () => {
+      readTask(() => {
+        this.autoGrow.run();
+      });
+    };
+    const run = () => {
+      if (!el) {
+        return;
+      }
+      el.style.height = 'auto';
+      el.style.height = el.scrollHeight + 'px';
+    };
+
+    return { handleRef, handleInput, run };
+  })();
+
   render() {
     return (
       <Host>
@@ -28,7 +50,15 @@ export class ApInput {
             </span>
           </div>
           {!this.textarea && <input value={this.value} maxLength={this.maxLength} />}
-          {this.textarea && <textarea maxLength={this.maxLength}>{this.value}</textarea>}
+          {this.textarea && (
+            <textarea
+              maxLength={this.maxLength}
+              ref={this.autoGrow.handleRef}
+              onInput={this.autoGrow.handleInput}
+            >
+              {this.value}
+            </textarea>
+          )}
         </label>
       </Host>
     );
