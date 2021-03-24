@@ -19,7 +19,10 @@ export class AppHome {
     return docs.map(v => {
       return (
         <div class="announce-box">
-          <span class="name">{v.name}</span>
+          <div class="head">
+            <span class="name">{v.name}</span>
+            {v.iconData && <img src={v.iconData} />}
+          </div>
           <span class="desc">{v.desc}</span>
           <div class="buttons">
             <a {...this.app.href(`/${v.id}`)}>{this.app.msgs.home.announces.postBtn}</a>

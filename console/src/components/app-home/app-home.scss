@@ -34,8 +34,26 @@ app-home {
     display: flex;
     flex-direction: column;
 
+    .head {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      .name {
+        font-size: 1.2rem;
+        flex-grow: 1;
+      }
+      img {
+        object-fit: contain;
+        width: 80px;
+        height: 80px;
+        border-radius: 5px;
+        background-color: var(--light-bk-color);
+      }
+    }
     .desc {
+      padding: 20px 5px;
       flex-grow: 1;
+      white-space: pre-line;
     }
     .buttons {
       display: flex;
