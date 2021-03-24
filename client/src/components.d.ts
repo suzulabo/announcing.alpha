@@ -14,6 +14,8 @@ export namespace Components {
     }
     interface ApModal {
     }
+    interface ApStyle {
+    }
     interface AppAnnounce {
         "announceID": string;
         "app": App;
@@ -48,6 +50,12 @@ declare global {
         prototype: HTMLApModalElement;
         new (): HTMLApModalElement;
     };
+    interface HTMLApStyleElement extends Components.ApStyle, HTMLStencilElement {
+    }
+    var HTMLApStyleElement: {
+        prototype: HTMLApStyleElement;
+        new (): HTMLApStyleElement;
+    };
     interface HTMLAppAnnounceElement extends Components.AppAnnounce, HTMLStencilElement {
     }
     var HTMLAppAnnounceElement: {
@@ -76,6 +84,7 @@ declare global {
         "ap-icon": HTMLApIconElement;
         "ap-loading": HTMLApLoadingElement;
         "ap-modal": HTMLApModalElement;
+        "ap-style": HTMLApStyleElement;
         "app-announce": HTMLAppAnnounceElement;
         "app-home": HTMLAppHomeElement;
         "app-post": HTMLAppPostElement;
@@ -90,6 +99,8 @@ declare namespace LocalJSX {
     }
     interface ApModal {
         "onClose"?: (event: CustomEvent<any>) => void;
+    }
+    interface ApStyle {
     }
     interface AppAnnounce {
         "announceID"?: string;
@@ -109,6 +120,7 @@ declare namespace LocalJSX {
         "ap-icon": ApIcon;
         "ap-loading": ApLoading;
         "ap-modal": ApModal;
+        "ap-style": ApStyle;
         "app-announce": AppAnnounce;
         "app-home": AppHome;
         "app-post": AppPost;
@@ -122,6 +134,7 @@ declare module "@stencil/core" {
             "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
             "ap-loading": LocalJSX.ApLoading & JSXBase.HTMLAttributes<HTMLApLoadingElement>;
             "ap-modal": LocalJSX.ApModal & JSXBase.HTMLAttributes<HTMLApModalElement>;
+            "ap-style": LocalJSX.ApStyle & JSXBase.HTMLAttributes<HTMLApStyleElement>;
             "app-announce": LocalJSX.AppAnnounce & JSXBase.HTMLAttributes<HTMLAppAnnounceElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;
             "app-post": LocalJSX.AppPost & JSXBase.HTMLAttributes<HTMLAppPostElement>;
