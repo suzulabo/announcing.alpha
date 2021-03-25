@@ -6,7 +6,8 @@ import { Component, Element, Event, EventEmitter, h, Host } from '@stencil/core'
 })
 export class ApModal {
   @Element()
-  el: HTMLApModalElement;
+  // eslint-disable-next-line @stencil/element-type
+  el: HTMLElement;
 
   @Event()
   close: EventEmitter;
