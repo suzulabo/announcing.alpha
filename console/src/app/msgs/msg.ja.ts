@@ -67,7 +67,7 @@ export const msgs = {
   posts: {
     title: (s: string) => `${s}の投稿`,
     noPosts: 'お知らせが投稿されていません',
-    newPost: 'お知らせを投稿する',
+    newPost: '新しいお知らせを投稿する',
   },
   postForm: {
     title: 'タイトル',

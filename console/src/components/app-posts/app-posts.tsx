@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Host, Listen, Prop, State } from '@stencil/core';
+import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 
@@ -143,20 +143,12 @@ export class AppPosts {
 
     return (
       <Host>
-        {noPosts && (
-          <Fragment>
-            <div>{this.app.msgs.posts.noPosts}</div>
-            <a {...this.app.href(`${this.announceID}/post_`)}>{this.app.msgs.posts.newPost}</a>
-          </Fragment>
-        )}
-        {!noPosts && (
-          <Fragment>
-            <a class="button" {...this.app.href(`${this.announceID}/post_`)}>
-              +
-            </a>
-            {this.renderedPosts}
-          </Fragment>
-        )}
+        {noPosts && <div>{this.app.msgs.posts.noPosts}</div>}
+        <a class="button" {...this.app.href(`${this.announceID}/post_`)}>
+          {this.app.msgs.posts.newPost}
+        </a>
+        {!noPosts && this.renderedPosts}
+        <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }
