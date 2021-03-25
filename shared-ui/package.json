@@ -1,9 +1,12 @@
 {
   "name": "announsing-shared-ui",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "build": "stencil build"
+  },
   "devDependencies": {
     "@stencil/core": "^2.4.0",
+    "@stencil/sass": "^1.4.1",
     "@types/pica": "^5.1.2",
     "destyle.css": "^2.0.2",
     "pica": "^6.1.1"
