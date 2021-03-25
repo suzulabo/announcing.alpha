@@ -11,7 +11,6 @@ export namespace Components {
         "icon": 'github' | 'google' | 'image' | 'trash';
     }
     interface ApImageInput {
-        "app": App;
         "data": string;
         "label": string;
         "resizeRect": { width: number; height: number };
@@ -165,10 +164,10 @@ declare namespace LocalJSX {
         "icon"?: 'github' | 'google' | 'image' | 'trash';
     }
     interface ApImageInput {
-        "app"?: App;
         "data"?: string;
         "label"?: string;
         "onImageChange"?: (event: CustomEvent<string>) => void;
+        "onImageResizing"?: (event: CustomEvent<boolean>) => void;
         "resizeRect"?: { width: number; height: number };
     }
     interface ApInput {

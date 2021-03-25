@@ -36,6 +36,10 @@ export class AppAnnounceEdit {
     },
   };
 
+  private handleImageResizing = (ev: CustomEvent<boolean>) => {
+    this.app.loading = ev.detail;
+  };
+
   private handleImageChange = (ev: CustomEvent<string>) => {
     this.values = { ...this.values, icon: undefined, iconData: ev.detail };
   };
@@ -112,10 +116,10 @@ export class AppAnnounceEdit {
     return (
       <Host>
         <ap-image-input
-          app={this.app}
           label={this.app.msgs.announceEdit.form.icon}
           data={this.values.iconData}
           resizeRect={{ width: 200, height: 200 }}
+          onImageResizing={this.handleImageResizing}
           onImageChange={this.handleImageChange}
         />
         <ap-input

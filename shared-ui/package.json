@@ -4,6 +4,8 @@
   "scripts": {},
   "devDependencies": {
     "@stencil/core": "^2.4.0",
-    "destyle.css": "^2.0.2"
+    "@types/pica": "^5.1.2",
+    "destyle.css": "^2.0.2",
+    "pica": "^6.1.1"
   }
 }

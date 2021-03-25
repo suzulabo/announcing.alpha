@@ -71,6 +71,9 @@ export class AppPostForm {
     img: (ev: CustomEvent<string>) => {
       this.values = { ...this.values, imgData: ev.detail };
     },
+    resizing: (ev: CustomEvent<boolean>) => {
+      this.app.loading = ev.detail;
+    },
   };
 
   private handleSubmitClick = async () => {
@@ -100,9 +103,9 @@ export class AppPostForm {
     return (
       <Host>
         <ap-image-input
-          app={this.app}
           resizeRect={{ width: 800, height: 800 }}
           data={this.values.imgData}
+          onImageResizing={this.handleInput.resizing}
           onImageChange={this.handleInput.img}
         />
         <ap-input

@@ -1,15 +1,11 @@
 import { Component, Event, EventEmitter, h, Host, Prop } from '@stencil/core';
-import { App } from 'src/app/app';
-import { resizeImage } from 'src/utils/image';
+import pica from 'pica';
 
 @Component({
   tag: 'ap-image-input',
   styleUrl: 'ap-image-input.scss',
 })
 export class ApImageInput {
-  @Prop()
-  app: App;
-
   @Prop()
   resizeRect: { width: number; height: number };
 
@@ -18,6 +14,9 @@ export class ApImageInput {
 
   @Prop()
   data: string;
+
+  @Event()
+  imageResizing: EventEmitter<boolean>;
 
   @Event()
   imageChange: EventEmitter<string>;
@@ -31,7 +30,7 @@ export class ApImageInput {
       this.handlers.fileInput.click();
     },
     change: async () => {
-      this.app.loading = true;
+      this.imageResizing.emit(true);
       try {
         const newData = await resizeImage(
           this.handlers.fileInput.files[0],
@@ -40,7 +39,7 @@ export class ApImageInput {
         );
         this.imageChange.emit(newData);
       } finally {
-        this.app.loading = false;
+        this.imageResizing.emit(false);
       }
       this.handlers.fileInput.value = '';
     },
@@ -78,3 +77,40 @@ export class ApImageInput {
     );
   }
 }
+
+const calcSize = (srcWidth: number, srcHeight: number, maxWidth: number, maxHeight: number) => {
+  const scale = Math.min(maxWidth / srcWidth, maxHeight / srcHeight, 1);
+  return { width: srcWidth * scale, height: srcHeight * scale };
+};
+
+const resizeImage = async (file: File, width: number, height: number) => {
+  const dataURL = await new Promise<string>(resolve => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      resolve(ev.target.result as string);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  const image = await new Promise<HTMLImageElement>(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      resolve(img);
+    };
+    img.src = dataURL;
+  });
+
+  const canvas: HTMLCanvasElement = document.createElement('canvas');
+  const canvasSize = calcSize(image.width, image.height, width, height);
+  canvas.width = canvasSize.width;
+  canvas.height = canvasSize.height;
+
+  const resizer = pica();
+  await resizer.resize(image, canvas, {
+    unsharpAmount: 80,
+    unsharpRadius: 0.6,
+    unsharpThreshold: 2,
+  });
+
+  return canvas.toDataURL('image/jpeg', 0.85);
+};
