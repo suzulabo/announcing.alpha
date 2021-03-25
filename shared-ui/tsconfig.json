@@ -15,6 +15,6 @@
     "jsxFragmentFactory": "Fragment",
     "baseUrl": "."
   },
-  "include": ["ap-components"],
+  "include": ["src"],
   "exclude": ["node_modules"]
 }
