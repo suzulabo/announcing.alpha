@@ -4,7 +4,7 @@
   "watch": {
     "copy-shared": {
       "patterns": [
-        "../shared-ui/ap-components",
+        "../shared-ui/src",
         "../shared/src"
       ],
       "extensions": "ts,tsx,scss"
