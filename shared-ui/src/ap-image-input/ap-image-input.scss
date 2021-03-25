@@ -12,9 +12,7 @@ ap-image-input {
     border-radius: 5px;
     overflow: hidden;
 
-    &.no-img {
-      border: 1px solid var(--border-color);
-    }
+    border: 1px solid var(--light-border-color);
 
     img {
       max-width: var(--img-max-width);
