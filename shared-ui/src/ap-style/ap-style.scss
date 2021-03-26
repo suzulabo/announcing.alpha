@@ -7,17 +7,18 @@
 html {
   --color: #333333;
   --light-color: #666666;
-  --border-color: #333333;
 
+  --border-color: #333333;
   --light-border-color: #cccccc;
-  --post-border-color: #888888;
-  --placeholder-color: rgba(0, 0, 0, 0.7);
 
   --bk-color: white;
   --light-bk-color: #eeeeee;
+
   --button-hover-bk-color: #eeeeee;
   --bk-modal-color: rgba(0, 0, 0, 0.7);
   --bk-skeleton-color: #aaaaaa;
+
+  --post-border-color: #888888;
 }
 
 html,

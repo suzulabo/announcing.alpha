@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { Post } from 'src/shared';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
@@ -21,7 +21,7 @@ export class AppPost {
   showDelete = false;
 
   private announce: AnnounceState;
-  private post: Post;
+  private post: Post & { imgData?: string };
 
   async componentWillLoad() {
     const as = await this.app.getAnnounceState(this.announceID);
@@ -35,6 +35,10 @@ export class AppPost {
     if (!this.post) {
       this.app.pushRoute(`/${this.announceID}`, true);
       return;
+    }
+
+    if (this.post.img) {
+      this.post.imgData = await this.app.getImage(this.post.img);
     }
   }
 
@@ -63,13 +67,23 @@ export class AppPost {
       return;
     }
 
+    const post = this.post;
+
     return (
       <Host>
-        <span class="title">{this.post.title}</span>
+        {this.post.img && <img src={post.imgData} />}
+        <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
+        {post.title && (
+          <Fragment>
+            <span class="title">{post.title}</span>
+          </Fragment>
+        )}
+        <span class="body">{post.body}</span>
+        {post.link && <a href={post.link}></a>}
+        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
+          {this.app.msgs.common.back}
+        </a>
         <hr />
-        <span class="body">{this.post.body}</span>
-        {this.post.link && <a href={this.post.link}></a>}
-        <a {...this.app.href(`/${this.announceID}`, true)}>{this.app.msgs.common.back}</a>
         <div class="edit">
           <a {...this.app.href(`/${this.announceID}/${this.postID}/edit_`)}>
             {this.app.msgs.post.edit}
