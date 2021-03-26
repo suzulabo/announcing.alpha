@@ -84,6 +84,7 @@ export class App {
   }
 
   async signOut() {
+    this.appFirebase.releaseListeners();
     await this.appFirebase.signOut();
     this.appState.updateSignIn(this.appFirebase.user != null);
   }

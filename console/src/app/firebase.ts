@@ -1,4 +1,8 @@
 import { Build } from '@stencil/core';
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
+import 'firebase/functions';
 import {
   AnnounceConverter,
   AnnounceMetaConverter,
@@ -11,10 +15,6 @@ import {
   PutPostParams,
   UserConverter,
 } from 'src/shared';
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
-import 'firebase/functions';
 import { AppMsg } from './msg';
 
 import FieldValue = firebase.firestore.FieldValue;
@@ -134,10 +134,10 @@ export class AppFirebase {
   }
 
   private listeners = (() => {
-    const l = new Set<string>();
+    const listenMap = new Map<string, () => void>();
 
     const add = (p: string, cb: () => void) => {
-      if (l.has(p)) {
+      if (listenMap.has(p)) {
         return;
       }
 
@@ -148,14 +148,25 @@ export class AppFirebase {
         err => {
           console.warn(err);
           unsubscribe();
-          l.delete(p);
+          listenMap.delete(p);
         },
       );
-      l.add(p);
+      listenMap.set(p, unsubscribe);
     };
 
-    return { add };
+    const release = () => {
+      listenMap.forEach(v => {
+        v();
+      });
+      listenMap.clear();
+    };
+
+    return { add, release };
   })();
+
+  releaseListeners() {
+    this.listeners.release();
+  }
 
   listenUser(cb: () => void) {
     if (!this.user) {
