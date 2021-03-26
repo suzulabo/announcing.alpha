@@ -98,7 +98,7 @@ export class AppPostForm {
       return;
     }
 
-    const canSubmit = !!this.values.title && !!this.values.body;
+    const canSubmit = !!this.values.body;
 
     return (
       <Host>
