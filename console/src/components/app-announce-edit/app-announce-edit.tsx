@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
+import { isURL } from 'src/utils/isurl';
 
 @Component({
   tag: 'app-announce-edit',
@@ -113,6 +114,8 @@ export class AppAnnounceEdit {
       this.values.icon != this.announce.icon ||
       this.values.iconData != this.announce.iconData;
 
+    const canSubmit = !!this.values.name && isURL(this.values.link) && modified;
+
     return (
       <Host>
         <ap-image-input
@@ -141,7 +144,7 @@ export class AppAnnounceEdit {
           onInput={this.handleInput.link}
           maxLength={500}
         />
-        <button disabled={!this.values.name || !modified} onClick={this.handleSubmitClick}>
+        <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
           {this.app.msgs.announceEdit.form.btn}
         </button>
         <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>

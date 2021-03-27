@@ -2,6 +2,7 @@ import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 import { Post } from 'src/shared';
+import { isURL } from 'src/utils/isurl';
 
 @Component({
   tag: 'app-post-form',
@@ -100,7 +101,7 @@ export class AppPostForm {
       return;
     }
 
-    let canSubmit = !!this.values.body;
+    let canSubmit = !!this.values.body && isURL(this.values.link);
     if (canSubmit && this.postID) {
       canSubmit =
         this.values.title != this.post.title ||
