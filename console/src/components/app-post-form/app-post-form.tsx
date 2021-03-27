@@ -90,7 +90,7 @@ export class AppPostForm {
         this.values.imgData?.split(',')[1],
         this.postID,
       );
-      this.app.pushRoute(this.backPath);
+      this.app.pushRoute(`/${this.announceID}`);
     } finally {
       this.app.loading = false;
     }
