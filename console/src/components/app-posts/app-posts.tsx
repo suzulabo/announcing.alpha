@@ -123,8 +123,7 @@ export class AppPosts {
         ref={this.handleRef.observe}
       >
         <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
-        <span class="title">{post.title}</span>
-        <hr />
+        {post.title && <span class="title">{post.title}</span>}
         <div class="body">{post.body}</div>
       </a>
     );
