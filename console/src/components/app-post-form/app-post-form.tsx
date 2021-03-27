@@ -1,6 +1,7 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
+import { Post } from 'src/shared';
 
 @Component({
   tag: 'app-post-form',
@@ -20,7 +21,7 @@ export class AppPostForm {
   values: { title?: string; body?: string; link?: string; img?: string; imgData?: string };
 
   private announce: AnnounceState;
-  //private post: Post;
+  private post: Post & { imgData?: string };
 
   private backPath: string;
 
@@ -50,11 +51,12 @@ export class AppPostForm {
       this.app.pushRoute(this.backPath, true);
       return;
     }
-    //this.post = post;
+    this.post = post;
     this.values = { ...post };
 
     if (post.img) {
       this.values.imgData = await this.app.getImage(post.img);
+      this.post.imgData = this.values.imgData;
     }
   }
 
@@ -98,7 +100,14 @@ export class AppPostForm {
       return;
     }
 
-    const canSubmit = !!this.values.body;
+    let canSubmit = !!this.values.body;
+    if (canSubmit && this.postID) {
+      canSubmit =
+        this.values.title != this.post.title ||
+        this.values.body != this.post.body ||
+        this.values.link != this.post.link ||
+        this.values.imgData != this.post.imgData;
+    }
 
     return (
       <Host>
