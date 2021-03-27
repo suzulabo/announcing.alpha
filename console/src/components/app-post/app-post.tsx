@@ -79,7 +79,11 @@ export class AppPost {
           </Fragment>
         )}
         <span class="body">{post.body}</span>
-        {post.link && <a href={post.link}></a>}
+        {post.link && (
+          <a class="link" href={post.link}>
+            {post.link}
+          </a>
+        )}
         <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
           {this.app.msgs.common.back}
         </a>
