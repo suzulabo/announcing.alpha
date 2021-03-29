@@ -66,6 +66,23 @@ ap-announce {
     }
 
     &.skeleton {
+      @keyframes blink {
+        0% {
+          opacity: 0;
+        }
+        33% {
+          opacity: 0;
+        }
+        66% {
+          opacity: 1;
+        }
+      }
+
+      > * {
+        opacity: 0;
+        animation: blink 3s linear infinite;
+      }
+
       .date {
         background-color: var(--bk-skeleton-color);
         height: 1em;
