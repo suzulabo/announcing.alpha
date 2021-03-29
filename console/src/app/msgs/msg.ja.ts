@@ -68,11 +68,6 @@ export const msgs = {
       confirm: 'アナウンスを削除します。よろしいですか？',
     },
   },
-  posts: {
-    title: (s: string) => `${s}の投稿`,
-    noPosts: 'お知らせが投稿されていません',
-    newPost: '新しいお知らせを投稿する',
-  },
   postForm: {
     title: 'タイトル',
     body: '本文',
