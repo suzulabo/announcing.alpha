@@ -100,7 +100,7 @@ const resizeImage = async (file: File, width: number, height: number) => {
     img.src = dataURL;
   });
 
-  const canvas: HTMLCanvasElement = document.createElement('canvas');
+  const canvas = document.createElement('canvas');
   const canvasSize = calcSize(image.width, image.height, width, height);
   canvas.width = canvasSize.width;
   canvas.height = canvasSize.height;
@@ -110,7 +110,17 @@ const resizeImage = async (file: File, width: number, height: number) => {
     unsharpAmount: 80,
     unsharpRadius: 0.6,
     unsharpThreshold: 2,
+    alpha: true,
   });
 
-  return canvas.toDataURL('image/jpeg', 0.85);
+  // fill white on alpha channel
+  const canvas2 = document.createElement('canvas');
+  canvas2.width = canvasSize.width;
+  canvas2.height = canvasSize.height;
+  var ctx = canvas2.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(canvas, 0, 0);
+
+  return canvas2.toDataURL('image/jpeg', 0.85);
 };
