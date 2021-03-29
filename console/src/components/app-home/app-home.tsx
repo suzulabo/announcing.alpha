@@ -18,17 +18,13 @@ export class AppHome {
     const docs = this.app.getAnnounces();
     return docs.map(v => {
       return (
-        <div class="announce-box">
+        <a class="announce-box" {...this.app.href(`/${v.id}`)}>
           <div class="head">
             <span class="name">{v.name}</span>
             {v.iconData && <img src={v.iconData} />}
           </div>
           <span class="desc">{v.desc}</span>
-          <div class="buttons">
-            <a {...this.app.href(`/${v.id}`)}>{this.app.msgs.home.announces.postBtn}</a>
-            <a {...this.app.href(`/${v.id}/edit_`)}>{this.app.msgs.home.announces.editBtn}</a>
-          </div>
-        </div>
+        </a>
       );
     });
   }
