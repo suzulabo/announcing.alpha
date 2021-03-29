@@ -34,6 +34,10 @@ export const msgs = {
       editBtn: '設定',
     },
   },
+  announce: {
+    noPosts: 'お知らせが投稿されていません',
+    newPost: '新しいお知らせを投稿する',
+  },
   announceCreate: {
     title: '新規登録',
     form: {

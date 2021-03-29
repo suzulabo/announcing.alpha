@@ -7,6 +7,29 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { App } from "src/app/app";
 export namespace Components {
+    interface ApAnnounce {
+        "announce": {
+    name: string;
+    desc?: string;
+    iconData?: string;
+    link?: string;
+    posts?: string[];
+  };
+        "msgs": {
+    datetime: (d: number) => string;
+    noPosts: string;
+  };
+        "postLoader": (
+    id: string,
+  ) => Promise<{
+    title?: string;
+    body: string;
+    imgData?: string;
+    link?: string;
+    pT: number;
+    anchorAttrs: { [k: string]: any };
+  }>;
+    }
     interface ApIcon {
         "icon": 'github' | 'google' | 'image' | 'trash';
     }
@@ -26,6 +49,10 @@ export namespace Components {
     interface ApModal {
     }
     interface ApStyle {
+    }
+    interface AppAnnounce {
+        "announceID": string;
+        "app": App;
     }
     interface AppAnnounceCreate {
         "app": App;
@@ -58,6 +85,12 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLApAnnounceElement extends Components.ApAnnounce, HTMLStencilElement {
+    }
+    var HTMLApAnnounceElement: {
+        prototype: HTMLApAnnounceElement;
+        new (): HTMLApAnnounceElement;
+    };
     interface HTMLApIconElement extends Components.ApIcon, HTMLStencilElement {
     }
     var HTMLApIconElement: {
@@ -93,6 +126,12 @@ declare global {
     var HTMLApStyleElement: {
         prototype: HTMLApStyleElement;
         new (): HTMLApStyleElement;
+    };
+    interface HTMLAppAnnounceElement extends Components.AppAnnounce, HTMLStencilElement {
+    }
+    var HTMLAppAnnounceElement: {
+        prototype: HTMLAppAnnounceElement;
+        new (): HTMLAppAnnounceElement;
     };
     interface HTMLAppAnnounceCreateElement extends Components.AppAnnounceCreate, HTMLStencilElement {
     }
@@ -143,12 +182,14 @@ declare global {
         new (): HTMLAppSigninElement;
     };
     interface HTMLElementTagNameMap {
+        "ap-announce": HTMLApAnnounceElement;
         "ap-icon": HTMLApIconElement;
         "ap-image-input": HTMLApImageInputElement;
         "ap-input": HTMLApInputElement;
         "ap-loading": HTMLApLoadingElement;
         "ap-modal": HTMLApModalElement;
         "ap-style": HTMLApStyleElement;
+        "app-announce": HTMLAppAnnounceElement;
         "app-announce-create": HTMLAppAnnounceCreateElement;
         "app-announce-edit": HTMLAppAnnounceEditElement;
         "app-home": HTMLAppHomeElement;
@@ -160,6 +201,29 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    interface ApAnnounce {
+        "announce"?: {
+    name: string;
+    desc?: string;
+    iconData?: string;
+    link?: string;
+    posts?: string[];
+  };
+        "msgs"?: {
+    datetime: (d: number) => string;
+    noPosts: string;
+  };
+        "postLoader"?: (
+    id: string,
+  ) => Promise<{
+    title?: string;
+    body: string;
+    imgData?: string;
+    link?: string;
+    pT: number;
+    anchorAttrs: { [k: string]: any };
+  }>;
+    }
     interface ApIcon {
         "icon"?: 'github' | 'google' | 'image' | 'trash';
     }
@@ -182,6 +246,10 @@ declare namespace LocalJSX {
         "onClose"?: (event: CustomEvent<any>) => void;
     }
     interface ApStyle {
+    }
+    interface AppAnnounce {
+        "announceID"?: string;
+        "app"?: App;
     }
     interface AppAnnounceCreate {
         "app"?: App;
@@ -213,12 +281,14 @@ declare namespace LocalJSX {
         "app"?: App;
     }
     interface IntrinsicElements {
+        "ap-announce": ApAnnounce;
         "ap-icon": ApIcon;
         "ap-image-input": ApImageInput;
         "ap-input": ApInput;
         "ap-loading": ApLoading;
         "ap-modal": ApModal;
         "ap-style": ApStyle;
+        "app-announce": AppAnnounce;
         "app-announce-create": AppAnnounceCreate;
         "app-announce-edit": AppAnnounceEdit;
         "app-home": AppHome;
@@ -233,12 +303,14 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "ap-announce": LocalJSX.ApAnnounce & JSXBase.HTMLAttributes<HTMLApAnnounceElement>;
             "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
             "ap-image-input": LocalJSX.ApImageInput & JSXBase.HTMLAttributes<HTMLApImageInputElement>;
             "ap-input": LocalJSX.ApInput & JSXBase.HTMLAttributes<HTMLApInputElement>;
             "ap-loading": LocalJSX.ApLoading & JSXBase.HTMLAttributes<HTMLApLoadingElement>;
             "ap-modal": LocalJSX.ApModal & JSXBase.HTMLAttributes<HTMLApModalElement>;
             "ap-style": LocalJSX.ApStyle & JSXBase.HTMLAttributes<HTMLApStyleElement>;
+            "app-announce": LocalJSX.AppAnnounce & JSXBase.HTMLAttributes<HTMLAppAnnounceElement>;
             "app-announce-create": LocalJSX.AppAnnounceCreate & JSXBase.HTMLAttributes<HTMLAppAnnounceCreateElement>;
             "app-announce-edit": LocalJSX.AppAnnounceEdit & JSXBase.HTMLAttributes<HTMLAppAnnounceEditElement>;
             "app-home": LocalJSX.AppHome & JSXBase.HTMLAttributes<HTMLAppHomeElement>;

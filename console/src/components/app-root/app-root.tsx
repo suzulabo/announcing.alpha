@@ -111,7 +111,7 @@ export class AppRoot {
           return { tag: 'app-post', params: { announceID, postID } };
         }
       } else {
-        return { tag: 'app-posts', params: { announceID } };
+        return { tag: 'app-announce', params: { announceID } };
       }
     }
   }
