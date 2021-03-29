@@ -52,6 +52,7 @@ export class AppAnnounce {
             {this.app.msgs.announce.newPost}
           </a>
         </ap-announce>
+        <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }
