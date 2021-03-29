@@ -152,6 +152,7 @@ export class ApAnnounce {
             {announce.link}
           </a>
         )}
+        <slot name="bottomAnnounce" />
         <hr />
         {noPosts && <span class="no-posts">{this.msgs.noPosts}</span>}
         <slot name="beforePosts" />

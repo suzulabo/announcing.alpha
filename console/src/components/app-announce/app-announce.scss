@@ -5,6 +5,15 @@ app-announce {
   align-items: center;
   justify-content: center;
 
+  div.buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    a.button {
+      margin-right: 10px;
+    }
+  }
+
   a.new-post {
     align-self: center;
     margin-bottom: 20px;

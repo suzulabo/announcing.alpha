@@ -34,16 +34,24 @@ export class AppAnnounce {
   };
 
   render() {
+    const msgs = this.app.msgs;
+
     return (
       <Host>
         <ap-announce
           announce={this.announce}
           postLoader={this.postLoader}
           msgs={{
-            datetime: this.app.msgs.common.datetime,
-            noPosts: this.app.msgs.announce.noPosts,
+            datetime: msgs.common.datetime,
+            noPosts: msgs.announce.noPosts,
           }}
         >
+          <div class="buttons" slot="bottomAnnounce">
+            <a class="button small" {...this.app.href(`${this.announceID}/edit_`)}>
+              {msgs.announce.edit}
+            </a>
+            <a class="button small">{msgs.announce.showURL}</a>
+          </div>
           <a
             slot="beforePosts"
             class="button new-post"

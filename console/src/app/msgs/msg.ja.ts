@@ -37,6 +37,8 @@ export const msgs = {
   announce: {
     noPosts: 'お知らせが投稿されていません',
     newPost: '新しいお知らせを投稿する',
+    edit: '編集する',
+    showURL: 'URLを表示',
   },
   announceCreate: {
     title: '新規登録',
