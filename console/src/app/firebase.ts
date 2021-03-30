@@ -146,9 +146,9 @@ export class AppFirebase {
           cb();
         },
         err => {
-          console.warn(err);
           unsubscribe();
           listenMap.delete(p);
+          throw err;
         },
       );
       listenMap.set(p, unsubscribe);
