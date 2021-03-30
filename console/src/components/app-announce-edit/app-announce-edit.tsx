@@ -160,7 +160,7 @@ export class AppAnnounceEdit {
           </Fragment>
         )}
         {this.showDeleteConfirm && (
-          <ap-modal>
+          <ap-modal onClose={this.handleDeleteModalClose}>
             <div class="delete-modal">
               <div>{this.app.msgs.announceEdit.deletion.confirm}</div>
               <div class="buttons">

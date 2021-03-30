@@ -91,17 +91,20 @@ button,
     padding: 10px;
   }
 
-  &.small {
+  &.small,
+  &.slim {
     font-size: 0.9rem;
     padding: 5px 10px;
   }
 
+  &.slim {
+    border-width: 1px;
+  }
+
   &.anchor {
     border: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
+    text-decoration: underline;
+    padding: 0;
   }
 
   &.full-width {

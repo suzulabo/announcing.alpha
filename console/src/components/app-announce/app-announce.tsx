@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 
@@ -12,6 +12,9 @@ export class AppAnnounce {
 
   @Prop()
   announceID: string;
+
+  @State()
+  showURL = false;
 
   private announce: AnnounceState;
 
@@ -33,8 +36,40 @@ export class AppAnnounce {
     return { ...post, anchorAttrs: this.app.href(`/${this.announceID}/${postID}`) };
   };
 
+  private urlModal = {
+    urlEl: null as HTMLElement,
+    handlers: {
+      show: () => {
+        this.showURL = true;
+      },
+      close: () => {
+        this.showURL = false;
+      },
+      copy: async () => {
+        const urlEl = this.urlModal.urlEl;
+        if (!urlEl) {
+          return;
+        }
+
+        await navigator.clipboard.writeText(`${this.app.clientSite}/${this.announceID}`);
+
+        urlEl.classList.remove('copied');
+
+        // void codeEl.offsetWidth; <- It is removed when production build
+        if (!isNaN(urlEl.offsetWidth)) {
+          urlEl.classList.add('copied');
+        }
+      },
+      urlRef: (el: HTMLElement) => {
+        this.urlModal.urlEl = el;
+      },
+    },
+  };
+
   render() {
     const msgs = this.app.msgs;
+
+    const url = `${this.app.clientSite}/${this.announceID}`;
 
     return (
       <Host>
@@ -50,7 +85,9 @@ export class AppAnnounce {
             <a class="button small" {...this.app.href(`${this.announceID}/edit_`)}>
               {msgs.announce.edit}
             </a>
-            <a class="button small">{msgs.announce.showURL}</a>
+            <button class="small" onClick={this.urlModal.handlers.show}>
+              {msgs.announce.showURL}
+            </button>
           </div>
           <a
             slot="beforePosts"
@@ -61,6 +98,26 @@ export class AppAnnounce {
           </a>
         </ap-announce>
         <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
+        {this.showURL && (
+          <ap-modal onClose={this.urlModal.handlers.close}>
+            <div class="url-modal">
+              <div class="url" ref={this.urlModal.handlers.urlRef}>
+                {url}
+              </div>
+              <div class="buttons">
+                <a class="button slim open" href={url} target="_blank" rel="noopener">
+                  {msgs.announce.open}
+                </a>
+                <button class="slim copy" onClick={this.urlModal.handlers.copy}>
+                  {msgs.announce.copy}
+                </button>
+                <button class="slim close" onClick={this.urlModal.handlers.close}>
+                  {msgs.common.close}
+                </button>
+              </div>
+            </div>
+          </ap-modal>
+        )}
       </Host>
     );
   }

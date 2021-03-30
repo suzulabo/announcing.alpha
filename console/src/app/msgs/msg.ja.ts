@@ -38,6 +38,8 @@ export const msgs = {
     noPosts: 'お知らせが投稿されていません',
     newPost: '新しいお知らせを投稿する',
     edit: '編集する',
+    open: 'URLを開く',
+    copy: 'URLをコピー',
     showURL: 'URLを表示',
   },
   announceCreate: {

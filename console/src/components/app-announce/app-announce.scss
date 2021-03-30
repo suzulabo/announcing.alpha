@@ -5,17 +5,62 @@ app-announce {
   align-items: center;
   justify-content: center;
 
-  div.buttons {
-    margin-top: 20px;
-    display: flex;
-    justify-content: flex-end;
-    a.button {
-      margin-right: 10px;
+  ap-announce {
+    div.buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      > * {
+        margin-right: 10px;
+      }
+    }
+
+    a.new-post {
+      align-self: center;
+      margin-bottom: 20px;
     }
   }
 
-  a.new-post {
-    align-self: center;
-    margin-bottom: 20px;
+  .url-modal {
+    background-color: var(--bk-color);
+    border-radius: 5px;
+    padding: 30px 10px 20px;
+
+    width: 100%;
+    max-width: 400px;
+
+    text-align: center;
+
+    .url {
+      border-radius: 5px;
+      border: 1px solid var(--light-border-color);
+      user-select: all;
+      padding: 10px 0;
+
+      &.copied {
+        animation: copied 0.1s 1;
+      }
+
+      @keyframes copied {
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    }
+
+    div.buttons {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      .open {
+        margin-right: 20px;
+      }
+      .close {
+        margin-left: auto;
+      }
+    }
   }
 }
