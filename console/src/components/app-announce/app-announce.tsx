@@ -34,8 +34,8 @@ export class AppAnnounce {
     this.announce = as;
 
     this.qrCode = new QRCodeStyling({
-      width: 150,
-      height: 150,
+      width: 200,
+      height: 200,
       dotsOptions: {
         color: '#333333',
         type: 'extra-rounded',
@@ -154,7 +154,7 @@ export class AppAnnounce {
                     min="100"
                     max="300"
                     value="200"
-                    step="10"
+                    step="50"
                     onInput={this.urlModal.handlers.qrsize}
                   />
                   <button class="slim qr-download" onClick={this.urlModal.handlers.download}>
