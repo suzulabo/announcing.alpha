@@ -38,9 +38,11 @@ export const msgs = {
     noPosts: 'お知らせが投稿されていません',
     newPost: '新しいお知らせを投稿する',
     edit: '編集する',
-    open: 'URLを開く',
-    copy: 'URLをコピー',
     showURL: 'URLを表示',
+    showQRCode: 'QRコードを表示',
+    downloadQRCode: 'QRコードをダウンロード',
+    openURL: 'URLを開く',
+    copyURL: 'URLをコピー',
   },
   announceCreate: {
     title: '新規登録',

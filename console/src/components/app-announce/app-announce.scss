@@ -24,18 +24,41 @@ app-announce {
   .url-modal {
     background-color: var(--bk-color);
     border-radius: 5px;
-    padding: 30px 10px 20px;
+    padding: 20px 10px;
+
+    > * {
+      margin: 10px 0;
+    }
 
     width: 100%;
     max-width: 400px;
 
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+
+    div.qr {
+      align-self: center;
+      width: 300px;
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    input.qr-size {
+      align-self: center;
+      width: 300px;
+    }
+    button.qr-download {
+      align-self: center;
+    }
 
     .url {
+      text-align: center;
       border-radius: 5px;
       border: 1px solid var(--light-border-color);
       user-select: all;
       padding: 10px 0;
+      font-weight: bolder;
 
       &.copied {
         animation: copied 0.1s 1;
@@ -52,6 +75,7 @@ app-announce {
     }
 
     div.buttons {
+      align-self: stretch;
       margin-top: 20px;
       display: flex;
       align-items: center;

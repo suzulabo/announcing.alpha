@@ -1,4 +1,5 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import QRCodeStyling from 'qr-code-styling';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 
@@ -16,7 +17,12 @@ export class AppAnnounce {
   @State()
   showURL = false;
 
+  @State()
+  showQRCode = false;
+
   private announce: AnnounceState;
+
+  private qrCode: QRCodeStyling;
 
   async componentWillLoad() {
     const as = await this.app.getAnnounceState(this.announceID);
@@ -26,6 +32,20 @@ export class AppAnnounce {
     }
 
     this.announce = as;
+
+    this.qrCode = new QRCodeStyling({
+      width: 150,
+      height: 150,
+      dotsOptions: {
+        color: '#333333',
+        type: 'extra-rounded',
+      },
+      cornersSquareOptions: {
+        type: 'extra-rounded',
+      },
+      image: as.iconData,
+      data: this.clientURL,
+    });
   }
 
   private postLoader = async (postID: string) => {
@@ -36,14 +56,22 @@ export class AppAnnounce {
     return { ...post, anchorAttrs: this.app.href(`/${this.announceID}/${postID}`) };
   };
 
+  private get clientURL() {
+    return `${this.app.clientSite}/${this.announceID}`;
+  }
+
   private urlModal = {
     urlEl: null as HTMLElement,
     handlers: {
       show: () => {
         this.showURL = true;
+        this.showQRCode = false;
       },
       close: () => {
         this.showURL = false;
+      },
+      showQrCode: () => {
+        this.showQRCode = true;
       },
       copy: async () => {
         const urlEl = this.urlModal.urlEl;
@@ -51,7 +79,7 @@ export class AppAnnounce {
           return;
         }
 
-        await navigator.clipboard.writeText(`${this.app.clientSite}/${this.announceID}`);
+        await navigator.clipboard.writeText(this.clientURL);
 
         urlEl.classList.remove('copied');
 
@@ -60,8 +88,19 @@ export class AppAnnounce {
           urlEl.classList.add('copied');
         }
       },
+      qrsize: (event: Event) => {
+        const el = event.target as HTMLInputElement;
+        const w = parseInt(el.value);
+        this.qrCode.update({ width: w, height: w });
+      },
+      download: () => {
+        this.qrCode.download({ name: `qrcode-${this.announce.name}`, extension: 'png' });
+      },
       urlRef: (el: HTMLElement) => {
         this.urlModal.urlEl = el;
+      },
+      qrcodeRef: (el: HTMLElement) => {
+        this.qrCode.append(el);
       },
     },
   };
@@ -69,7 +108,7 @@ export class AppAnnounce {
   render() {
     const msgs = this.app.msgs;
 
-    const url = `${this.app.clientSite}/${this.announceID}`;
+    const url = this.clientURL;
 
     return (
       <Host>
@@ -101,15 +140,37 @@ export class AppAnnounce {
         {this.showURL && (
           <ap-modal onClose={this.urlModal.handlers.close}>
             <div class="url-modal">
+              {!this.showQRCode && (
+                <button class="anchor" onClick={this.urlModal.handlers.showQrCode}>
+                  {msgs.announce.showQRCode}
+                </button>
+              )}
+              {this.showQRCode && (
+                <Fragment>
+                  <div class="qr" ref={this.urlModal.handlers.qrcodeRef} />
+                  <input
+                    class="qr-size"
+                    type="range"
+                    min="100"
+                    max="300"
+                    value="200"
+                    step="10"
+                    onInput={this.urlModal.handlers.qrsize}
+                  />
+                  <button class="slim qr-download" onClick={this.urlModal.handlers.download}>
+                    {msgs.announce.downloadQRCode}
+                  </button>
+                </Fragment>
+              )}
               <div class="url" ref={this.urlModal.handlers.urlRef}>
                 {url}
               </div>
               <div class="buttons">
                 <a class="button slim open" href={url} target="_blank" rel="noopener">
-                  {msgs.announce.open}
+                  {msgs.announce.openURL}
                 </a>
                 <button class="slim copy" onClick={this.urlModal.handlers.copy}>
-                  {msgs.announce.copy}
+                  {msgs.announce.copyURL}
                 </button>
                 <button class="slim close" onClick={this.urlModal.handlers.close}>
                   {msgs.common.close}
