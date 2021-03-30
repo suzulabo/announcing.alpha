@@ -163,17 +163,11 @@ export class App {
     return this.appState.state.announces;
   }
 
-  async getAnnounceState(id: string) {
+  getAnnounceState(id: string) {
     this.listenUser();
-    const user = await this.appFirebase.getUser();
-    if (!user.announces || user.announces.indexOf(id) < 0) {
-      return;
-    }
-
-    const a = await this.appFirebase.getAnnounce(id);
-    if (a) {
-      return await this.toAnnounceState(id, a);
-    }
+    return this.appState.state.announces.find(v => {
+      return v.id == id;
+    });
   }
 
   getPost(id: string, postID: string) {

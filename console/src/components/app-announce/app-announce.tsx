@@ -1,7 +1,6 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import QRCodeStyling from 'qr-code-styling';
 import { App } from 'src/app/app';
-import { AnnounceState } from 'src/app/datatypes';
 
 @Component({
   tag: 'app-announce',
@@ -20,18 +19,10 @@ export class AppAnnounce {
   @State()
   showQRCode = false;
 
-  private announce: AnnounceState;
-
   private qrCode: QRCodeStyling;
 
-  async componentWillLoad() {
-    const as = await this.app.getAnnounceState(this.announceID);
-    if (!as) {
-      this.app.pushRoute('/');
-      return;
-    }
-
-    this.announce = as;
+  componentWillLoad() {
+    this.app.getAnnounceState(this.announceID);
 
     this.qrCode = new QRCodeStyling({
       width: 200,
@@ -43,7 +34,6 @@ export class AppAnnounce {
       cornersSquareOptions: {
         type: 'extra-rounded',
       },
-      image: as.iconData,
       data: this.clientURL,
     });
   }
@@ -94,7 +84,10 @@ export class AppAnnounce {
         this.qrCode.update({ width: w, height: w });
       },
       download: () => {
-        this.qrCode.download({ name: `qrcode-${this.announce.name}`, extension: 'png' });
+        const announce = this.app.getAnnounceState(this.announceID);
+        if (announce) {
+          this.qrCode.download({ name: `qrcode-${announce.name}`, extension: 'png' });
+        }
       },
       urlRef: (el: HTMLElement) => {
         this.urlModal.urlEl = el;
@@ -106,6 +99,11 @@ export class AppAnnounce {
   };
 
   render() {
+    const announce = this.app.getAnnounceState(this.announceID);
+    if (!announce) {
+      return;
+    }
+
     const msgs = this.app.msgs;
 
     const url = this.clientURL;
@@ -113,7 +111,7 @@ export class AppAnnounce {
     return (
       <Host>
         <ap-announce
-          announce={this.announce}
+          announce={announce}
           postLoader={this.postLoader}
           msgs={{
             datetime: msgs.common.datetime,
