@@ -1,29 +1,21 @@
 import { createStore } from '@stencil/store';
+import { User } from 'src/shared';
 import { AnnounceState } from './datatypes';
 
 interface State {
   loading: boolean;
   signIn: boolean;
-  announces: AnnounceState[];
+  user: User;
+  announces: Map<string, AnnounceState>;
 }
 
 const store = createStore<State>({
   loading: false,
   signIn: false,
-  announces: [],
+  user: null,
+  announces: new Map(),
 });
 
 export class AppState {
-  readonly state = store.state as Readonly<State>;
-
-  updateLoading(v: boolean) {
-    store.state.loading = v;
-  }
-
-  updateSignIn(v: boolean) {
-    store.state.signIn = v;
-  }
-  updateAnnounces(announces: AnnounceState[]) {
-    store.state.announces = announces;
-  }
+  readonly state: State = store.state as Readonly<State>;
 }

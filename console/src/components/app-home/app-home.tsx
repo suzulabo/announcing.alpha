@@ -9,6 +9,10 @@ export class AppHome {
   @Prop()
   app: App;
 
+  async componentWillLoad() {
+    await this.app.loadAnnounces();
+  }
+
   private handleSignOutClick = async () => {
     await this.app.signOut();
     this.app.redirectRoute('/signin');
@@ -16,7 +20,7 @@ export class AppHome {
 
   private renderAnnounces() {
     const docs = this.app.getAnnounces();
-    return docs.map(v => {
+    return docs?.map(v => {
       return (
         <a class="announce-box" {...this.app.href(`/${v.id}`)}>
           <div class="head">

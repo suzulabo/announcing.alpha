@@ -29,7 +29,7 @@ export class App {
 
   async init() {
     await this.appFirebase.init();
-    this.appState.updateSignIn(this.appFirebase.user != null);
+    this.appState.state.signIn = this.appFirebase.user != null;
   }
 
   setTitle(v: string) {
@@ -69,7 +69,7 @@ export class App {
   }
 
   set loading(v: boolean) {
-    this.appState.updateLoading(v);
+    this.appState.state.loading = v;
   }
   get loading() {
     return this.appState.state.loading;
@@ -86,7 +86,7 @@ export class App {
   async signOut() {
     this.appFirebase.releaseListeners();
     await this.appFirebase.signOut();
-    this.appState.updateSignIn(this.appFirebase.user != null);
+    this.appState.state.signIn = this.appFirebase.user != null;
   }
 
   signInGoogle() {
@@ -134,40 +134,54 @@ export class App {
     return { id, ...a, ...meta, iconData };
   }
 
-  private listenUser() {
-    this.appFirebase.listenUser(async () => {
+  async loadUser() {
+    await this.appFirebase.listenUser(async () => {
       const user = await this.appFirebase.getUser();
-      if (!user || !user.announces) {
-        return;
-      }
+      this.appState.state.user = user;
+    });
+  }
 
-      const as = [] as AnnounceState[];
-      for (const id of user.announces) {
-        const announce = await this.appFirebase.getAnnounce(id);
-        const v = await this.toAnnounceState(id, announce);
-        if (v) {
-          as.push(v);
-        }
-      }
+  async loadAnnounces() {
+    await this.loadUser();
+    const user = this.appState.state.user;
+    for (const id of user.announces) {
+      await this.loadAnnounce(id);
+    }
+  }
 
-      as.sort((v1, v2) => {
-        return v2.uT - v1.uT;
-      });
-
-      this.appState.updateAnnounces(as);
+  async loadAnnounce(id: string) {
+    await this.appFirebase.listenAnnounce(id, async () => {
+      const a = await this.appFirebase.getAnnounce(id);
+      const as = await this.toAnnounceState(id, a);
+      const m = new Map(this.appState.state.announces);
+      m.set(id, as);
+      this.appState.state.announces = m;
     });
   }
 
   getAnnounces() {
-    this.listenUser();
-    return this.appState.state.announces;
+    const user = this.appState.state.user;
+    if (!user) {
+      return;
+    }
+
+    const result: AnnounceState[] = [];
+    for (const id of user.announces) {
+      const as = this.appState.state.announces.get(id);
+      if (as) {
+        result.push(as);
+      }
+    }
+
+    result.sort((v1, v2) => {
+      return v2.uT - v1.uT;
+    });
+
+    return result;
   }
 
   getAnnounceState(id: string) {
-    this.listenUser();
-    return this.appState.state.announces.find(v => {
-      return v.id == id;
-    });
+    return this.appState.state.announces.get(id);
   }
 
   getPost(id: string, postID: string) {

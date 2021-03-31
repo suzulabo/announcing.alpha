@@ -26,7 +26,10 @@ export const converters = {
   user: new UserConverter<FieldValue>(),
 };
 
-const getCacheFirst = async <T>(docRef: firebase.firestore.DocumentReference<T>) => {
+const getCacheFirst = async <T>(
+  docRef: firebase.firestore.DocumentReference<T>,
+  cacheOnly = false,
+) => {
   {
     try {
       const doc = await docRef.get({ source: 'cache' });
@@ -35,6 +38,9 @@ const getCacheFirst = async <T>(docRef: firebase.firestore.DocumentReference<T>)
         return doc.data();
       }
     } catch {}
+  }
+  if (cacheOnly) {
+    return;
   }
   {
     const doc = await docRef.get({ source: 'default' });
@@ -136,22 +142,27 @@ export class AppFirebase {
   private listeners = (() => {
     const listenMap = new Map<string, () => void>();
 
-    const add = (p: string, cb: () => void) => {
+    const add = async (p: string, cb: () => Promise<void>) => {
       if (listenMap.has(p)) {
         return;
       }
 
-      const unsubscribe = this.firestore.doc(p).onSnapshot(
-        () => {
-          cb();
-        },
-        err => {
-          unsubscribe();
-          listenMap.delete(p);
-          throw err;
-        },
-      );
-      listenMap.set(p, unsubscribe);
+      return new Promise<void>((resolve, reject) => {
+        const unsubscribe = this.firestore.doc(p).onSnapshot(
+          async () => {
+            if (cb) {
+              await cb();
+            }
+            resolve();
+          },
+          err => {
+            unsubscribe();
+            listenMap.delete(p);
+            reject(err);
+          },
+        );
+        listenMap.set(p, unsubscribe);
+      });
     };
 
     const release = () => {
@@ -168,21 +179,15 @@ export class AppFirebase {
     this.listeners.release();
   }
 
-  listenUser(cb: () => void) {
+  listenUser(cb: () => Promise<void>) {
     if (!this.user) {
       return;
     }
+    return this.listeners.add(`users/${this.user.uid}`, cb);
+  }
 
-    this.listeners.add(`users/${this.user.uid}`, async () => {
-      const user = await this.getUser();
-      if (!user || !user.announces) {
-        return;
-      }
-      for (const a of user.announces) {
-        this.listeners.add(`announces/${a}`, cb);
-      }
-      cb();
-    });
+  listenAnnounce(id: string, cb: () => Promise<void>) {
+    return this.listeners.add(`announces/${id}`, cb);
   }
 
   async getUser() {
@@ -191,12 +196,12 @@ export class AppFirebase {
     }
 
     const docRef = this.firestore.doc(`users/${this.user.uid}`).withConverter(converters.user);
-    return getCacheFirst(docRef);
+    return getCacheFirst(docRef, true);
   }
 
   async getAnnounce(id: string) {
     const docRef = this.firestore.doc(`announces/${id}`).withConverter(converters.announce);
-    return getCacheFirst(docRef);
+    return getCacheFirst(docRef, true);
   }
 
   async getAnnounceMeta(id: string, metaID: string) {

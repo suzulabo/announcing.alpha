@@ -21,8 +21,8 @@ export class AppAnnounce {
 
   private qrCode: QRCodeStyling;
 
-  componentWillLoad() {
-    this.app.getAnnounceState(this.announceID);
+  async componentWillLoad() {
+    await this.app.loadAnnounce(this.announceID);
 
     this.qrCode = new QRCodeStyling({
       width: 200,

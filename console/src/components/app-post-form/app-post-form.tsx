@@ -29,7 +29,8 @@ export class AppPostForm {
   async componentWillLoad() {
     this.backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
 
-    const as = await this.app.getAnnounceState(this.announceID);
+    await this.app.loadAnnounce(this.announceID);
+    const as = this.app.getAnnounceState(this.announceID);
     if (!as) {
       this.app.pushRoute(this.backPath, true);
       return;

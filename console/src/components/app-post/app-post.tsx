@@ -24,7 +24,9 @@ export class AppPost {
   private post: Post & { imgData?: string };
 
   async componentWillLoad() {
-    const as = await this.app.getAnnounceState(this.announceID);
+    await this.app.loadAnnounce(this.announceID);
+
+    const as = this.app.getAnnounceState(this.announceID);
     if (!as) {
       this.app.pushRoute(`/${this.announceID}`, true);
       return;

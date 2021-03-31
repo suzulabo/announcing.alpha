@@ -56,7 +56,7 @@ export class AppAnnounceEdit {
         this.values.icon,
         this.values.icon ? undefined : this.values.iconData?.split(',')[1],
       );
-      this.app.pushRoute('/');
+      this.app.pushRoute(`/${this.announceID}`);
     } finally {
       this.app.loading = false;
     }
@@ -86,7 +86,8 @@ export class AppAnnounceEdit {
   };
 
   async componentWillLoad() {
-    const as = await this.app.getAnnounceState(this.announceID);
+    await this.app.loadAnnounce(this.announceID);
+    const as = this.app.getAnnounceState(this.announceID);
     if (!as) {
       this.app.pushRoute('/');
       return;
