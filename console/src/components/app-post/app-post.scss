@@ -39,6 +39,9 @@ app-post {
     padding: 0 10px;
     white-space: pre-line;
   }
+  .link {
+    word-break: break-all;
+  }
 
   a.back {
     margin: 30px 0;
