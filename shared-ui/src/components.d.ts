@@ -6,8 +6,37 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface ApAnnounce {
+        "announce": {
+    name: string;
+    desc?: string;
+    iconData?: string;
+    link?: string;
+    posts?: string[];
+  };
+        "msgs": {
+    datetime: (d: number) => string;
+    noPosts: string;
+  };
+        "postLoader": (
+    id: string,
+  ) => Promise<{
+    title?: string;
+    body: string;
+    imgData?: string;
+    link?: string;
+    pT: number;
+    anchorAttrs: { [k: string]: any };
+  }>;
+    }
+    interface ApError {
+        "msgs": {
+    main: string;
+    close: string;
+  };
+    }
     interface ApIcon {
-        "icon": 'github' | 'google' | 'image' | 'trash';
+        "icon": 'github' | 'google' | 'image' | 'trash' | 'dizzy';
     }
     interface ApImageInput {
         "data": string;
@@ -28,6 +57,18 @@ export namespace Components {
     }
 }
 declare global {
+    interface HTMLApAnnounceElement extends Components.ApAnnounce, HTMLStencilElement {
+    }
+    var HTMLApAnnounceElement: {
+        prototype: HTMLApAnnounceElement;
+        new (): HTMLApAnnounceElement;
+    };
+    interface HTMLApErrorElement extends Components.ApError, HTMLStencilElement {
+    }
+    var HTMLApErrorElement: {
+        prototype: HTMLApErrorElement;
+        new (): HTMLApErrorElement;
+    };
     interface HTMLApIconElement extends Components.ApIcon, HTMLStencilElement {
     }
     var HTMLApIconElement: {
@@ -65,6 +106,8 @@ declare global {
         new (): HTMLApStyleElement;
     };
     interface HTMLElementTagNameMap {
+        "ap-announce": HTMLApAnnounceElement;
+        "ap-error": HTMLApErrorElement;
         "ap-icon": HTMLApIconElement;
         "ap-image-input": HTMLApImageInputElement;
         "ap-input": HTMLApInputElement;
@@ -74,8 +117,37 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    interface ApAnnounce {
+        "announce"?: {
+    name: string;
+    desc?: string;
+    iconData?: string;
+    link?: string;
+    posts?: string[];
+  };
+        "msgs"?: {
+    datetime: (d: number) => string;
+    noPosts: string;
+  };
+        "postLoader"?: (
+    id: string,
+  ) => Promise<{
+    title?: string;
+    body: string;
+    imgData?: string;
+    link?: string;
+    pT: number;
+    anchorAttrs: { [k: string]: any };
+  }>;
+    }
+    interface ApError {
+        "msgs"?: {
+    main: string;
+    close: string;
+  };
+    }
     interface ApIcon {
-        "icon"?: 'github' | 'google' | 'image' | 'trash';
+        "icon"?: 'github' | 'google' | 'image' | 'trash' | 'dizzy';
     }
     interface ApImageInput {
         "data"?: string;
@@ -98,6 +170,8 @@ declare namespace LocalJSX {
     interface ApStyle {
     }
     interface IntrinsicElements {
+        "ap-announce": ApAnnounce;
+        "ap-error": ApError;
         "ap-icon": ApIcon;
         "ap-image-input": ApImageInput;
         "ap-input": ApInput;
@@ -110,6 +184,8 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "ap-announce": LocalJSX.ApAnnounce & JSXBase.HTMLAttributes<HTMLApAnnounceElement>;
+            "ap-error": LocalJSX.ApError & JSXBase.HTMLAttributes<HTMLApErrorElement>;
             "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
             "ap-image-input": LocalJSX.ApImageInput & JSXBase.HTMLAttributes<HTMLApImageInputElement>;
             "ap-input": LocalJSX.ApInput & JSXBase.HTMLAttributes<HTMLApInputElement>;

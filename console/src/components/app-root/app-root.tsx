@@ -135,6 +135,7 @@ export class AppRoot {
           </div>
         </footer>
         <ap-loading class={{ show: this.app.loading }} />
+        <ap-error msgs={{ ...this.app.msgs.error, close: this.app.msgs.common.close }}></ap-error>
       </Host>
     );
   }

@@ -1,0 +1,39 @@
+ap-error {
+  .error-modal {
+    background-color: var(--bk-color);
+    border-radius: 5px;
+    padding: 20px 10px 10px;
+
+    > * {
+      margin: 10px 0;
+    }
+
+    width: 100%;
+    max-width: 400px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    ap-icon {
+      font-size: 2rem;
+    }
+    .main {
+      white-space: pre-line;
+    }
+    button.show-errors {
+      font-size: 0.9rem;
+      color: var(--light-color);
+    }
+    .errors {
+      align-self: stretch;
+      white-space: pre-line;
+      font-size: 0.9rem;
+      max-height: 300px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px;
+      overflow: scroll;
+    }
+  }
+}

@@ -30,8 +30,16 @@ export namespace Components {
     anchorAttrs: { [k: string]: any };
   }>;
     }
+    interface ApError {
+        "msgs": {
+    main: string;
+    close: string;
+    showErrors: string;
+    datetime: (d: number) => string;
+  };
+    }
     interface ApIcon {
-        "icon": 'github' | 'google' | 'image' | 'trash';
+        "icon": 'github' | 'google' | 'image' | 'trash' | 'dizzy';
     }
     interface ApImageInput {
         "data": string;
@@ -86,6 +94,12 @@ declare global {
     var HTMLApAnnounceElement: {
         prototype: HTMLApAnnounceElement;
         new (): HTMLApAnnounceElement;
+    };
+    interface HTMLApErrorElement extends Components.ApError, HTMLStencilElement {
+    }
+    var HTMLApErrorElement: {
+        prototype: HTMLApErrorElement;
+        new (): HTMLApErrorElement;
     };
     interface HTMLApIconElement extends Components.ApIcon, HTMLStencilElement {
     }
@@ -173,6 +187,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "ap-announce": HTMLApAnnounceElement;
+        "ap-error": HTMLApErrorElement;
         "ap-icon": HTMLApIconElement;
         "ap-image-input": HTMLApImageInputElement;
         "ap-input": HTMLApInputElement;
@@ -213,8 +228,16 @@ declare namespace LocalJSX {
     anchorAttrs: { [k: string]: any };
   }>;
     }
+    interface ApError {
+        "msgs"?: {
+    main: string;
+    close: string;
+    showErrors: string;
+    datetime: (d: number) => string;
+  };
+    }
     interface ApIcon {
-        "icon"?: 'github' | 'google' | 'image' | 'trash';
+        "icon"?: 'github' | 'google' | 'image' | 'trash' | 'dizzy';
     }
     interface ApImageInput {
         "data"?: string;
@@ -267,6 +290,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "ap-announce": ApAnnounce;
+        "ap-error": ApError;
         "ap-icon": ApIcon;
         "ap-image-input": ApImageInput;
         "ap-input": ApInput;
@@ -288,6 +312,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ap-announce": LocalJSX.ApAnnounce & JSXBase.HTMLAttributes<HTMLApAnnounceElement>;
+            "ap-error": LocalJSX.ApError & JSXBase.HTMLAttributes<HTMLApErrorElement>;
             "ap-icon": LocalJSX.ApIcon & JSXBase.HTMLAttributes<HTMLApIconElement>;
             "ap-image-input": LocalJSX.ApImageInput & JSXBase.HTMLAttributes<HTMLApImageInputElement>;
             "ap-input": LocalJSX.ApInput & JSXBase.HTMLAttributes<HTMLApInputElement>;

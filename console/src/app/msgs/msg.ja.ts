@@ -17,6 +17,15 @@ export const msgs = {
   footer: {
     title: 'Announsing\u266A Console',
   },
+  error: {
+    main: 'ご迷惑をおかけします。\nしばらくしてから再度お試しください。',
+    showErrors: 'エラー内容を表示',
+    datetime: (d: number) => {
+      if (d > 0) {
+        return format(d, 'yyyy/MM/dd H:mm:ss');
+      }
+    },
+  },
   signIn: {
     title: 'ログイン',
     social: {
