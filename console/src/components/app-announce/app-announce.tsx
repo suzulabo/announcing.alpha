@@ -23,6 +23,10 @@ export class AppAnnounce {
 
   async componentWillLoad() {
     await this.app.loadAnnounce(this.announceID);
+    if (!this.app.getAnnounceState(this.announceID)) {
+      this.app.pushRoute('/');
+      return;
+    }
 
     this.qrCode = new QRCodeStyling({
       width: 200,
