@@ -158,8 +158,8 @@ export class App {
       } else {
         const as = await this.toAnnounceState(id, a);
         m.set(id, as);
-        this.appState.state.announces = m;
       }
+      this.appState.state.announces = m;
     });
   }
 
