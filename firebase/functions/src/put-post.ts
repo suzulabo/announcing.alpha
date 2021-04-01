@@ -26,10 +26,10 @@ const putPost = async (
   if (!id) {
     throw new Error('missing id');
   }
-  if (!body) {
-    throw new Error('missing body');
+  if (!title && !body) {
+    throw new Error('missing title and body');
   }
-  if (body.length > 500) {
+  if (body && body.length > 500) {
     throw new Error('body is too long');
   }
   if (title && title.length > 50) {
@@ -53,7 +53,7 @@ const putPost = async (
 
   const postData: Post_FS = {
     ...(!!title && { title }),
-    body,
+    ...(!!body && { body }),
     ...(!!link && { link }),
     pT: admin.firestore.FieldValue.serverTimestamp(),
   };

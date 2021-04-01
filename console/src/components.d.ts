@@ -23,7 +23,7 @@ export namespace Components {
     id: string,
   ) => Promise<{
     title?: string;
-    body: string;
+    body?: string;
     imgData?: string;
     link?: string;
     pT: number;
@@ -221,7 +221,7 @@ declare namespace LocalJSX {
     id: string,
   ) => Promise<{
     title?: string;
-    body: string;
+    body?: string;
     imgData?: string;
     link?: string;
     pT: number;

@@ -34,7 +34,7 @@ export class ApAnnounce {
     id: string,
   ) => Promise<{
     title?: string;
-    body: string;
+    body?: string;
     imgData?: string;
     link?: string;
     pT: number;
@@ -127,7 +127,7 @@ export class ApAnnounce {
       <a {...post.anchorAttrs} key={`post-${postID}`} class="post" ref={this.handleRef.observe}>
         <span class="date">{this.msgs.datetime(post.pT)}</span>
         {post.title && <span class="title">{post.title}</span>}
-        <div class="body">{post.body}</div>
+        {post.body && <div class="body">{post.body}</div>}
       </a>
     );
   }

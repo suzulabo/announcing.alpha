@@ -1,6 +1,6 @@
 export interface Post {
   title?: string;
-  body: string;
+  body?: string;
   link?: string;
   img?: string;
   pT: number; // published time

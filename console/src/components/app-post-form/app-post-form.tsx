@@ -102,13 +102,16 @@ export class AppPostForm {
       return;
     }
 
-    let canSubmit = !!this.values.body && isURL(this.values.link);
+    const values = this.values;
+
+    let canSubmit = (values.title || values.body) && isURL(this.values.link);
     if (canSubmit && this.postID) {
+      const post = this.post;
       canSubmit =
-        this.values.title != this.post.title ||
-        this.values.body != this.post.body ||
-        this.values.link != this.post.link ||
-        this.values.imgData != this.post.imgData;
+        values.title != post.title ||
+        values.body != post.body ||
+        values.link != post.link ||
+        values.imgData != post.imgData;
     }
 
     return (
