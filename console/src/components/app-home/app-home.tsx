@@ -11,6 +11,7 @@ export class AppHome {
 
   async componentWillLoad() {
     await this.app.loadAnnounces();
+    this.app.setTitle(this.app.msgs.home.pageTitle);
   }
 
   private handleSignOutClick = async () => {

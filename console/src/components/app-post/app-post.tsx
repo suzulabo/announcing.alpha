@@ -1,7 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
-import { Post } from 'src/shared';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
+import { Post } from 'src/shared';
 
 @Component({
   tag: 'app-post',
@@ -42,6 +42,10 @@ export class AppPost {
     if (this.post.img) {
       this.post.imgData = await this.app.getImage(this.post.img);
     }
+
+    this.app.setTitle(
+      this.app.msgs.post.pageTitle(this.post.title || this.post.body.substr(0, 20)),
+    );
   }
 
   private handleDelete = (ev: Event) => {

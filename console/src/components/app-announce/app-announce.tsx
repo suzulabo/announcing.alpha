@@ -23,10 +23,14 @@ export class AppAnnounce {
 
   async componentWillLoad() {
     await this.app.loadAnnounce(this.announceID);
-    if (!this.app.getAnnounceState(this.announceID)) {
+
+    const as = this.app.getAnnounceState(this.announceID);
+    if (!as) {
       this.app.pushRoute('/');
       return;
     }
+
+    this.app.setTitle(this.app.msgs.announce.pageTitle(as.name));
 
     this.qrCode = new QRCodeStyling({
       width: 200,

@@ -21,6 +21,10 @@ export class AppAnnounceCreate {
     },
   };
 
+  componentWillLoad() {
+    this.app.setTitle(this.app.msgs.announceCreate.pageTitle);
+  }
+
   private handleSubmitClick = async () => {
     this.app.loading = true;
     try {

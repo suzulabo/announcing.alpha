@@ -93,6 +93,8 @@ export class AppAnnounceEdit {
       return;
     }
 
+    this.app.setTitle(this.app.msgs.announceEdit.pageTitle(as.name));
+
     this.announce = as;
     this.values = {
       name: as.name,

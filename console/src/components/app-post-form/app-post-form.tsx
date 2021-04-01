@@ -60,6 +60,8 @@ export class AppPostForm {
       this.values.imgData = await this.app.getImage(post.img);
       this.post.imgData = this.values.imgData;
     }
+
+    this.app.setTitle(this.app.msgs.postForm.pageTitle(as.name));
   }
 
   private handleInput = {

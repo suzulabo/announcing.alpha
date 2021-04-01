@@ -1,13 +1,13 @@
 import { format } from 'date-fns';
 
+const titleSuffix = 'Announcing Console';
+
 export const msgs = {
   common: {
     back: '戻る',
-    next: '次へ',
     cancel: 'キャンセル',
     close: '閉じる',
     ok: 'OK',
-    or: 'または',
     datetime: (d: number) => {
       if (d > 0) {
         return format(d, 'yyyy/MM/dd H:mm');
@@ -27,13 +27,13 @@ export const msgs = {
     },
   },
   signIn: {
-    title: 'ログイン',
+    pageTitle: `ログイン - ${titleSuffix}`,
     social: {
       google: 'Googleでログイン',
     },
   },
   home: {
-    title: 'Home',
+    pageTitle: titleSuffix,
     createAnnounceBtn: 'アナウンスを作る',
     signOut: 'ログアウト',
     announces: {
@@ -44,6 +44,9 @@ export const msgs = {
     },
   },
   announce: {
+    pageTitle: (s: string) => {
+      return `${s} - ${titleSuffix}`;
+    },
     noPosts: 'お知らせが投稿されていません',
     newPost: '新しいお知らせを投稿する',
     edit: '編集する',
@@ -54,7 +57,7 @@ export const msgs = {
     copyURL: 'URLをコピー',
   },
   announceCreate: {
-    title: '新規登録',
+    pageTitle: `アナウンスの作成 - ${titleSuffix}`,
     form: {
       name: 'アナウンス名',
       desc: '紹介文',
@@ -64,7 +67,9 @@ export const msgs = {
     },
   },
   announceEdit: {
-    title: 'アナウンス編集',
+    pageTitle: (s: string) => {
+      return `${s} - 編集 - ${titleSuffix}`;
+    },
     form: {
       name: 'アナウンス名',
       desc: '紹介文',
@@ -84,6 +89,9 @@ export const msgs = {
     },
   },
   postForm: {
+    pageTitle: (s: string) => {
+      return `${s} - お知らせの投稿 - ${titleSuffix}`;
+    },
     title: 'タイトル',
     body: '本文',
     lnik: 'リンク',
@@ -91,6 +99,9 @@ export const msgs = {
     btn: '投稿する',
   },
   post: {
+    pageTitle: (s: string) => {
+      return `${s} - ${titleSuffix}`;
+    },
     edit: '編集',
     delete: '削除',
     deleteConfirm: 'お知らせを削除します。よろしいですか？',
