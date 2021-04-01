@@ -1,5 +1,5 @@
 {
-  "name": "announsing-shared-ui",
+  "name": "announcing-shared-ui",
   "private": true,
   "scripts": {
     "build": "stencil build"

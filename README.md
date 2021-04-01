@@ -1,1 +1,1 @@
-# announsing
+# announcing

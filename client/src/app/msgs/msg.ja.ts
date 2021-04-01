@@ -15,7 +15,7 @@ export const msgs = {
     },
   },
   footer: {
-    title: 'Announsing\u266A',
+    title: 'Announcing',
   },
   home: {},
   announce: {

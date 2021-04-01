@@ -1,5 +1,5 @@
 {
-  "name": "announsing-firebase",
+  "name": "announcing-firebase",
   "private": true,
   "scripts": {
     "func.build": "npm --prefix ./functions run build",

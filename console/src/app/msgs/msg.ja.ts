@@ -15,7 +15,7 @@ export const msgs = {
     },
   },
   footer: {
-    title: 'Announsing\u266A Console',
+    title: 'Announcing Console',
   },
   error: {
     main: 'ご迷惑をおかけします。\nしばらくしてから再度お試しください。',

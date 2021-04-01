@@ -1,5 +1,5 @@
 {
-  "name": "announsing-client",
+  "name": "announcing-client",
   "private": true,
   "watch": {
     "copy-shared": {

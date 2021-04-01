@@ -129,7 +129,7 @@ export class AppRoot {
           <div class="build-info">Version: {this.app.buildInfo.src}</div>
           <div class="build-info">Built at {new Date(this.app.buildInfo.time).toISOString()}</div>
           <div class="github">
-            <a href="https://github.com/suzulabo/announsing">
+            <a href="https://github.com/suzulabo/announcing">
               <ap-icon icon="github" />
             </a>
           </div>
