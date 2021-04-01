@@ -48,10 +48,9 @@ export class ApAnnounce {
   };
 
   @State()
-  renderedPosts: any[];
+  loadedPosts = new Map<string, any>();
 
   private iob: IntersectionObserver;
-  private postsMap: Map<string, { loaded: boolean; el: any }>;
 
   private iobCallback = async (entries: IntersectionObserverEntry[]) => {
     let updated = false;
@@ -64,30 +63,22 @@ export class ApAnnounce {
       if (!postID) {
         continue;
       }
-      if (this.postsMap.get(postID)?.loaded) {
+      if (this.loadedPosts.has(postID)) {
         continue;
       }
 
       const el = await this.renderPost(postID);
-      this.postsMap.set(postID, { loaded: true, el });
+      this.loadedPosts.set(postID, el);
       updated = true;
     }
 
     if (updated) {
-      this.updateRenderdPosts();
+      this.loadedPosts = new Map(this.loadedPosts);
     }
   };
 
   componentWillLoad() {
     this.iob = new IntersectionObserver(this.iobCallback, {});
-
-    this.postsMap = new Map();
-    const posts = [...(this.announce.posts || [])].reverse();
-    for (const v of posts) {
-      this.postsMap.set(v, { loaded: false, el: this.renderSkeletonPost(v) });
-    }
-
-    this.updateRenderdPosts();
   }
 
   disconnectedCallback() {
@@ -95,10 +86,9 @@ export class ApAnnounce {
   }
   private handleRef = {
     observe: (el: HTMLElement) => {
-      this.iob.observe(el);
-    },
-    unobserve: (el: HTMLElement) => {
-      this.iob.unobserve(el);
+      if (el) {
+        this.iob.observe(el);
+      }
     },
   };
 
@@ -132,12 +122,18 @@ export class ApAnnounce {
     );
   }
 
-  private updateRenderdPosts() {
-    this.renderedPosts = [...this.postsMap.values()].map(v => v.el);
+  private renderPosts() {
+    const posts = [...(this.announce.posts || [])].reverse();
+    return posts.map(v => {
+      return this.loadedPosts.has(v) ? this.loadedPosts.get(v) : this.renderSkeletonPost(v);
+    });
   }
 
   render() {
     const announce = this.announce;
+    if (!announce) {
+      return;
+    }
     const noPosts = !announce.posts || announce.posts.length == 0;
 
     return (
@@ -156,7 +152,7 @@ export class ApAnnounce {
         <hr />
         {noPosts && <span class="no-posts">{this.msgs.noPosts}</span>}
         <slot name="beforePosts" />
-        {!noPosts && this.renderedPosts}
+        {!noPosts && this.renderPosts()}
       </Host>
     );
   }

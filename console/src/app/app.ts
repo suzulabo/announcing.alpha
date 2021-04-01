@@ -152,10 +152,14 @@ export class App {
   async loadAnnounce(id: string) {
     await this.appFirebase.listenAnnounce(id, async () => {
       const a = await this.appFirebase.getAnnounce(id);
-      const as = await this.toAnnounceState(id, a);
       const m = new Map(this.appState.state.announces);
-      m.set(id, as);
-      this.appState.state.announces = m;
+      if (!a) {
+        m.delete(id);
+      } else {
+        const as = await this.toAnnounceState(id, a);
+        m.set(id, as);
+        this.appState.state.announces = m;
+      }
     });
   }
 
