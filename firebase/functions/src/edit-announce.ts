@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { announceMetaHash, AnnounceMeta_FS, Announce_FS, converters } from './firestore';
-import { EditAnnounceParams } from './shared';
+import { AnnounceMetaRule, EditAnnounceParams, ImageRule } from './shared';
 import { toMD5Base62 } from './utils';
 
 export const callEditAnnounce = async (
@@ -29,16 +29,16 @@ const editAnnounce = async (
   if (!name) {
     throw new Error('missing name');
   }
-  if (name.length > 50) {
+  if (name.length > AnnounceMetaRule.name.length) {
     throw new Error('name is too long');
   }
-  if (desc && desc.length > 500) {
+  if (desc && desc.length > AnnounceMetaRule.desc.length) {
     throw new Error('desc is too long');
   }
-  if (link && link.length > 500) {
+  if (link && link.length > AnnounceMetaRule.link.length) {
     throw new Error('link is too long');
   }
-  if (newIcon && newIcon.length > 1024 * 1024) {
+  if (newIcon && newIcon.length > ImageRule.d.length) {
     throw new Error('newIcon is too long');
   }
 

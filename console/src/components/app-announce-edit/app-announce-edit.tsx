@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
+import { AnnounceMetaRule } from 'src/shared';
 import { isURL } from 'src/utils/isurl';
 
 @Component({
@@ -132,20 +133,20 @@ export class AppAnnounceEdit {
           label={this.app.msgs.announceEdit.form.name}
           value={this.values.name}
           onInput={this.handleInput.name}
-          maxLength={50}
+          maxLength={AnnounceMetaRule.name.length}
         />
         <ap-input
           textarea={true}
           label={this.app.msgs.announceEdit.form.desc}
           value={this.values.desc}
           onInput={this.handleInput.desc}
-          maxLength={500}
+          maxLength={AnnounceMetaRule.desc.length}
         />
         <ap-input
           label={this.app.msgs.announceEdit.form.link}
           value={this.values.link}
           onInput={this.handleInput.link}
-          maxLength={500}
+          maxLength={AnnounceMetaRule.link.length}
         />
         <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
           {this.app.msgs.announceEdit.form.btn}

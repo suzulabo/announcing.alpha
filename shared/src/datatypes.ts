@@ -6,6 +6,12 @@ export interface Post {
   pT: number; // published time
 }
 
+export const PostRule = {
+  title: { length: 100 },
+  body: { length: 500 },
+  link: { length: 500 },
+};
+
 export interface Announce {
   mid: string; // meta id
   posts?: string[];
@@ -21,6 +27,12 @@ export interface AnnounceMeta {
   cT: number; // created time
 }
 
+export const AnnounceMetaRule = {
+  name: { length: 100 },
+  desc: { length: 500 },
+  link: { length: 500 },
+};
+
 export interface User {
   announces?: string[];
 }
@@ -28,6 +40,10 @@ export interface User {
 export interface Image {
   d: Uint8Array;
 }
+
+export const ImageRule = {
+  d: { length: 1000 * 1000 },
+};
 
 export interface Device {
   fcmToken: string;

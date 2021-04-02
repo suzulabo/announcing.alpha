@@ -1,7 +1,7 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
-import { Post } from 'src/shared';
+import { Post, PostRule } from 'src/shared';
 import { isURL } from 'src/utils/isurl';
 
 @Component({
@@ -127,20 +127,20 @@ export class AppPostForm {
         <ap-input
           label={this.app.msgs.postForm.title}
           value={this.values.title}
-          maxLength={50}
+          maxLength={PostRule.title.length}
           onInput={this.handleInput.title}
         />
         <ap-input
           textarea={true}
           label={this.app.msgs.postForm.body}
           value={this.values.body}
-          maxLength={500}
+          maxLength={PostRule.body.length}
           onInput={this.handleInput.body}
         />
         <ap-input
           label={this.app.msgs.postForm.lnik}
           value={this.values.link}
-          maxLength={500}
+          maxLength={PostRule.link.length}
           onInput={this.handleInput.link}
         />
         <button disabled={!canSubmit} onClick={this.handleSubmitClick}>

@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { announceMetaHash, AnnounceMeta_FS, Announce_FS, User_FS } from './firestore';
-import { CreateAnnounceParams } from './shared';
+import { AnnounceMetaRule, CreateAnnounceParams } from './shared';
 import { autoID } from './utils';
 
 export const callCreateAnnounce = async (
@@ -25,10 +25,10 @@ const createAnnounce = async (
   if (!name) {
     throw new Error('missing name');
   }
-  if (name.length > 50) {
+  if (name.length > AnnounceMetaRule.name.length) {
     throw new Error('name is too long');
   }
-  if (desc && desc.length > 500) {
+  if (desc && desc.length > AnnounceMetaRule.desc.length) {
     throw new Error('desc is too long');
   }
 
