@@ -2,7 +2,7 @@ import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { Announce_FS, checkOwner, converters, Post_FS, storeImage } from './firestore';
 import { incString } from './incstring';
-import { PutPostParams } from './shared';
+import { ImageRule, PostRule, PutPostParams } from './shared';
 
 export const callPutPost = async (
   params: PutPostParams,
@@ -29,16 +29,16 @@ const putPost = async (
   if (!title && !body) {
     throw new Error('missing title and body');
   }
-  if (body && body.length > 500) {
+  if (body && body.length > PostRule.body.length) {
     throw new Error('body is too long');
   }
-  if (title && title.length > 50) {
+  if (title && title.length > PostRule.title.length) {
     throw new Error('title is too long');
   }
-  if (link && link.length > 500) {
+  if (link && link.length > PostRule.link.length) {
     throw new Error('link is too long');
   }
-  if (imgData && imgData.length > 1024 * 1024) {
+  if (imgData && imgData.length > ImageRule.d.length) {
     throw new Error('imgData is too long');
   }
 
