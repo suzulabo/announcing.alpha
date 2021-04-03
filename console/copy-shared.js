@@ -1,9 +1,11 @@
 const fs = require('fs-extra');
 
-//fs.emptyDirSync('src/shared');
-fs.copySync('../shared/src', 'src/shared');
+const copy = (src, dest) => {
+  fs.copySync(src, dest, { preserveTimestamps: true });
+};
 
-//fs.emptyDirSync('src/shared-ui');
+copy('../shared/src', 'src/shared');
+
 const components = [
   'style',
   'error',
@@ -15,5 +17,5 @@ const components = [
   'announce',
 ];
 for (const v of components) {
-  fs.copySync(`../shared-ui/src/ap-${v}`, `src/shared-ui/ap-${v}`);
+  copy(`../shared-ui/src/ap-${v}`, `src/shared-ui/ap-${v}`);
 }
