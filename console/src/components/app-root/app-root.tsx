@@ -18,6 +18,9 @@ export class AppRoot {
   private app: App;
 
   @State()
+  initialized = false;
+
+  @State()
   path: string;
 
   @Listen('popstate', { target: 'window' })
@@ -35,14 +38,23 @@ export class AppRoot {
     this.path = p;
   }
 
-  async componentWillLoad() {
-    const appEnv = new AppEnv();
-    const appMsg = new AppMsg();
-    const appFirebase = new AppFirebase(appEnv, appMsg);
-    const appState = new AppState();
-    this.app = new App(appMsg, appFirebase, appState);
-    await this.app.init();
-    this.handlePopState();
+  componentWillLoad() {
+    void this.init();
+  }
+
+  private async init() {
+    this.initialized = false;
+    try {
+      const appEnv = new AppEnv();
+      const appMsg = new AppMsg();
+      const appFirebase = new AppFirebase(appEnv, appMsg);
+      const appState = new AppState();
+      this.app = new App(appMsg, appFirebase, appState);
+      await this.app.init();
+      this.handlePopState();
+    } finally {
+      this.initialized = true;
+    }
   }
 
   private checkRedirect() {
@@ -117,6 +129,10 @@ export class AppRoot {
   }
 
   render() {
+    if (!this.initialized) {
+      return;
+    }
+
     const m = this.getRoute();
 
     return (
