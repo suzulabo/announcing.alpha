@@ -144,8 +144,10 @@ export class App {
   async loadAnnounces() {
     await this.loadUser();
     const user = this.appState.state.user;
-    for (const id of user.announces) {
-      await this.loadAnnounce(id);
+    if (user && user.announces) {
+      for (const id of user.announces) {
+        await this.loadAnnounce(id);
+      }
     }
   }
 
@@ -170,10 +172,12 @@ export class App {
     }
 
     const result: AnnounceState[] = [];
-    for (const id of user.announces) {
-      const as = this.appState.state.announces.get(id);
-      if (as) {
-        result.push(as);
+    if (user && user.announces) {
+      for (const id of user.announces) {
+        const as = this.appState.state.announces.get(id);
+        if (as) {
+          result.push(as);
+        }
       }
     }
 
