@@ -6,7 +6,7 @@ service cloud.firestore {
     }
 
     match /users/{id} {
-      allow get: if request.auth.uid == id;
+      allow get: if request.auth != null && request.auth.uid == id;
     }
 
     match /images/{id} {
