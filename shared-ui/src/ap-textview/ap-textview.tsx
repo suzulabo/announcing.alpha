@@ -21,7 +21,7 @@ export class ApTextView {
   }
 
   private effect() {
-    this.effectedText = Autolinker.link(this.text || '');
+    this.effectedText = Autolinker.link(this.text || '', { stripPrefix: false, newWindow: false });
   }
 
   render() {

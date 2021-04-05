@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 import { Post } from 'src/shared';
@@ -73,23 +73,9 @@ export class AppPost {
       return;
     }
 
-    const post = this.post;
-
     return (
       <Host>
-        {this.post.img && <img src={post.imgData} />}
-        <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
-        {post.title && (
-          <Fragment>
-            <span class="title">{post.title}</span>
-          </Fragment>
-        )}
-        <span class="body">{post.body}</span>
-        {post.link && (
-          <a class="link" href={post.link}>
-            {post.link}
-          </a>
-        )}
+        <ap-post post={this.post} msgs={{ datetime: this.app.msgs.common.datetime }} />
         <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
           {this.app.msgs.common.back}
         </a>
