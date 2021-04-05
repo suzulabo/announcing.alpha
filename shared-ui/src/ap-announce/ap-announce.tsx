@@ -142,7 +142,7 @@ export class ApAnnounce {
           <span class="name">{announce.name}</span>
           {announce.iconData && <img src={announce.iconData} />}
         </div>
-        {announce.desc && <span class="desc">{announce.desc}</span>}
+        {announce.desc && <ap-textview class="desc" text={announce.desc} />}
         {announce.link && (
           <a class="link" href={announce.link}>
             {announce.link}

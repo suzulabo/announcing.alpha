@@ -12,6 +12,7 @@ const components = [
   'icon',
   'input',
   'image-input',
+  'textview',
   'loading',
   'modal',
   'announce',
