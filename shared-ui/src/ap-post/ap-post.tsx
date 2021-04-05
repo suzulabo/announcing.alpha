@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Host, Prop } from '@stencil/core';
+import { Component, h, Host, Prop } from '@stencil/core';
 
 @Component({
   tag: 'ap-post',
@@ -10,7 +10,6 @@ export class ApTextView {
     title?: string;
     body?: string;
     link?: string;
-    img?: string;
     imgData?: string;
     pT: number;
   };
@@ -25,14 +24,10 @@ export class ApTextView {
 
     return (
       <Host>
-        {this.post.img && <img src={post.imgData} />}
+        {this.post.imgData && <img src={post.imgData} />}
         <span class="date">{this.msgs.datetime(post.pT)}</span>
-        {post.title && (
-          <Fragment>
-            <span class="title">{post.title}</span>
-          </Fragment>
-        )}
-        <ap-textview class="body" text={post.body} />
+        {post.title && <span class="title">{post.title}</span>}
+        {post.body && <ap-textview class="body" text={post.body} />}
         {post.link && (
           <a class="link" href={post.link}>
             {post.link}
