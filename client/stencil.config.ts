@@ -8,6 +8,7 @@ declare var process: {
   env: {
     [key: string]: string;
   };
+  argv: string[];
 };
 
 const buildSrc = () => {
@@ -25,7 +26,10 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: { swSrc: 'src/sw.js' },
+      serviceWorker: {
+        swSrc: 'src/sw.js',
+        globPatterns: process.argv.includes('--dev') ? ['index.html'] : ['**/*.{js,html}'],
+      },
     },
   ],
   plugins: [
