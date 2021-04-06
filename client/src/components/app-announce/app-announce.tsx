@@ -1,25 +1,12 @@
-import { Component, Fragment, h, Host, Listen, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
-
-const scrollPosMap = new Map<string, number>();
 
 @Component({
   tag: 'app-announce',
   styleUrl: 'app-announce.scss',
 })
 export class AppAnnounce {
-  @Listen('scroll', { target: 'window' })
-  handleWindowScroll() {
-    scrollPosMap.set(this.announceID, window.scrollY);
-  }
-
-  componentDidLoad() {
-    if (scrollPosMap.has(this.announceID)) {
-      window.scroll(0, scrollPosMap.get(this.announceID));
-    }
-  }
-
   @Prop()
   app: App;
 
