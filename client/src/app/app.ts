@@ -128,8 +128,8 @@ export class App {
     return this.appStorage.follows.get(id);
   }
 
-  setFollow(id: string, follow: Follow) {
-    if (!this.getFollow(id)) {
+  async setFollow(id: string, follow: Follow) {
+    if (!(await this.getFollow(id))) {
       return this.appStorage.follows.set(id, follow);
     }
   }

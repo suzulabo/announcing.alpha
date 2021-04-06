@@ -29,6 +29,9 @@ export class AppAnnounce {
   @State()
   follow: Follow;
 
+  @State()
+  showUnfollowConfirm = false;
+
   async componentWillLoad() {
     this.app.loading = true;
     try {
@@ -51,9 +54,25 @@ export class AppAnnounce {
     }
   };
 
-  private handleFollowingClick = async () => {
-    await this.app.deleteFollow(this.announceID);
-    this.follow = undefined;
+  private unfollow = {
+    handlers: {
+      confirm: () => {
+        this.showUnfollowConfirm = true;
+      },
+      close: () => {
+        this.showUnfollowConfirm = false;
+      },
+      unfollow: async () => {
+        this.showUnfollowConfirm = false;
+        this.app.loading = true;
+        try {
+          await this.app.deleteFollow(this.announceID);
+          this.follow = undefined;
+        } finally {
+          this.app.loading = false;
+        }
+      },
+    },
   };
 
   private handleNotifyClick = async () => {
@@ -96,7 +115,7 @@ export class AppAnnounce {
                 <button class="slim" onClick={this.handleNotifyClick}>
                   {msgs.announce.notifyBtn}
                 </button>
-                <button class="following slim" onClick={this.handleFollowingClick}>
+                <button class="following slim" onClick={this.unfollow.handlers.confirm}>
                   {msgs.announce.followingBtn}
                 </button>
               </Fragment>
@@ -104,6 +123,19 @@ export class AppAnnounce {
           </div>
         </ap-announce>
         <a {...this.app.href('/', true)}>{msgs.common.back}</a>
+        {this.showUnfollowConfirm && (
+          <ap-modal onClose={this.unfollow.handlers.close}>
+            <div class="unfollow-modal">
+              <div>{this.app.msgs.announce.unfollowConfirm}</div>
+              <div class="buttons">
+                <button onClick={this.unfollow.handlers.close}>
+                  {this.app.msgs.common.cancel}
+                </button>
+                <button onClick={this.unfollow.handlers.unfollow}>{this.app.msgs.common.ok}</button>
+              </div>
+            </div>
+          </ap-modal>
+        )}
       </Host>
     );
   }
