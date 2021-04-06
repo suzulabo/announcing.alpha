@@ -115,7 +115,7 @@ export class AppAnnounce {
                 <button class="slim" onClick={this.handleNotifyClick}>
                   {msgs.announce.notifyBtn}
                 </button>
-                <button class="following slim" onClick={this.unfollow.handlers.confirm}>
+                <button class="slim" onClick={this.unfollow.handlers.confirm}>
                   {msgs.announce.followingBtn}
                 </button>
               </Fragment>
