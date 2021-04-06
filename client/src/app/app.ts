@@ -129,7 +129,9 @@ export class App {
   }
 
   setFollow(id: string, follow: Follow) {
-    return this.appStorage.follows.set(id, follow);
+    if (!this.getFollow(id)) {
+      return this.appStorage.follows.set(id, follow);
+    }
   }
 
   async deleteFollow(id: string) {
