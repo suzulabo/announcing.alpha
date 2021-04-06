@@ -30,5 +30,6 @@ export const msgs = {
     noPosts: 'お知らせはまだありません',
     followBtn: 'フォローする',
     followingBtn: 'フォロー中',
+    notifyBtn: '通知を設定',
   },
 };

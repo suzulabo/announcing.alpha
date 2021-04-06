@@ -74,14 +74,6 @@ export class AppAnnounce {
 
     return (
       <Host>
-        {this.follow && (
-          <Fragment>
-            <button onClick={this.handleNotifyClick}>notify</button>
-            <button class="following clear" onClick={this.handleFollowingClick}>
-              {this.app.msgs.announce.followingBtn}
-            </button>
-          </Fragment>
-        )}
         <ap-announce
           announce={announce}
           postLoader={this.postLoader}
@@ -92,11 +84,21 @@ export class AppAnnounce {
         >
           <div class="buttons" slot="bottomAnnounce">
             {!this.follow && (
-              <button onClick={this.handleFollowClick}>{this.app.msgs.announce.followBtn}</button>
+              <button onClick={this.handleFollowClick}>{msgs.announce.followBtn}</button>
+            )}
+            {this.follow && (
+              <Fragment>
+                <button class="slim" onClick={this.handleNotifyClick}>
+                  {msgs.announce.notifyBtn}
+                </button>
+                <button class="following slim" onClick={this.handleFollowingClick}>
+                  {msgs.announce.followingBtn}
+                </button>
+              </Fragment>
             )}
           </div>
         </ap-announce>
-        <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
+        <a {...this.app.href('/', true)}>{msgs.common.back}</a>
       </Host>
     );
   }
