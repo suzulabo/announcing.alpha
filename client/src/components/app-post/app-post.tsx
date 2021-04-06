@@ -17,12 +17,15 @@ export class AppPost {
   postID: string;
 
   @State()
-  post: Post;
+  post: Post & { imgData?: string };
 
   async componentWillLoad() {
     this.app.loading = true;
     try {
       this.post = await this.app.fetchPost(this.announceID, this.postID);
+      if (this.post?.img) {
+        this.post.imgData = this.app.getImageURI(this.post.img);
+      }
     } finally {
       this.app.loading = false;
     }
@@ -33,15 +36,9 @@ export class AppPost {
       return;
     }
 
-    const post = this.post;
-
     return (
       <Host>
-        <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
-        <span class="title">{post.title}</span>
-        <hr />
-        <div class="body">{post.body}</div>
-        {post.img && <img src={this.app.getImageURI(post.img)} />}
+        <ap-post post={this.post} msgs={{ datetime: this.app.msgs.common.datetime }} />
         <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
           {this.app.msgs.common.back}
         </a>

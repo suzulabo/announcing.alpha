@@ -1,32 +1,14 @@
 app-post {
-  width: 100%;
+  width: fit-content;
+  min-width: 300px;
   max-width: 600px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
 
-  > * {
-    margin: 10px 0;
-  }
-
-  .date {
-    color: var(--light-color);
-    font-size: 0.95rem;
-  }
-  .title {
-    font-size: 1.1rem;
-  }
-  .body {
-    white-space: pre-line;
-  }
-  img {
-    align-self: center;
-    max-width: 100%;
-    border-radius: 5px;
-  }
   .back {
-    margin-top: 30px;
+    margin-top: 50px;
     align-self: center;
   }
 }
