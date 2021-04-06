@@ -17,5 +17,5 @@ const store = createStore<State>({
 });
 
 export class AppState {
-  readonly state: State = store.state as Readonly<State>;
+  readonly state = store.state;
 }

@@ -17,7 +17,7 @@ export const converters = {
   announce: new AnnounceConverter<FieldValue>(),
 };
 
-const getCacheFirst = async <T>(docRef: firebase.firestore.DocumentReference<T>) => {
+const getCache = async <T>(docRef: firebase.firestore.DocumentReference<T>) => {
   {
     try {
       const doc = await docRef.get({ source: 'cache' });
@@ -26,12 +26,6 @@ const getCacheFirst = async <T>(docRef: firebase.firestore.DocumentReference<T>)
         return doc.data();
       }
     } catch {}
-  }
-  {
-    const doc = await docRef.get({ source: 'default' });
-    if (doc.exists) {
-      return doc.data();
-    }
   }
 };
 
@@ -76,40 +70,52 @@ export class AppFirebase {
   }
 
   private listeners = (() => {
-    const l = new Set<string>();
+    const listenMap = new Map<string, () => void>();
 
-    const add = (p: string, cb?: () => void) => {
-      if (l.has(p)) {
+    const add = async (p: string, cb: () => Promise<void>) => {
+      if (listenMap.has(p)) {
         return;
       }
 
-      return new Promise<void>((resovle, reject) => {
+      return new Promise<void>((resolve, reject) => {
         const unsubscribe = this.firestore.doc(p).onSnapshot(
-          () => {
-            resovle();
+          async () => {
             if (cb) {
-              cb();
+              await cb();
             }
+            resolve();
           },
           err => {
-            console.warn(err);
             unsubscribe();
-            l.delete(p);
-            reject();
+            listenMap.delete(p);
+            reject(err);
           },
         );
-        l.add(p);
+        listenMap.set(p, unsubscribe);
       });
     };
 
-    return { add };
+    const release = () => {
+      listenMap.forEach(v => {
+        v();
+      });
+      listenMap.clear();
+    };
+
+    return { add, release };
   })();
 
+  releaseListeners() {
+    this.listeners.release();
+  }
+
+  listenAnnounce(id: string, cb: () => Promise<void>) {
+    return this.listeners.add(`announces/${id}`, cb);
+  }
+
   async getAnnounce(id: string) {
-    const p = `announces/${id}`;
-    await this.listeners.add(p);
-    const docRef = this.firestore.doc(p).withConverter(converters.announce);
-    return getCacheFirst(docRef);
+    const docRef = this.firestore.doc(`announces/${id}`).withConverter(converters.announce);
+    return getCache(docRef);
   }
 
   private async messageToken() {

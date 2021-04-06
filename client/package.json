@@ -12,7 +12,7 @@
   },
   "scripts": {
     "build": "rm -rf www && npm run copy-shared && stencil build",
-    "serve": "stencil build --dev --watch --serve",
+    "serve": "stencil build --dev --watch --serve --service-worker",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watch",
     "copy-shared": "node copy-shared.js",
@@ -25,6 +25,7 @@
     "@stencil/core": "^2.5.2",
     "@stencil/sass": "^1.4.1",
     "@stencil/store": "^1.4.1",
+    "autolinker": "^3.14.3",
     "bootstrap-icons": "^1.4.1",
     "date-fns": "^2.18.0",
     "destyle.css": "^2.0.2",

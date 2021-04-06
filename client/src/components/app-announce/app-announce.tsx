@@ -27,124 +27,17 @@ export class AppAnnounce {
   announceID: string;
 
   @State()
-  announce: { name: string; desc: string; link: string; icon: string; posts: string[] };
-
-  @State()
   follow: Follow;
-
-  @State()
-  renderedPosts: any[];
-
-  private postsMap: Map<string, { loaded: boolean; el: any }>;
-  private iob: IntersectionObserver;
 
   async componentWillLoad() {
     this.app.loading = true;
     try {
-      const announce = await this.app.getAnnounce(this.announceID);
-      const meta = await this.app.fetchAnnounceMeta(this.announceID, announce.mid);
-      this.announce = {
-        name: meta.name,
-        desc: meta.desc,
-        link: meta.link,
-        icon: meta.icon,
-        posts: announce.posts || [],
-      };
+      await this.app.loadAnnounce(this.announceID);
 
       this.follow = await this.app.getFollow(this.announceID);
-
-      this.iob = new IntersectionObserver(this.iobCallback, {});
-
-      this.postsMap = new Map();
-      const posts = [...(this.announce.posts || [])].reverse();
-      for (const v of posts) {
-        this.postsMap.set(v, { loaded: false, el: this.renderSkeletonPost(v) });
-      }
-
-      this.renderPosts();
     } finally {
       this.app.loading = false;
     }
-  }
-
-  private iobCallback = async (entries: IntersectionObserverEntry[]) => {
-    let updated = false;
-
-    for (const entry of entries) {
-      if (!entry.isIntersecting) {
-        continue;
-      }
-      const postID = entry.target.getAttribute('data-postid');
-      if (!postID) {
-        continue;
-      }
-      if (this.postsMap.get(postID)?.loaded) {
-        continue;
-      }
-
-      const el = await this.renderPost(postID);
-      this.postsMap.set(postID, { loaded: true, el });
-      updated = true;
-    }
-
-    if (updated) {
-      this.renderPosts();
-    }
-  };
-
-  disconnectedCallback() {
-    this.iob?.disconnect();
-  }
-
-  private handleRef = {
-    observe: (el: HTMLElement) => {
-      this.iob.observe(el);
-    },
-    unobserve: (el: HTMLElement) => {
-      this.iob.unobserve(el);
-    },
-  };
-
-  private renderSkeletonPost(postID: string) {
-    return (
-      <a
-        key={`post-${postID}`}
-        class="post skeleton"
-        ref={this.handleRef.observe}
-        data-postid={postID}
-      >
-        <span class="date"></span>
-        <span class="title"></span>
-      </a>
-    );
-  }
-
-  private async renderPost(postID: string) {
-    const post = await this.app.fetchPost(this.announceID, postID);
-    if (!post) {
-      return <div class="post">no post data: [{postID}]</div>;
-    }
-
-    return (
-      <a
-        {...this.app.href(`${this.announceID}/${postID}`)}
-        key={`post-${postID}`}
-        class="post"
-        ref={this.handleRef.observe}
-      >
-        <span class="date">{this.app.msgs.common.datetime(post.pT)}</span>
-        <span class="title">{post.title}</span>
-      </a>
-    );
-  }
-
-  private renderPosts() {
-    const l = [];
-    this.postsMap.forEach(v => {
-      l.push(v.el, <hr />);
-    });
-    l.pop();
-    this.renderedPosts = l;
   }
 
   private handleFollowClick = async () => {
@@ -162,12 +55,22 @@ export class AppAnnounce {
     await this.app.registerMessaging(this.announceID, 'always');
   };
 
+  private postLoader = async (postID: string) => {
+    const post = await this.app.fetchPost(this.announceID, postID);
+    if (!post) {
+      return;
+    }
+    return { ...post, anchorAttrs: this.app.href(`/${this.announceID}/${postID}`) };
+  };
+
   render() {
-    if (!this.announce) {
+    const announce = this.app.getAnnounceState(this.announceID);
+
+    if (!announce) {
       return;
     }
 
-    const noPosts = this.announce.posts.length == 0;
+    const msgs = this.app.msgs;
 
     return (
       <Host>
@@ -179,20 +82,21 @@ export class AppAnnounce {
             </button>
           </Fragment>
         )}
-        {this.announce.icon && <img src={this.app.getImageURI(this.announce.icon)} />}
-        <div class="name">{this.announce.name}</div>
-        {this.announce.desc && <div class="desc">{this.announce.desc}</div>}
-        {this.announce.link && (
-          <a href={this.announce.link} rel="noopener">
-            {this.announce.link}
-          </a>
-        )}
-        {!this.follow && (
-          <button onClick={this.handleFollowClick}>{this.app.msgs.announce.followBtn}</button>
-        )}
-        <hr />
-        {noPosts && <div>{this.app.msgs.announce.noPosts}</div>}
-        {!noPosts && this.renderedPosts}
+        <ap-announce
+          announce={announce}
+          postLoader={this.postLoader}
+          msgs={{
+            datetime: msgs.common.datetime,
+            noPosts: msgs.announce.noPosts,
+          }}
+        >
+          <div class="buttons" slot="bottomAnnounce">
+            {!this.follow && (
+              <button onClick={this.handleFollowClick}>{this.app.msgs.announce.followBtn}</button>
+            )}
+          </div>
+        </ap-announce>
+        <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }

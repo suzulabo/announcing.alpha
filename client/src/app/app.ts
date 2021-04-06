@@ -1,6 +1,6 @@
 import { Build } from '@stencil/core';
-import { AnnounceMeta, NotificationMode, Post } from 'src/shared';
-import { Follow } from './datatypes';
+import { Announce, AnnounceMeta, NotificationMode, Post } from 'src/shared';
+import { AnnounceState, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
@@ -70,7 +70,7 @@ export class App {
   }
 
   set loading(v: boolean) {
-    this.appState.updateLoading(v);
+    this.appState.state.loading = v;
   }
   get loading() {
     return this.appState.state.loading;
@@ -80,8 +80,31 @@ export class App {
     return this.appMsg.msgs;
   }
 
-  getAnnounce(id: string) {
-    return this.appFirebase.getAnnounce(id);
+  private async toAnnounceState(id: string, a: Announce): Promise<AnnounceState> {
+    const meta = await this.fetchAnnounceMeta(id, a.mid);
+    if (!meta) {
+      return;
+    }
+
+    return { id, ...a, ...meta, ...(!!meta.icon && { iconData: this.getImageURI(meta.icon) }) };
+  }
+
+  async loadAnnounce(id: string) {
+    await this.appFirebase.listenAnnounce(id, async () => {
+      const a = await this.appFirebase.getAnnounce(id);
+      const m = new Map(this.appState.state.announces);
+      if (!a) {
+        m.delete(id);
+      } else {
+        const as = await this.toAnnounceState(id, a);
+        m.set(id, as);
+      }
+      this.appState.state.announces = m;
+    });
+  }
+
+  getAnnounceState(id: string) {
+    return this.appState.state.announces.get(id);
   }
 
   private async fetchApi<T>(p: string) {
