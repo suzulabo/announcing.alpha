@@ -1,6 +1,7 @@
 import { Component, h, Host, Prop } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
+import { PromiseValue } from 'type-fest';
 
 @Component({
   tag: 'app-announce-notify',
@@ -13,7 +14,7 @@ export class AppAnnounceNotify {
   @Prop()
   announceID: string;
 
-  private permission: boolean;
+  private permission: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
 
   private follow: Follow;
 
@@ -38,16 +39,46 @@ export class AppAnnounceNotify {
     }
   }
 
+  private renderUnsupported() {
+    const msgs = this.app.msgs;
+
+    // TODO
+    return (
+      <Host>
+        <span>Unsupported Brwoser</span>
+        <a {...this.app.href(`/${this.announceID}`, true)}>{msgs.common.back}</a>
+      </Host>
+    );
+  }
+
+  private renderDenied() {
+    const msgs = this.app.msgs;
+
+    // TODO
+    return (
+      <Host>
+        <span>Not permitted</span>
+        <a {...this.app.href(`/${this.announceID}`, true)}>{msgs.common.back}</a>
+      </Host>
+    );
+  }
+
   render() {
     if (!this.follow) {
       return;
+    }
+
+    if (this.permission == 'unsupported') {
+      return this.renderUnsupported();
+    }
+    if (this.permission == 'deny') {
+      return this.renderDenied();
     }
 
     const msgs = this.app.msgs;
 
     return (
       <Host>
-        {!this.permission && <span>通知が許可されていません</span>}
         <label>
           <input type="checkbox" />
           新しいお知らせを通知する

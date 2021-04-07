@@ -53,7 +53,11 @@ export class AppFirebase {
     this._firebaseApp = firebase.initializeApp(this.appEnv.env.firebaseConfig);
     this.functions = this._firebaseApp.functions(this.appEnv.env.functionsRegion);
     this.firestore = this._firebaseApp.firestore();
-    this.messaging = this._firebaseApp.messaging();
+    try {
+      this.messaging = this._firebaseApp.messaging();
+    } catch (err) {
+      console.warn('create messaging', err);
+    }
     this.devonly_setEmulator();
 
     try {
@@ -128,12 +132,19 @@ export class AppFirebase {
   }
 
   async checkNotifyPermission() {
+    if (!this.messaging) {
+      return 'unsupported';
+    }
     try {
       const token = await this.messageToken();
-      return !!token;
+      if (token) {
+        return 'allow';
+      } else {
+        return 'deny';
+      }
     } catch (err) {
       if (err.code == 'messaging/permission-blocked') {
-        return false;
+        return 'deny';
       }
       throw err;
     }

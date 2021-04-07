@@ -33,4 +33,5 @@ export const msgs = {
     notifyBtn: '通知を設定',
     unfollowConfirm: 'フォローを解除します。よろしいですか？',
   },
+  announceNorify: {},
 };
