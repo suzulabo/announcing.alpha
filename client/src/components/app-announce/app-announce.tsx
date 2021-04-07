@@ -62,10 +62,6 @@ export class AppAnnounce {
     },
   };
 
-  private handleNotifyClick = async () => {
-    await this.app.registerMessaging(this.announceID, 'always');
-  };
-
   private postLoader = async (postID: string) => {
     const post = await this.app.fetchPost(this.announceID, postID);
     if (!post) {
@@ -99,9 +95,9 @@ export class AppAnnounce {
             )}
             {this.follow && (
               <Fragment>
-                <button class="slim" onClick={this.handleNotifyClick}>
+                <a class="button slim" {...this.app.href(`/${this.announceID}/notify_`)}>
                   {msgs.announce.notifyBtn}
-                </button>
+                </a>
                 <button class="slim" onClick={this.unfollow.handlers.confirm}>
                   {msgs.announce.followingBtn}
                 </button>

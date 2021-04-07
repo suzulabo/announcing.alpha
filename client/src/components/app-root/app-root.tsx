@@ -92,7 +92,9 @@ export class AppRoot {
       }
 
       if (!!postID) {
-        if (this.postIDPattern.test(postID)) {
+        if (postID == 'notify_') {
+          return { tag: 'app-announce-notify', params: { announceID } };
+        } else if (this.postIDPattern.test(postID)) {
           return { tag: 'app-post', params: { announceID, postID } };
         }
       } else {
