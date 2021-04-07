@@ -139,6 +139,10 @@ export class App {
     await this.appStorage.follows.remove(id);
   }
 
+  async checkNotifyPermission() {
+    return this.appFirebase.checkNotifyPermission();
+  }
+
   async registerMessaging(announceID: string, mode: NotificationMode, hours?: number[]) {
     const follow = await this.getFollow(announceID);
     if (!follow && mode != 'disabled') {

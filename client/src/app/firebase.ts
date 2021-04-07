@@ -127,6 +127,18 @@ export class AppFirebase {
     return token;
   }
 
+  async checkNotifyPermission() {
+    try {
+      const token = await this.messageToken();
+      return !!token;
+    } catch (err) {
+      if (err.code == 'messaging/permission-blocked') {
+        return false;
+      }
+      throw err;
+    }
+  }
+
   async registerMessaging(announceID: string, mode: NotificationMode, hours?: number[]) {
     const fcmToken = await this.messageToken();
     const params: RegisterNotificationParams = {

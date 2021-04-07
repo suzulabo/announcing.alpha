@@ -13,6 +13,8 @@ export class AppAnnounceNotify {
   @Prop()
   announceID: string;
 
+  private permission: boolean;
+
   private follow: Follow;
 
   async componentWillLoad() {
@@ -29,6 +31,8 @@ export class AppAnnounceNotify {
         this.app.redirectRoute(`/${id}`);
         return;
       }
+
+      this.permission = await this.app.checkNotifyPermission();
     } finally {
       this.app.loading = false;
     }
@@ -43,6 +47,7 @@ export class AppAnnounceNotify {
 
     return (
       <Host>
+        {!this.permission && <span>通知が許可されていません</span>}
         <label>
           <input type="checkbox" />
           新しいお知らせを通知する
