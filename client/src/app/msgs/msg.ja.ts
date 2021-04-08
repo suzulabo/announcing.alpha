@@ -12,6 +12,9 @@ export const msgs = {
         return format(d, 'yyyy/MM/dd H:mm');
       }
     },
+    hour: (v: number) => {
+      return `${v}時`;
+    },
   },
   error: {
     main: 'ご迷惑をおかけします。\nしばらくしてから再度お試しください。',
@@ -33,5 +36,12 @@ export const msgs = {
     notifyBtn: '通知を設定',
     unfollowConfirm: 'フォローを解除します。よろしいですか？',
   },
-  announceNorify: {},
+  announceNorify: {
+    enable: '通知を有効にする',
+    hours: (hours: number[]) => {
+      return `${hours.join('時,')}時に通知する`;
+    },
+    hoursBtn: '通知時刻を設定',
+    submitBtn: '通知を登録する',
+  },
 };

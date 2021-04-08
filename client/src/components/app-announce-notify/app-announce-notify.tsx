@@ -1,6 +1,7 @@
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
+import { NotificationMode } from 'src/shared';
 import { PromiseValue } from 'type-fest';
 
 @Component({
@@ -13,6 +14,12 @@ export class AppAnnounceNotify {
 
   @Prop()
   announceID: string;
+
+  @State()
+  values: { mode: NotificationMode; hours: number[] };
+
+  @State()
+  showHoursModal = false;
 
   private permission: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
 
@@ -33,11 +40,24 @@ export class AppAnnounceNotify {
         return;
       }
 
+      this.values = { mode: this.follow.notify.mode, hours: this.follow.notify.hours || [] };
+
       this.permission = await this.app.checkNotifyPermission();
     } finally {
       this.app.loading = false;
     }
   }
+
+  private hoursModal = {
+    handlers: {
+      show: () => {
+        this.showHoursModal = true;
+      },
+      close: () => {
+        this.showHoursModal = false;
+      },
+    },
+  };
 
   private renderUnsupported() {
     const msgs = this.app.msgs;
@@ -76,14 +96,50 @@ export class AppAnnounceNotify {
     }
 
     const msgs = this.app.msgs;
+    const values = this.values;
 
     return (
       <Host>
         <label>
           <input type="checkbox" />
-          新しいお知らせを通知する
+          {msgs.announceNorify.enable}
         </label>
+        <div class="hours-grid">
+          {[...Array(24)].map((_, i) => {
+            return (
+              <span class={{ selected: values.hours.includes(i) }}>{msgs.common.hour(i)}</span>
+            );
+          })}
+        </div>
+        <div>
+          <button class="slim" onClick={this.hoursModal.handlers.show}>
+            {msgs.announceNorify.hoursBtn}
+          </button>
+        </div>
+        <button>{msgs.announceNorify.submitBtn}</button>
+
         <a {...this.app.href(`/${this.announceID}`, true)}>{msgs.common.back}</a>
+
+        {this.showHoursModal && (
+          <ap-modal onClose={this.hoursModal.handlers.close}>
+            <div class="hours-modal">
+              <div class="hours-grid">
+                {[...Array(24)].map((_, i) => {
+                  return (
+                    <span class={{ selected: values.hours.includes(i) }}>
+                      {msgs.common.hour(i)}
+                    </span>
+                  );
+                })}
+              </div>
+              <div class="buttons">
+                <button class="slim close" onClick={this.hoursModal.handlers.close}>
+                  {msgs.common.close}
+                </button>
+              </div>
+            </div>
+          </ap-modal>
+        )}
       </Host>
     );
   }
