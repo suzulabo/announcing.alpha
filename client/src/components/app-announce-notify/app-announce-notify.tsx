@@ -56,9 +56,24 @@ export class AppAnnounceNotify {
       close: () => {
         this.showHoursModal = false;
       },
+      hourClick: (event: CustomEvent<number>) => {
+        console.log('check1', event.detail);
+        const hour = event.detail;
+        let hours = [...this.values.hours];
+        if (hours.includes(hour)) {
+          hours = hours.filter(v => {
+            return v != hour;
+          });
+        } else {
+          hours.push(hour);
+        }
+        hours.sort();
+        console.log(hours);
+        this.values = { ...this.values, hours };
+      },
       hoursClick: (event: MouseEvent) => {
         const hour = parseInt((event.target as HTMLElement).getAttribute('data-hour'));
-        let hours = this.values.hours;
+        let hours = [...this.values.hours];
         if (hours.includes(hour)) {
           hours = hours.filter(v => {
             return v != hour;
@@ -102,7 +117,7 @@ export class AppAnnounceNotify {
     }
 
     if (this.permission == 'unsupported') {
-      return this.renderUnsupported();
+      //return this.renderUnsupported();
     }
     if (this.permission == 'deny') {
       return this.renderDenied();
@@ -129,19 +144,10 @@ export class AppAnnounceNotify {
         {this.showHoursModal && (
           <ap-modal onClose={this.hoursModal.handlers.close}>
             <div class="hours-modal">
-              <div class="hours-box">
-                {[...Array(24)].map((_, i) => {
-                  return (
-                    <span
-                      class={{ selected: values.hours.includes(i) }}
-                      data-hour={i}
-                      onClick={this.hoursModal.handlers.hoursClick}
-                    >
-                      {msgs.common.hour(i)}
-                    </span>
-                  );
-                })}
-              </div>
+              <ap-clock-select
+                selected={values.hours}
+                onHourClick={this.hoursModal.handlers.hourClick}
+              />
               <button class="anchor close" onClick={this.hoursModal.handlers.close}>
                 {msgs.common.close}
               </button>

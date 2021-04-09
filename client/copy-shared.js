@@ -6,7 +6,18 @@ const copy = (src, dest) => {
 
 copy('../shared/src', 'src/shared');
 
-const components = ['style', 'error', 'icon', 'textview', 'loading', 'modal', 'announce', 'post'];
+const components = [
+  'style',
+  'error',
+  'icon',
+  'textview',
+  'checkbox',
+  'clock-select',
+  'loading',
+  'modal',
+  'announce',
+  'post',
+];
 for (const v of components) {
   copy(`../shared-ui/src/ap-${v}`, `src/shared-ui/ap-${v}`);
 }
