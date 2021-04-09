@@ -11,90 +11,19 @@ app-announce-notify {
     margin: 10px 0;
   }
 
-  > .hours-grid {
-    display: grid;
-    display: none;
-    //grid-auto-flow: column;
-    grid-template-columns: repeat(6, auto);
-    //grid-template-rows: repeat(6, 30px);
-    gap: 10px;
-
-    span {
-      width: 50px;
-      text-align: center;
-      //border: 1px solid var(--light-border-color);
-      background-color: var(--light-bk-color);
-      border-radius: 5px;
-      padding: 5px;
-    }
-  }
-
   .hours-modal {
     background-color: var(--bk-color);
     border-radius: 5px;
     padding: 20px 10px 10px;
     width: 100%;
-    max-width: 400px;
+    max-width: 350px;
 
     display: flex;
     flex-direction: column;
 
-    /*
-    .hours-box {
-      display: flex;
-      flex-direction: column;
-      max-height: 70vh;
-      overflow-y: scroll;
-
-      span {
-        text-align: center;
-        cursor: pointer;
-        border-radius: 5px;
-        margin: 2px 20px;
-        padding: 15px 20px;
-        &.selected {
-          color: var(--selected-color);
-          background-color: var(--selected-bk-color);
-          font-weight: bolder;
-        }
-      }
-    }*/
-
     button.close {
       margin-top: 30px;
       align-self: center;
-    }
-
-    .hours-box {
-      display: grid;
-      //grid-auto-flow: column;
-      //grid-template-rows: repeat(6, auto);
-      grid-template-columns: repeat(4, auto);
-      max-height: 70vh;
-      overflow-y: scroll;
-      gap: 5px;
-
-      span {
-        text-align: center;
-        cursor: pointer;
-        border-radius: 5px;
-        padding: 15px 20px;
-        &.selected {
-          color: var(--selected-color);
-          background-color: var(--selected-bk-color);
-          font-weight: bolder;
-        }
-      }
-    }
-
-    div.buttons {
-      align-self: stretch;
-      margin-top: 20px;
-      display: flex;
-      align-items: center;
-      .close {
-        margin-left: auto;
-      }
     }
   }
 }

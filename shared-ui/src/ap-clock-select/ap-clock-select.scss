@@ -1,6 +1,7 @@
 ap-clock-select {
   --num-size: 30px;
   --num-font-size: 1.2rem;
+  --ampm-font-size: 1.2rem;
 
   &:before {
     content: '';
@@ -14,7 +15,33 @@ ap-clock-select {
     flex-grow: 1;
     margin: var(--num-font-size);
 
-    > span {
+    > div.ampm {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      span {
+        font-size: var(--ampm-font-size);
+        border-radius: 5px;
+        padding: 10px 15px;
+        margin: 5px 0;
+
+        cursor: pointer;
+        user-select: none;
+      }
+    }
+
+    .selected {
+      color: var(--selected-color);
+      background-color: var(--selected-bk-color);
+    }
+
+    > span.hour {
       font-size: var(--num-font-size);
       position: absolute;
       width: var(--num-size);
@@ -24,13 +51,10 @@ ap-clock-select {
       justify-content: center;
 
       cursor: pointer;
+      user-select: none;
 
       padding: 25px;
       border-radius: 40%;
-      &.selected {
-        color: var(--selected-color);
-        background-color: var(--selected-bk-color);
-      }
 
       // https://www.sr-research.com/circular-coordinate-calculator/
       transform: translate(-50%, -50%);

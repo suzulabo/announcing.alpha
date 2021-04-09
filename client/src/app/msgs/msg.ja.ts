@@ -7,6 +7,8 @@ export const msgs = {
     cancel: 'キャンセル',
     close: '閉じる',
     ok: 'OK',
+    am: '午前',
+    pm: '午後',
     datetime: (d: number) => {
       if (d > 0) {
         return format(d, 'yyyy/MM/dd H:mm');

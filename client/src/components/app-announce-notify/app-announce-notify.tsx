@@ -117,7 +117,7 @@ export class AppAnnounceNotify {
     }
 
     if (this.permission == 'unsupported') {
-      //return this.renderUnsupported();
+      return this.renderUnsupported();
     }
     if (this.permission == 'deny') {
       return this.renderDenied();
@@ -145,6 +145,7 @@ export class AppAnnounceNotify {
           <ap-modal onClose={this.hoursModal.handlers.close}>
             <div class="hours-modal">
               <ap-clock-select
+                msgs={{ am: msgs.common.am, pm: msgs.common.pm }}
                 selected={values.hours}
                 onHourClick={this.hoursModal.handlers.hourClick}
               />
