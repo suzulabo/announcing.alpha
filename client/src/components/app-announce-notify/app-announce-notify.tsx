@@ -56,6 +56,19 @@ export class AppAnnounceNotify {
       close: () => {
         this.showHoursModal = false;
       },
+      hoursClick: (event: MouseEvent) => {
+        const hour = parseInt((event.target as HTMLElement).getAttribute('data-hour'));
+        let hours = this.values.hours;
+        if (hours.includes(hour)) {
+          hours = hours.filter(v => {
+            return v != hour;
+          });
+        } else {
+          hours.push(hour);
+        }
+        hours.sort();
+        this.values = { ...this.values, hours };
+      },
     },
   };
 
@@ -104,13 +117,6 @@ export class AppAnnounceNotify {
           <input type="checkbox" />
           {msgs.announceNorify.enable}
         </label>
-        <div class="hours-grid">
-          {[...Array(24)].map((_, i) => {
-            return (
-              <span class={{ selected: values.hours.includes(i) }}>{msgs.common.hour(i)}</span>
-            );
-          })}
-        </div>
         <div>
           <button class="slim" onClick={this.hoursModal.handlers.show}>
             {msgs.announceNorify.hoursBtn}
@@ -123,20 +129,22 @@ export class AppAnnounceNotify {
         {this.showHoursModal && (
           <ap-modal onClose={this.hoursModal.handlers.close}>
             <div class="hours-modal">
-              <div class="hours-grid">
+              <div class="hours-box">
                 {[...Array(24)].map((_, i) => {
                   return (
-                    <span class={{ selected: values.hours.includes(i) }}>
+                    <span
+                      class={{ selected: values.hours.includes(i) }}
+                      data-hour={i}
+                      onClick={this.hoursModal.handlers.hoursClick}
+                    >
                       {msgs.common.hour(i)}
                     </span>
                   );
                 })}
               </div>
-              <div class="buttons">
-                <button class="slim close" onClick={this.hoursModal.handlers.close}>
-                  {msgs.common.close}
-                </button>
-              </div>
+              <button class="anchor close" onClick={this.hoursModal.handlers.close}>
+                {msgs.common.close}
+              </button>
             </div>
           </ap-modal>
         )}

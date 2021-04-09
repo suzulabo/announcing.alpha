@@ -32,26 +32,58 @@ app-announce-notify {
   .hours-modal {
     background-color: var(--bk-color);
     border-radius: 5px;
-    padding: 20px 10px 0;
+    padding: 20px 10px 10px;
     width: 100%;
     max-width: 400px;
 
     display: flex;
     flex-direction: column;
 
-    > .hours-grid {
-      display: grid;
-      grid-auto-flow: column;
-      grid-template-rows: repeat(12, auto);
-      gap: 10px;
+    /*
+    .hours-box {
+      display: flex;
+      flex-direction: column;
+      max-height: 70vh;
+      overflow-y: scroll;
 
       span {
-        width: 50px;
         text-align: center;
-        //border: 1px solid var(--light-border-color);
-        background-color: var(--light-bk-color);
+        cursor: pointer;
         border-radius: 5px;
-        padding: 5px;
+        margin: 2px 20px;
+        padding: 15px 20px;
+        &.selected {
+          color: var(--selected-color);
+          background-color: var(--selected-bk-color);
+          font-weight: bolder;
+        }
+      }
+    }*/
+
+    button.close {
+      margin-top: 30px;
+      align-self: center;
+    }
+
+    .hours-box {
+      display: grid;
+      //grid-auto-flow: column;
+      //grid-template-rows: repeat(6, auto);
+      grid-template-columns: repeat(4, auto);
+      max-height: 70vh;
+      overflow-y: scroll;
+      gap: 5px;
+
+      span {
+        text-align: center;
+        cursor: pointer;
+        border-radius: 5px;
+        padding: 15px 20px;
+        &.selected {
+          color: var(--selected-color);
+          background-color: var(--selected-bk-color);
+          font-weight: bolder;
+        }
       }
     }
 
