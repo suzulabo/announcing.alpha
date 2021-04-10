@@ -4,12 +4,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
 import 'firebase/messaging';
-import {
-  AnnounceConverter,
-  AppEnv,
-  NotificationMode,
-  RegisterNotificationParams,
-} from 'src/shared';
+import { AnnounceConverter, AppEnv, RegisterNotificationParams } from 'src/shared';
 
 import FieldValue = firebase.firestore.FieldValue;
 
@@ -150,12 +145,12 @@ export class AppFirebase {
     }
   }
 
-  async registerMessaging(announceID: string, mode: NotificationMode, hours?: number[]) {
+  async registerMessaging(announceID: string, enable: boolean, hours?: number[]) {
     const fcmToken = await this.messageToken();
     const params: RegisterNotificationParams = {
       fcmToken,
       announceID,
-      mode,
+      enable,
       hours,
     };
     await this.callFunc<void>('registerNotification', params);

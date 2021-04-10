@@ -1,7 +1,7 @@
-import { Announce, AnnounceMeta, NotificationMode } from 'src/shared';
+import { Announce, AnnounceMeta } from 'src/shared';
 
 export interface Follow {
-  notify: { mode: NotificationMode; hours: number[] };
+  notify: { enable: boolean; hours: number[] };
   readTime: number;
 }
 

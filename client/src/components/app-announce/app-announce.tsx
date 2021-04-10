@@ -33,7 +33,7 @@ export class AppAnnounce {
   private handleFollowClick = async () => {
     this.app.loading = true;
     try {
-      const follow: Follow = { notify: { mode: 'disabled', hours: [] }, readTime: 0 };
+      const follow: Follow = { notify: { enable: false, hours: [] }, readTime: 0 };
       await this.app.setFollow(this.announceID, follow);
       this.follow = await this.app.getFollow(this.announceID);
     } finally {

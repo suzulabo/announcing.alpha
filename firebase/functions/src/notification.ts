@@ -6,6 +6,12 @@ import { toMD5Base62 } from './utils';
 interface FcmToken {
   [hash: string]: string;
 }
+interface Notification {
+  announceID: string;
+  members: {
+    [hash: string]: number[];
+  };
+}
 
 const tokenMap = new Map<string, string>();
 
@@ -42,7 +48,7 @@ export const callRegisterNotification = async (
   context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
-  const { fcmToken, announceID, mode, hours } = params;
+  const { fcmToken, announceID, enable, hours: _hours } = params;
 
   if (!fcmToken) {
     throw new Error('missing fcmToken');
@@ -53,78 +59,61 @@ export const callRegisterNotification = async (
   if (!announceID) {
     throw new Error('missing announceID');
   }
-  if (!['disabled', 'always', 'hours'].includes(mode as string)) {
-    throw new Error(`invalid mode: [${mode}]`);
-  }
-  if (mode == 'hours') {
-    if (!hours) {
-      throw new Error('missing hours');
-    }
-    hours.forEach(v => {
+  if (_hours) {
+    _hours.forEach(v => {
       if (v < 0 || v > 23) {
         throw new Error(`invalid hour: [${hours.join(',')}]`);
       }
     });
   }
 
+  const hours = _hours || [];
+
   const firestore = adminApp.firestore();
   const hash = await getTokenHash(fcmToken, firestore);
 
   const notificationsRef = firestore.collection('notifications');
   const curHours: number[] = [];
+  let curDocRef!: admin.firestore.DocumentReference;
   {
     const qs = await notificationsRef
       .where('announceID', '==', announceID)
-      .where('members', 'array-contains', hash)
-      .limit(30) // just in case
+      .orderBy(`members.${hash}`)
+      .limit(1)
       .get();
-    qs.forEach(v => {
-      curHours.push(v.data().hour);
-    });
+    if (!qs.empty) {
+      const doc = qs.docs[0];
+      if (doc.id != announceID) {
+        curDocRef = doc.ref;
+      }
+      const n = doc.data() as Notification;
+      curHours.push(...n.members[hash]);
+    }
+  }
+
+  // check same
+  if (enable && hours.join(':') == curHours.join(':')) {
+    console.debug('same hours', announceID, hash);
+    return;
   }
 
   const batch = firestore.batch();
-  console.log(mode, curHours);
-  if (mode == 'always') {
-    if (!curHours.includes(99)) {
-      batch.set(
-        notificationsRef.doc(`${announceID}_99`),
-        {
-          announceID,
-          hour: 99,
-          members: admin.firestore.FieldValue.arrayUnion(hash),
-        },
-        { merge: true },
-      );
-    }
-  } else if (mode == 'hours') {
-    hours!.forEach(v => {
-      if (curHours.includes(v)) {
-        return;
-      }
-      batch.set(
-        notificationsRef.doc(`${announceID}_${v}`),
-        {
-          announceID,
-          hour: v,
-          members: admin.firestore.FieldValue.arrayUnion(hash),
-        },
-        { merge: true },
-      );
-    });
+  if (enable) {
+    batch.set(
+      notificationsRef.doc(`${announceID}`),
+      {
+        announceID,
+        members: { [hash]: hours },
+      },
+      { merge: true },
+    );
   }
 
-  curHours.forEach(v => {
-    if (v == 99 && mode == 'always') {
-      return;
-    }
-    if (mode == 'hours' && hours!.includes(v)) {
-      return;
-    }
-    batch.update(notificationsRef.doc(`${announceID}_${v}`), {
-      members: admin.firestore.FieldValue.arrayRemove(hash),
-    });
-  });
+  if (curDocRef) {
+    batch.update(curDocRef, { [`members.${hash}`]: admin.firestore.FieldValue.delete() });
+  }
 
   await batch.commit();
+
+  console.info(`SET NOTIFICATION: ${announceID} ${hash} ${hours.join(':')}`);
 };

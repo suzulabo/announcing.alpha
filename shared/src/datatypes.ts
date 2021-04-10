@@ -82,11 +82,9 @@ export interface DeletePostParams {
   postID?: string;
 }
 
-export type NotificationMode = 'disabled' | 'always' | 'hours';
-
 export interface RegisterNotificationParams {
   fcmToken?: string;
   announceID?: string;
-  mode?: NotificationMode;
+  enable?: boolean;
   hours?: number[];
 }

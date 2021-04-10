@@ -1,5 +1,5 @@
 import { Build } from '@stencil/core';
-import { Announce, AnnounceMeta, NotificationMode, Post } from 'src/shared';
+import { Announce, AnnounceMeta, Post } from 'src/shared';
 import { AnnounceState, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
@@ -135,7 +135,7 @@ export class App {
   }
 
   async deleteFollow(id: string) {
-    await this.appFirebase.registerMessaging(id, 'disabled');
+    await this.appFirebase.registerMessaging(id, false);
     await this.appStorage.follows.remove(id);
   }
 
@@ -143,12 +143,15 @@ export class App {
     return this.appFirebase.checkNotifyPermission();
   }
 
-  async registerMessaging(announceID: string, mode: NotificationMode, hours?: number[]) {
+  async registerMessaging(announceID: string, enable: boolean, hours?: number[]) {
     const follow = await this.getFollow(announceID);
-    if (!follow && mode != 'disabled') {
+    if (!follow && enable) {
       return;
     }
-    await this.appFirebase.registerMessaging(announceID, mode, hours);
-    await this.setFollow(announceID, { ...follow, notify: { mode, hours } });
+    await this.appFirebase.registerMessaging(announceID, enable, hours);
+    await this.appStorage.follows.set(announceID, {
+      ...follow,
+      notify: { enable, hours },
+    });
   }
 }

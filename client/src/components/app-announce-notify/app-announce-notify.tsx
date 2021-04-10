@@ -1,7 +1,6 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
-import { NotificationMode } from 'src/shared';
 import { PromiseValue } from 'type-fest';
 
 @Component({
@@ -16,7 +15,7 @@ export class AppAnnounceNotify {
   announceID: string;
 
   @State()
-  values: { mode: NotificationMode; hours: number[] };
+  values: { enable: boolean; hours: number[] };
 
   @State()
   showHoursModal = false;
@@ -39,14 +38,19 @@ export class AppAnnounceNotify {
         this.app.redirectRoute(`/${id}`);
         return;
       }
+      console.log(this.follow);
 
-      this.values = { mode: this.follow.notify.mode, hours: this.follow.notify.hours || [] };
+      this.values = { enable: this.follow.notify.enable, hours: this.follow.notify.hours || [] };
 
       this.permission = await this.app.checkNotifyPermission();
     } finally {
       this.app.loading = false;
     }
   }
+
+  private handleEnableChange = () => {
+    this.values = { ...this.values, enable: !this.values.enable };
+  };
 
   private hoursModal = {
     handlers: {
@@ -57,7 +61,6 @@ export class AppAnnounceNotify {
         this.showHoursModal = false;
       },
       hourClick: (event: CustomEvent<number>) => {
-        console.log('check1', event.detail);
         const hour = event.detail;
         let hours = [...this.values.hours];
         if (hours.includes(hour)) {
@@ -67,8 +70,9 @@ export class AppAnnounceNotify {
         } else {
           hours.push(hour);
         }
-        hours.sort();
-        console.log(hours);
+        hours.sort((a, b) => {
+          return a - b;
+        });
         this.values = { ...this.values, hours };
       },
       hoursClick: (event: MouseEvent) => {
@@ -85,6 +89,16 @@ export class AppAnnounceNotify {
         this.values = { ...this.values, hours };
       },
     },
+  };
+
+  private handleSubmitClick = async () => {
+    this.app.loading = true;
+    try {
+      await this.app.registerMessaging(this.announceID, this.values.enable, this.values.hours);
+      this.app.pushRoute(`/${this.announceID}`);
+    } finally {
+      this.app.loading = false;
+    }
   };
 
   private renderUnsupported() {
@@ -129,15 +143,17 @@ export class AppAnnounceNotify {
     return (
       <Host>
         <label>
-          <input type="checkbox" />
-          {msgs.announceNorify.enable}
+          <ap-checkbox
+            label={msgs.announceNorify.enable}
+            checked={values.enable}
+            onClick={this.handleEnableChange}
+          />
         </label>
-        <div>
-          <button class="slim" onClick={this.hoursModal.handlers.show}>
-            {msgs.announceNorify.hoursBtn}
-          </button>
-        </div>
-        <button>{msgs.announceNorify.submitBtn}</button>
+        {values.hours.length > 0 && <span>{msgs.announceNorify.hours(values.hours)}</span>}
+        <button disabled={!values.enable} class="slim" onClick={this.hoursModal.handlers.show}>
+          {msgs.announceNorify.hoursBtn}
+        </button>
+        <button onClick={this.handleSubmitClick}>{msgs.announceNorify.submitBtn}</button>
 
         <a {...this.app.href(`/${this.announceID}`, true)}>{msgs.common.back}</a>
 
