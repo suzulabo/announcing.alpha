@@ -79,6 +79,18 @@ export class AppAnnounce {
 
     const msgs = this.app.msgs;
 
+    const notifyBtnLabel = () => {
+      const notify = this.follow.notify;
+      if (!notify.enable) {
+        return msgs.announce.notifyBtn;
+      }
+      if (notify.hours?.length > 0) {
+        return msgs.announce.hoursNotifyBtn;
+      } else {
+        return msgs.announce.alwaysNotifyBtn;
+      }
+    };
+
     return (
       <Host>
         <ap-announce
@@ -96,7 +108,7 @@ export class AppAnnounce {
             {this.follow && (
               <Fragment>
                 <a class="button slim" {...this.app.href(`/${this.announceID}/notify_`)}>
-                  {msgs.announce.notifyBtn}
+                  {notifyBtnLabel()}
                 </a>
                 <button class="slim" onClick={this.unfollow.handlers.confirm}>
                   {msgs.announce.followingBtn}

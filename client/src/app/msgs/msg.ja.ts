@@ -36,6 +36,8 @@ export const msgs = {
     followBtn: 'フォローする',
     followingBtn: 'フォロー中',
     notifyBtn: '通知を設定',
+    hoursNotifyBtn: '指定時刻に通知',
+    alwaysNotifyBtn: '随時通知',
     unfollowConfirm: 'フォローを解除します。よろしいですか？',
   },
   announceNorify: {
