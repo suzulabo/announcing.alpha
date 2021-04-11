@@ -149,7 +149,11 @@ export class AppAnnounceNotify {
             onClick={this.handleEnableChange}
           />
         </label>
-        {values.hours.length > 0 && <span>{msgs.announceNorify.hours(values.hours)}</span>}
+        {values.hours.length > 0 && (
+          <span class={{ disabled: !values.enable }}>
+            {msgs.announceNorify.hours(values.hours)}
+          </span>
+        )}
         <button disabled={!values.enable} class="slim" onClick={this.hoursModal.handlers.show}>
           {msgs.announceNorify.hoursBtn}
         </button>
