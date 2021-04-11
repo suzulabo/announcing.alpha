@@ -1,6 +1,5 @@
 import { Build } from '@stencil/core';
 import firebase from 'firebase/app';
-import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
 import 'firebase/messaging';
