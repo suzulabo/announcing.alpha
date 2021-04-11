@@ -94,7 +94,8 @@ export class AppAnnounceNotify {
   private handleSubmitClick = async () => {
     this.app.loading = true;
     try {
-      await this.app.registerMessaging(this.announceID, this.values.enable, this.values.hours);
+      const hours = this.values.enable ? this.values.hours : [];
+      await this.app.registerMessaging(this.announceID, this.values.enable, hours);
       this.app.pushRoute(`/${this.announceID}`);
     } finally {
       this.app.loading = false;
@@ -139,6 +140,13 @@ export class AppAnnounceNotify {
 
     const msgs = this.app.msgs;
     const values = this.values;
+    const notify = this.follow.notify;
+
+    const modified =
+      values.enable != notify.enable ||
+      (values.enable && values.hours.join(':') != notify.hours?.join(':'));
+
+    const canSubmit = modified;
 
     return (
       <Host>
@@ -157,7 +165,9 @@ export class AppAnnounceNotify {
         <button disabled={!values.enable} class="slim" onClick={this.hoursModal.handlers.show}>
           {msgs.announceNorify.hoursBtn}
         </button>
-        <button onClick={this.handleSubmitClick}>{msgs.announceNorify.submitBtn}</button>
+        <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
+          {msgs.announceNorify.submitBtn}
+        </button>
 
         <a {...this.app.href(`/${this.announceID}`, true)}>{msgs.common.back}</a>
 
