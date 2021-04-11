@@ -138,17 +138,12 @@ export class App {
     await this.appFirebase.listenUser(async () => {
       const user = await this.appFirebase.getUser();
       this.appState.state.user = user;
-    });
-  }
-
-  async loadAnnounces() {
-    await this.loadUser();
-    const user = this.appState.state.user;
-    if (user && user.announces) {
-      for (const id of user.announces) {
-        await this.loadAnnounce(id);
+      if (user && user.announces) {
+        for (const id of user.announces) {
+          await this.loadAnnounce(id);
+        }
       }
-    }
+    });
   }
 
   async loadAnnounce(id: string) {
