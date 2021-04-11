@@ -162,10 +162,14 @@ export class AppAnnounceNotify {
             {msgs.announceNorify.hours(values.hours)}
           </span>
         )}
-        <button disabled={!values.enable} class="slim" onClick={this.hoursModal.handlers.show}>
+        <button
+          disabled={!values.enable}
+          class="slim hours"
+          onClick={this.hoursModal.handlers.show}
+        >
           {msgs.announceNorify.hoursBtn}
         </button>
-        <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
+        <button class="submit" disabled={!canSubmit} onClick={this.handleSubmitClick}>
           {msgs.announceNorify.submitBtn}
         </button>
 

@@ -44,6 +44,6 @@ export const msgs = {
       return `${hours.join('時,')}時に通知する`;
     },
     hoursBtn: '通知時刻を設定',
-    submitBtn: '通知を登録する',
+    submitBtn: '登録',
   },
 };
