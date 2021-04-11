@@ -140,13 +140,20 @@ export class App {
       this.appState.state.user = user;
       if (user && user.announces) {
         for (const id of user.announces) {
-          await this.loadAnnounce(id);
+          await this.loadAnnounce(id, false);
         }
       }
     });
   }
 
-  async loadAnnounce(id: string) {
+  async loadAnnounce(id: string, checkOwner = true) {
+    if (checkOwner) {
+      const user = await this.appFirebase.getUser();
+      if (!user || !user.announces.includes(id)) {
+        return;
+      }
+    }
+
     await this.appFirebase.listenAnnounce(id, async () => {
       const a = await this.appFirebase.getAnnounce(id);
       const m = new Map(this.appState.state.announces);
