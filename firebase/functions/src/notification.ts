@@ -83,9 +83,7 @@ export const callRegisterNotification = async (
       .get();
     if (!qs.empty) {
       const doc = qs.docs[0];
-      if (doc.id != announceID) {
-        curDocRef = doc.ref;
-      }
+      curDocRef = doc.ref;
       const n = doc.data() as Notification;
       curHours.push(...n.members[hash]);
     }
@@ -109,7 +107,7 @@ export const callRegisterNotification = async (
     );
   }
 
-  if (curDocRef) {
+  if (!enable || curDocRef.id != announceID) {
     batch.update(curDocRef, { [`members.${hash}`]: admin.firestore.FieldValue.delete() });
   }
 
