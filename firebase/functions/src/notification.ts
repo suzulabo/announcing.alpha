@@ -107,8 +107,10 @@ export const callRegisterNotification = async (
     );
   }
 
-  if (!enable || curDocRef.id != announceID) {
-    batch.update(curDocRef, { [`members.${hash}`]: admin.firestore.FieldValue.delete() });
+  if (curDocRef) {
+    if (!enable || curDocRef?.id != announceID) {
+      batch.update(curDocRef, { [`members.${hash}`]: admin.firestore.FieldValue.delete() });
+    }
   }
 
   await batch.commit();
