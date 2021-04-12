@@ -34,13 +34,11 @@ export const msgs = {
   announce: {
     noPosts: 'お知らせはまだありません',
     followBtn: 'フォローする',
-    followingBtn: 'フォロー中',
-    notifyBtn: '通知を設定',
-    hoursNotifyBtn: '指定時刻に通知',
-    alwaysNotifyBtn: '随時通知',
-    unfollowConfirm: 'フォローを解除します。よろしいですか？',
+    configBtn: '設定',
   },
-  announceNorify: {
+  announceConfig: {
+    unfollowBtn: 'フォローを解除',
+    unfollowConfirm: 'フォローを解除します。よろしいですか？',
     enable: '通知を有効にする',
     hours: (hours: number[]) => {
       return `${hours.join('時,')}時に通知する`;

@@ -16,9 +16,6 @@ export class AppAnnounce {
   @State()
   follow: Follow;
 
-  @State()
-  showUnfollowConfirm = false;
-
   async componentWillLoad() {
     this.app.loading = true;
     try {
@@ -41,27 +38,6 @@ export class AppAnnounce {
     }
   };
 
-  private unfollow = {
-    handlers: {
-      confirm: () => {
-        this.showUnfollowConfirm = true;
-      },
-      close: () => {
-        this.showUnfollowConfirm = false;
-      },
-      unfollow: async () => {
-        this.showUnfollowConfirm = false;
-        this.app.loading = true;
-        try {
-          await this.app.deleteFollow(this.announceID);
-          this.follow = undefined;
-        } finally {
-          this.app.loading = false;
-        }
-      },
-    },
-  };
-
   private postLoader = async (postID: string) => {
     const post = await this.app.fetchPost(this.announceID, postID);
     if (!post) {
@@ -77,19 +53,8 @@ export class AppAnnounce {
       return;
     }
 
+    const follow = this.follow;
     const msgs = this.app.msgs;
-
-    const notifyBtnLabel = () => {
-      const notify = this.follow.notify;
-      if (!notify.enable) {
-        return msgs.announce.notifyBtn;
-      }
-      if (notify.hours?.length > 0) {
-        return msgs.announce.hoursNotifyBtn;
-      } else {
-        return msgs.announce.alwaysNotifyBtn;
-      }
-    };
 
     return (
       <Host>
@@ -102,35 +67,21 @@ export class AppAnnounce {
           }}
         >
           <div class="buttons" slot="bottomAnnounce">
-            {!this.follow && (
-              <button onClick={this.handleFollowClick}>{msgs.announce.followBtn}</button>
+            {!follow && (
+              <button class="slim" onClick={this.handleFollowClick}>
+                {msgs.announce.followBtn}
+              </button>
             )}
-            {this.follow && (
+            {follow && (
               <Fragment>
-                <a class="button slim" {...this.app.href(`/${this.announceID}/notify_`)}>
-                  {notifyBtnLabel()}
+                <a class="button slim" {...this.app.href(`/${this.announceID}/config_`)}>
+                  {msgs.announce.configBtn}
                 </a>
-                <button class="slim" onClick={this.unfollow.handlers.confirm}>
-                  {msgs.announce.followingBtn}
-                </button>
               </Fragment>
             )}
           </div>
         </ap-announce>
         <a {...this.app.href('/', true)}>{msgs.common.back}</a>
-        {this.showUnfollowConfirm && (
-          <ap-modal onClose={this.unfollow.handlers.close}>
-            <div class="unfollow-modal">
-              <div>{this.app.msgs.announce.unfollowConfirm}</div>
-              <div class="buttons">
-                <button onClick={this.unfollow.handlers.close}>
-                  {this.app.msgs.common.cancel}
-                </button>
-                <button onClick={this.unfollow.handlers.unfollow}>{this.app.msgs.common.ok}</button>
-              </div>
-            </div>
-          </ap-modal>
-        )}
       </Host>
     );
   }

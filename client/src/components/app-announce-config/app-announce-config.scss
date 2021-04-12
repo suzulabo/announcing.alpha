@@ -1,4 +1,4 @@
-app-announce-notify {
+app-announce-config {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
@@ -6,6 +6,11 @@ app-announce-notify {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  hr {
+    border-top: 1px solid var(--light-border-color);
+    align-self: stretch;
+  }
 
   > * {
     margin-top: 30px;
@@ -16,6 +21,25 @@ app-announce-notify {
   }
   button.submit {
     margin-top: 40px;
+  }
+  a.back {
+    margin-top: 40px;
+  }
+
+  .unfollow-modal {
+    background-color: var(--bk-color);
+    border-radius: 5px;
+    padding: 20px 10px;
+
+    width: 100%;
+    max-width: 400px;
+
+    text-align: center;
+    .buttons {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-around;
+    }
   }
 
   .hours-modal {

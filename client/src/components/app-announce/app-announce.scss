@@ -16,20 +16,4 @@ app-announce {
       }
     }
   }
-
-  .unfollow-modal {
-    background-color: var(--bk-color);
-    border-radius: 5px;
-    padding: 20px 10px;
-
-    width: 100%;
-    max-width: 400px;
-
-    text-align: center;
-    .buttons {
-      margin-top: 40px;
-      display: flex;
-      justify-content: space-around;
-    }
-  }
 }

@@ -4,10 +4,10 @@ import { Follow } from 'src/app/datatypes';
 import { PromiseValue } from 'type-fest';
 
 @Component({
-  tag: 'app-announce-notify',
-  styleUrl: 'app-announce-notify.scss',
+  tag: 'app-announce-config',
+  styleUrl: 'app-announce-config.scss',
 })
-export class AppAnnounceNotify {
+export class AppAnnounceConfig {
   @Prop()
   app: App;
 
@@ -16,6 +16,9 @@ export class AppAnnounceNotify {
 
   @State()
   values: { enable: boolean; hours: number[] };
+
+  @State()
+  showUnfollowConfirm = false;
 
   @State()
   showHoursModal = false;
@@ -47,6 +50,27 @@ export class AppAnnounceNotify {
       this.app.loading = false;
     }
   }
+
+  private unfollow = {
+    handlers: {
+      confirm: () => {
+        this.showUnfollowConfirm = true;
+      },
+      close: () => {
+        this.showUnfollowConfirm = false;
+      },
+      unfollow: async () => {
+        this.showUnfollowConfirm = false;
+        this.app.loading = true;
+        try {
+          await this.app.deleteFollow(this.announceID);
+          this.follow = undefined;
+        } finally {
+          this.app.loading = false;
+        }
+      },
+    },
+  };
 
   private handleEnableChange = () => {
     this.values = { ...this.values, enable: !this.values.enable };
@@ -152,14 +176,14 @@ export class AppAnnounceNotify {
       <Host>
         <label>
           <ap-checkbox
-            label={msgs.announceNorify.enable}
+            label={msgs.announceConfig.enable}
             checked={values.enable}
             onClick={this.handleEnableChange}
           />
         </label>
         {values.hours.length > 0 && (
           <span class={{ disabled: !values.enable }}>
-            {msgs.announceNorify.hours(values.hours)}
+            {msgs.announceConfig.hours(values.hours)}
           </span>
         )}
         <button
@@ -167,13 +191,31 @@ export class AppAnnounceNotify {
           class="slim hours"
           onClick={this.hoursModal.handlers.show}
         >
-          {msgs.announceNorify.hoursBtn}
+          {msgs.announceConfig.hoursBtn}
         </button>
         <button class="submit" disabled={!canSubmit} onClick={this.handleSubmitClick}>
-          {msgs.announceNorify.submitBtn}
+          {msgs.announceConfig.submitBtn}
+        </button>
+        <hr />
+        <button class="anchor unfollow" onClick={this.unfollow.handlers.confirm}>
+          {msgs.announceConfig.unfollowBtn}
         </button>
 
-        <a {...this.app.href(`/${this.announceID}`, true)}>{msgs.common.back}</a>
+        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
+          {msgs.common.back}
+        </a>
+
+        {this.showUnfollowConfirm && (
+          <ap-modal onClose={this.unfollow.handlers.close}>
+            <div class="unfollow-modal">
+              <div>{msgs.announceConfig.unfollowConfirm}</div>
+              <div class="buttons">
+                <button onClick={this.unfollow.handlers.close}>{msgs.common.cancel}</button>
+                <button onClick={this.unfollow.handlers.unfollow}>{msgs.common.ok}</button>
+              </div>
+            </div>
+          </ap-modal>
+        )}
 
         {this.showHoursModal && (
           <ap-modal onClose={this.hoursModal.handlers.close}>
