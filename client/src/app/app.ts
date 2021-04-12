@@ -56,15 +56,25 @@ export class App {
   }
 
   redirectRoute(path: string) {
-    history.replaceState(history.state, null, path);
+    const url = new URL(path, location.href);
+    if (location.href == url.href) {
+      return;
+    }
+
+    history.replaceState(history.state, null, url.pathname);
     window.dispatchEvent(new PopStateEvent('popstate'));
   }
 
   pushRoute(path: string, back?: boolean) {
-    if (back && history.state?.beforeRoute == path) {
+    const url = new URL(path, location.href);
+    if (location.href == url.href) {
+      return;
+    }
+
+    if (back && history.state?.beforeRoute == url.pathname) {
       history.back();
     } else {
-      history.pushState(null, null, path);
+      history.pushState(null, null, url.pathname);
       window.dispatchEvent(new PopStateEvent('popstate'));
     }
   }
