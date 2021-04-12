@@ -81,7 +81,7 @@ export class AppRoot {
     ['/', 'app-home'],
   ]);
   private announceIDPattern = /^[A-Z0-9]{12}$/;
-  private postIDPattern = /^[a-zA-Z0-9]+$/;
+  private postIDPattern = /^[-a-zA-Z0-9]+$/;
 
   private getRoute(): MatchPathResult {
     const p = location.pathname;

@@ -26,6 +26,7 @@
     "@stencil/sass": "^1.4.1",
     "@stencil/store": "^1.4.1",
     "autolinker": "^3.14.3",
+    "base-x": "^3.0.8",
     "bootstrap-icons": "^1.4.1",
     "date-fns": "^2.20.1",
     "destyle.css": "^2.0.2",
@@ -34,6 +35,7 @@
     "intersection-observer": "^0.12.0",
     "npm-run-all": "^4.1.5",
     "npm-watch": "^0.9.0",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "type-fest": "^1.0.1",
     "workbox-build": "^4.3.1"
   }

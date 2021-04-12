@@ -3,6 +3,7 @@ import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { Announce_FS, checkOwner, converters, Post_FS, storeImage } from './firestore';
 import { incString } from './incstring';
 import { ImageRule, PostRule, PutPostParams } from './shared';
+import { millisToBase62 } from './utils';
 
 export const callPutPost = async (
   params: PutPostParams,
@@ -51,11 +52,13 @@ const putPost = async (
     }
   }
 
+  const now = admin.firestore.Timestamp.now();
+
   const postData: Post_FS = {
     ...(!!title && { title }),
     ...(!!body && { body }),
     ...(!!link && { link }),
-    pT: admin.firestore.FieldValue.serverTimestamp(),
+    pT: now,
   };
 
   if (editID) {
@@ -75,7 +78,22 @@ const putPost = async (
       return;
     }
 
-    const postID = incString.next(announceData.pid);
+    const postID = (() => {
+      const id = millisToBase62((postData.pT as admin.firestore.Timestamp).toMillis());
+      if (!editID) {
+        return id;
+      }
+
+      let c = editID.split('-')[1];
+      const posts = announceData.posts || [];
+      while (true) {
+        c = incString.next(c);
+        const v = `${id}-${c}`;
+        if (!posts.includes(v)) {
+          return v;
+        }
+      }
+    })();
     const posts = announceData.posts || [];
 
     if (imgData) {
