@@ -2,8 +2,5 @@
   "name": "announcing-shared",
   "private": true,
   "version": "0.0.1",
-  "scripts": {},
-  "dependencies": {
-    "type-fest": "^0.21.1"
-  }
+  "scripts": {}
 }
