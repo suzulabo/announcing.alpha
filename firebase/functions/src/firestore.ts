@@ -1,20 +1,34 @@
 import * as admin from 'firebase-admin';
-import { AnnounceConverter, AnnounceMetaConverter, PostConverter, UserConverter } from './shared';
+import { Merge } from 'type-fest';
+import {
+  Announce,
+  AnnounceConverter,
+  AnnounceMeta,
+  AnnounceMetaConverter,
+  Post,
+  PostConverter,
+  User,
+  UserConverter,
+} from './shared';
 import { toMD5Base62 } from './utils';
 
 import FieldValue = admin.firestore.FieldValue;
+import Timestamp = admin.firestore.Timestamp;
 
 export const converters = {
-  announce: new AnnounceConverter<FieldValue>(),
-  announceMeta: new AnnounceMetaConverter<FieldValue>(),
-  post: new PostConverter<FieldValue>(),
-  user: new UserConverter<FieldValue>(),
+  announce: new AnnounceConverter(),
+  announceMeta: new AnnounceMetaConverter(),
+  post: new PostConverter(),
+  user: new UserConverter(),
 };
 
-export type Announce_FS = AnnounceConverter<FieldValue>['fsType'];
-export type AnnounceMeta_FS = AnnounceMetaConverter<FieldValue>['fsType'];
-export type Post_FS = PostConverter<FieldValue>['fsType'];
-export type User_FS = UserConverter<FieldValue>['fsType'];
+export type Announce_FS = Merge<
+  Announce,
+  { posts?: string[] | FieldValue; uT: Timestamp | FieldValue }
+>;
+export type AnnounceMeta_FS = Merge<AnnounceMeta, { cT: Timestamp | FieldValue }>;
+export type Post_FS = Merge<Post, { pT: Timestamp | FieldValue }>;
+export type User_FS = Merge<User, { announces: string[] | FieldValue }>;
 
 const serialize = (...args: (string | undefined)[]) => {
   return args

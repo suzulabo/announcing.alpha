@@ -17,13 +17,11 @@ import {
 } from 'src/shared';
 import { AppMsg } from './msg';
 
-import FieldValue = firebase.firestore.FieldValue;
-
 export const converters = {
-  announce: new AnnounceConverter<FieldValue>(),
-  announceMeta: new AnnounceMetaConverter<FieldValue>(),
-  post: new PostConverter<FieldValue>(),
-  user: new UserConverter<FieldValue>(),
+  announce: new AnnounceConverter(),
+  announceMeta: new AnnounceMetaConverter(),
+  post: new PostConverter(),
+  user: new UserConverter(),
 };
 
 const getCacheFirst = async <T>(

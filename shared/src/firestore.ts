@@ -1,52 +1,34 @@
-import { Merge } from 'type-fest';
 import { Announce, AnnounceMeta, Post, User } from './datatypes';
 
 type Timestamp = {
   toMillis: () => number;
 };
 
-type Announce_FS<TFieldValue> = Merge<
-  Announce,
-  { posts?: string[] | TFieldValue; uT: Timestamp | TFieldValue }
->;
-type AnnounceMeta_FS<TFieldValue> = Merge<AnnounceMeta, { cT: Timestamp | TFieldValue }>;
-type Post_FS<TFieldValue> = Merge<Post, { pT: Timestamp | TFieldValue }>;
-type User_FS<TFieldValue> = Merge<User, { announces: string[] | TFieldValue }>;
-
-abstract class ConverterBase<T, U> {
-  fsType!: U;
-
+abstract class ConverterBase<T> {
   // not use
   toFirestore(o: any) {
     return o;
   }
 
   fromFirestore(snapshot: { data: (options: unknown) => unknown }, options?: unknown) {
-    const data = snapshot.data(options) as U;
+    const data = snapshot.data(options);
     return this.fromFirebaseImpl(data);
   }
 
-  abstract fromFirebaseImpl(data: U): T;
+  abstract fromFirebaseImpl(data: any): T;
 }
 
-export class AnnounceConverter<TFieldValue> extends ConverterBase<
-  Announce,
-  Announce_FS<TFieldValue>
-> {
-  fromFirebaseImpl(data: Announce_FS<TFieldValue>) {
+export class AnnounceConverter extends ConverterBase<Announce> {
+  fromFirebaseImpl(data: any): Announce {
     return {
       ...data,
-      posts: data.posts as string[],
       uT: (data.uT as Timestamp).toMillis(),
     };
   }
 }
 
-export class AnnounceMetaConverter<TFieldValue> extends ConverterBase<
-  AnnounceMeta,
-  AnnounceMeta_FS<TFieldValue>
-> {
-  fromFirebaseImpl(data: AnnounceMeta_FS<TFieldValue>) {
+export class AnnounceMetaConverter extends ConverterBase<AnnounceMeta> {
+  fromFirebaseImpl(data: any): AnnounceMeta {
     return {
       ...data,
       cT: (data.cT as Timestamp).toMillis(),
@@ -54,8 +36,8 @@ export class AnnounceMetaConverter<TFieldValue> extends ConverterBase<
   }
 }
 
-export class PostConverter<TFieldValue> extends ConverterBase<Post, Post_FS<TFieldValue>> {
-  fromFirebaseImpl(data: Post_FS<TFieldValue>) {
+export class PostConverter extends ConverterBase<Post> {
+  fromFirebaseImpl(data: any) {
     return {
       ...data,
       pT: (data.pT as Timestamp).toMillis(),
@@ -63,8 +45,8 @@ export class PostConverter<TFieldValue> extends ConverterBase<Post, Post_FS<TFie
   }
 }
 
-export class UserConverter<TFieldValue> extends ConverterBase<User, User_FS<TFieldValue>> {
-  fromFirebaseImpl(data: User_FS<TFieldValue>) {
-    return { announces: data.announces as string[] };
+export class UserConverter extends ConverterBase<User> {
+  fromFirebaseImpl(data: any): User {
+    return { ...data };
   }
 }

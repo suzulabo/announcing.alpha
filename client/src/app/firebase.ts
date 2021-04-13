@@ -5,10 +5,8 @@ import 'firebase/functions';
 import 'firebase/messaging';
 import { AnnounceConverter, AppEnv, RegisterNotificationParams } from 'src/shared';
 
-import FieldValue = firebase.firestore.FieldValue;
-
 export const converters = {
-  announce: new AnnounceConverter<FieldValue>(),
+  announce: new AnnounceConverter(),
 };
 
 const getCache = async <T>(docRef: firebase.firestore.DocumentReference<T>) => {
