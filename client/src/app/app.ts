@@ -157,7 +157,9 @@ export class App {
   }
 
   async deleteFollow(id: string) {
-    await this.appFirebase.registerMessaging(id, false);
+    if ((await this.appFirebase.checkNotifyPermission()) == 'allow') {
+      await this.appFirebase.registerMessaging(id, false);
+    }
     await this.appStorage.follows.remove(id);
   }
 
