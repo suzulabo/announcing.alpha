@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
 import { PromiseValue } from 'type-fest';
@@ -127,39 +127,26 @@ export class AppAnnounceConfig {
   };
 
   private renderUnsupported() {
-    const msgs = this.app.msgs;
-
     // TODO
     return (
-      <Host>
+      <Fragment>
         <span>Unsupported Brwoser</span>
-        <a {...this.app.href(`/${this.announceID}`, true)}>{msgs.common.back}</a>
-      </Host>
+      </Fragment>
     );
   }
 
   private renderDenied() {
-    const msgs = this.app.msgs;
-
     // TODO
     return (
-      <Host>
+      <Fragment>
         <span>Not permitted</span>
-        <a {...this.app.href(`/${this.announceID}`, true)}>{msgs.common.back}</a>
-      </Host>
+      </Fragment>
     );
   }
 
   render() {
     if (!this.follow) {
       return;
-    }
-
-    if (this.permission == 'unsupported') {
-      return this.renderUnsupported();
-    }
-    if (this.permission == 'deny') {
-      return this.renderDenied();
     }
 
     const msgs = this.app.msgs;
@@ -172,30 +159,45 @@ export class AppAnnounceConfig {
 
     const canSubmit = modified;
 
+    const renderNotify = () => {
+      if (this.permission == 'unsupported') {
+        return this.renderUnsupported();
+      }
+      if (this.permission == 'deny') {
+        return this.renderDenied();
+      }
+
+      return (
+        <Fragment>
+          <label>
+            <ap-checkbox
+              label={msgs.announceConfig.enable}
+              checked={values.enable}
+              onClick={this.handleEnableChange}
+            />
+          </label>
+          {values.hours.length > 0 && (
+            <span class={{ disabled: !values.enable }}>
+              {msgs.announceConfig.hours(values.hours)}
+            </span>
+          )}
+          <button
+            disabled={!values.enable}
+            class="slim hours"
+            onClick={this.hoursModal.handlers.show}
+          >
+            {msgs.announceConfig.hoursBtn}
+          </button>
+          <button class="submit" disabled={!canSubmit} onClick={this.handleSubmitClick}>
+            {msgs.announceConfig.submitBtn}
+          </button>
+        </Fragment>
+      );
+    };
+
     return (
       <Host>
-        <label>
-          <ap-checkbox
-            label={msgs.announceConfig.enable}
-            checked={values.enable}
-            onClick={this.handleEnableChange}
-          />
-        </label>
-        {values.hours.length > 0 && (
-          <span class={{ disabled: !values.enable }}>
-            {msgs.announceConfig.hours(values.hours)}
-          </span>
-        )}
-        <button
-          disabled={!values.enable}
-          class="slim hours"
-          onClick={this.hoursModal.handlers.show}
-        >
-          {msgs.announceConfig.hoursBtn}
-        </button>
-        <button class="submit" disabled={!canSubmit} onClick={this.handleSubmitClick}>
-          {msgs.announceConfig.submitBtn}
-        </button>
+        {renderNotify()}
         <hr />
         <button class="anchor unfollow" onClick={this.unfollow.handlers.confirm}>
           {msgs.announceConfig.unfollowBtn}
