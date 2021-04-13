@@ -134,6 +134,10 @@ export class App {
     return `${this.apiSite}/image/${id}`;
   }
 
+  getFollows() {
+    return this.appStorage.follows.entries();
+  }
+
   getFollow(id: string) {
     return this.appStorage.follows.get(id);
   }
@@ -142,6 +146,14 @@ export class App {
     if (!(await this.getFollow(id))) {
       return this.appStorage.follows.set(id, follow);
     }
+  }
+
+  async setReadTime(id: string) {
+    const follow = await this.getFollow(id);
+    if (follow) {
+      follow.readTime = Date.now();
+    }
+    return this.appStorage.follows.set(id, follow);
   }
 
   async deleteFollow(id: string) {

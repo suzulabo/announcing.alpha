@@ -64,7 +64,7 @@ export class AppAnnounceConfig {
         this.app.loading = true;
         try {
           await this.app.deleteFollow(this.announceID);
-          this.follow = undefined;
+          this.app.pushRoute(`/${this.announceID}`);
         } finally {
           this.app.loading = false;
         }

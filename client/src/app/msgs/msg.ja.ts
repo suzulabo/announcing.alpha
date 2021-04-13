@@ -30,7 +30,9 @@ export const msgs = {
   footer: {
     title: 'Announcing',
   },
-  home: {},
+  home: {
+    newBadge: '新着',
+  },
   announce: {
     noPosts: 'お知らせはまだありません',
     followBtn: 'フォローする',
