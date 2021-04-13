@@ -32,6 +32,10 @@ export const msgs = {
   },
   home: {
     newBadge: '新着',
+    deleted: (name: string) => {
+      return `「${name}」は削除されました`;
+    },
+    unfollowBtn: 'フォローを解除する',
   },
   announce: {
     noPosts: 'お知らせはまだありません',

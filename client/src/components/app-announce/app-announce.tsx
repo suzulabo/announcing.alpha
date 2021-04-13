@@ -18,18 +18,20 @@ export class AppAnnounce {
   follow: Follow;
 
   private latestPostID: string;
+  private announceName: string;
 
   async componentWillLoad() {
     this.app.loading = true;
     try {
       await this.app.loadAnnounce(this.announceID);
 
-      const follow = await this.app.getFollow(this.announceID);
+      const a = this.app.getAnnounceState(this.announceID);
+      this.announceName = a.name;
 
+      const follow = await this.app.getFollow(this.announceID);
       if (follow) {
         this.follow = follow;
 
-        const a = this.app.getAnnounceState(this.announceID);
         if (a && a.posts) {
           const latestPostID = a.posts[a.posts.length - 1];
           if (latestPostID) {
@@ -37,6 +39,11 @@ export class AppAnnounce {
               this.latestPostID = latestPostID;
             }
           }
+        }
+
+        if (follow.name != a.name) {
+          follow.name = a.name;
+          await this.app.setFollow(this.announceID, follow);
         }
       }
     } finally {
@@ -47,7 +54,11 @@ export class AppAnnounce {
   private handleFollowClick = async () => {
     this.app.loading = true;
     try {
-      const follow: Follow = { notify: { enable: false, hours: [] }, readTime: Date.now() };
+      const follow: Follow = {
+        name: this.announceName,
+        notify: { enable: false, hours: [] },
+        readTime: Date.now(),
+      };
       await this.app.setFollow(this.announceID, follow);
       this.follow = await this.app.getFollow(this.announceID);
     } finally {
