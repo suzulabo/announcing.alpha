@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 
-const titleSuffix = 'Announcing Console';
+const titleSuffix = 'Announcing♪ Console';
 
 export const msgs = {
   common: {
@@ -15,7 +15,7 @@ export const msgs = {
     },
   },
   footer: {
-    title: 'Announcing Console',
+    title: 'Announcing♪ Console',
   },
   error: {
     main: 'ご迷惑をおかけします。\nしばらくしてから再度お試しください。',

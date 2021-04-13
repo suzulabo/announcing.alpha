@@ -28,7 +28,7 @@ export const msgs = {
     },
   },
   footer: {
-    title: 'Announcing',
+    title: 'Announcing♪ Client',
   },
   home: {
     newBadge: '新着',
