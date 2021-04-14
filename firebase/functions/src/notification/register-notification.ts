@@ -9,6 +9,7 @@ export const callRegisterNotification = async (
   context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
+  console.debug('params:', params);
   const { fcmToken, announceID, enable, hours: _hours } = params;
 
   if (!fcmToken) {
@@ -53,7 +54,7 @@ export const callRegisterNotification = async (
   }
 
   // check same
-  if (enable && hours.join(':') == curHours.join(':')) {
+  if (enable && curDocRef && hours.join(':') == curHours.join(':')) {
     console.debug('same hours', announceID, hash);
     return;
   }
