@@ -9,8 +9,8 @@ import {
   PostConverter,
   User,
   UserConverter,
-} from './shared';
-import { toMD5Base62 } from './utils';
+} from '../shared';
+import { toMD5Base62 } from './util';
 
 import FieldValue = admin.firestore.FieldValue;
 import Timestamp = admin.firestore.Timestamp;

@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { RegisterNotificationParams } from './shared';
-import { toMD5Base62 } from './utils';
+import { RegisterNotificationParams } from '../shared';
+import { toMD5Base62 } from '../utils/util';
 
 interface FcmToken {
   [hash: string]: string;

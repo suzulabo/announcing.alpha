@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import { Request, Response } from 'firebase-functions';
-import { converters } from './firestore';
+import { converters } from '../utils/firestore';
 
 const cacheControl = 'public, max-age=31556952, s-maxage=86400, immutable';
 const announceMetaPattern = new RegExp('^/announce/([a-zA-Z0-9]{12})/meta/([a-zA-Z0-9]{8})$');

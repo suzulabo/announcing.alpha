@@ -2,8 +2,8 @@ import * as admin from 'firebase-admin';
 import { EventContext } from 'firebase-functions/lib/cloud-functions';
 import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { User_FS } from './firestore';
-import { Announce, DeleteAnnounceParams } from './shared';
+import { Announce, DeleteAnnounceParams } from '../shared';
+import { User_FS } from '../utils/firestore';
 
 export const callDeleteAnnounce = async (
   params: DeleteAnnounceParams,

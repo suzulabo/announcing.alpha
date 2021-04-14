@@ -1,9 +1,9 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { Announce_FS, checkOwner, converters, Post_FS, storeImage } from './firestore';
-import { incString } from './incstring';
-import { ImageRule, PostRule, PutPostParams } from './shared';
-import { millisToBase62 } from './utils';
+import { ImageRule, PostRule, PutPostParams } from '../shared';
+import { Announce_FS, checkOwner, converters, Post_FS, storeImage } from '../utils/firestore';
+import { incString } from '../utils/incstring';
+import { millisToBase62 } from '../utils/util';
 
 export const callPutPost = async (
   params: PutPostParams,

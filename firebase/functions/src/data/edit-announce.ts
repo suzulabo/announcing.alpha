@@ -1,8 +1,8 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { announceMetaHash, AnnounceMeta_FS, Announce_FS, converters } from './firestore';
-import { AnnounceMetaRule, EditAnnounceParams, ImageRule } from './shared';
-import { toMD5Base62 } from './utils';
+import { AnnounceMetaRule, EditAnnounceParams, ImageRule } from '../shared';
+import { announceMetaHash, AnnounceMeta_FS, Announce_FS, converters } from '../utils/firestore';
+import { toMD5Base62 } from '../utils/util';
 
 export const callEditAnnounce = async (
   params: EditAnnounceParams,
