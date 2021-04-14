@@ -11,8 +11,8 @@ import {
   httpsGetAnnouncePostData,
   httpsGetImageData,
 } from './data/get-data';
-import { callRegisterNotification } from './notification/notification';
 import { callPutPost } from './data/put-post';
+import { callRegisterNotification } from './notification/register-notification';
 import { AppEnv } from './shared';
 
 const adminApp = initializeApp();

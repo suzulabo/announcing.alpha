@@ -9,18 +9,12 @@ import {
   PostConverter,
   User,
   UserConverter,
+  ConverterBase,
 } from '../shared';
 import { toMD5Base62 } from './util';
 
 import FieldValue = admin.firestore.FieldValue;
 import Timestamp = admin.firestore.Timestamp;
-
-export const converters = {
-  announce: new AnnounceConverter(),
-  announceMeta: new AnnounceMetaConverter(),
-  post: new PostConverter(),
-  user: new UserConverter(),
-};
 
 export type Announce_FS = Merge<
   Announce,
@@ -29,6 +23,25 @@ export type Announce_FS = Merge<
 export type AnnounceMeta_FS = Merge<AnnounceMeta, { cT: Timestamp | FieldValue }>;
 export type Post_FS = Merge<Post, { pT: Timestamp | FieldValue }>;
 export type User_FS = Merge<User, { announces: string[] | FieldValue }>;
+
+export interface FcmToken {
+  [hash: string]: string;
+}
+export interface Notification {
+  announceID: string;
+  members: {
+    [hash: string]: number[];
+  };
+}
+
+export const converters = {
+  announce: new AnnounceConverter(),
+  announceMeta: new AnnounceMetaConverter(),
+  post: new PostConverter(),
+  user: new UserConverter(),
+  fcmToken: new ConverterBase<FcmToken>(),
+  notification: new ConverterBase<Notification>(),
+};
 
 const serialize = (...args: (string | undefined)[]) => {
   return args

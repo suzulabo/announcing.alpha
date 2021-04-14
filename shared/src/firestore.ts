@@ -4,7 +4,7 @@ type Timestamp = {
   toMillis: () => number;
 };
 
-abstract class ConverterBase<T> {
+export class ConverterBase<T> {
   // not use
   toFirestore(o: any) {
     return o;
@@ -15,7 +15,9 @@ abstract class ConverterBase<T> {
     return this.fromFirebaseImpl(data);
   }
 
-  abstract fromFirebaseImpl(data: any): T;
+  fromFirebaseImpl(data: any): T {
+    return data as T;
+  }
 }
 
 export class AnnounceConverter extends ConverterBase<Announce> {

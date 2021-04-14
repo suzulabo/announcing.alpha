@@ -1,47 +1,8 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { RegisterNotificationParams } from '../shared';
-import { toMD5Base62 } from '../utils/util';
-
-interface FcmToken {
-  [hash: string]: string;
-}
-interface Notification {
-  announceID: string;
-  members: {
-    [hash: string]: number[];
-  };
-}
-
-const tokenMap = new Map<string, string>();
-
-const getTokenHash = async (token: string, firestore: admin.firestore.Firestore) => {
-  const hash = toMD5Base62(token).substring(0, 10);
-  const cachedToken = tokenMap.get(hash);
-  if (cachedToken) {
-    if (cachedToken == token) {
-      return hash;
-    } else {
-      throw new Error(`Collision? [${hash}](${token} : ${cachedToken})`);
-    }
-  }
-
-  const qs = await firestore.collection('fcmtokens').where(hash, '>', '').limit(1).get();
-  if (qs.size > 0) {
-    const data = qs.docs[0].data() as FcmToken;
-    const storedToken = data[hash];
-    if (token != storedToken) {
-      throw new Error(`Collision? [${hash}](${token} : ${storedToken})`);
-    }
-    return hash;
-  }
-
-  await firestore.doc(`fcmtokens/0`).set({ [hash]: token }, { merge: true });
-
-  tokenMap.set(hash, token);
-
-  return hash;
-};
+import { converters } from '../utils/firestore';
+import { getTokenHash } from './token';
 
 export const callRegisterNotification = async (
   params: RegisterNotificationParams,
@@ -72,7 +33,9 @@ export const callRegisterNotification = async (
   const firestore = adminApp.firestore();
   const hash = await getTokenHash(fcmToken, firestore);
 
-  const notificationsRef = firestore.collection('notifications');
+  const notificationsRef = firestore
+    .collection('notifications')
+    .withConverter(converters.notification);
   const curHours: number[] = [];
   let curDocRef!: admin.firestore.DocumentReference;
   {
@@ -84,7 +47,7 @@ export const callRegisterNotification = async (
     if (!qs.empty) {
       const doc = qs.docs[0];
       curDocRef = doc.ref;
-      const n = doc.data() as Notification;
+      const n = doc.data();
       curHours.push(...n.members[hash]);
     }
   }
