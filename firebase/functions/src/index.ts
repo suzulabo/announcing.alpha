@@ -13,6 +13,7 @@ import {
 } from './data/get-data';
 import { callPutPost } from './data/put-post';
 import { callRegisterNotification } from './notification/register-notification';
+import { firestoreCreatePost } from './notification/send';
 import { AppEnv } from './shared';
 
 const adminApp = initializeApp();
@@ -65,4 +66,10 @@ export const onFirestoreDeleteAnnounce = region.firestore
   .document('announces/{announceID}')
   .onDelete((qs, context) => {
     return firestoreDeleteAnnounce(qs, context, adminApp);
+  });
+
+export const onFirestoreCreatePost = region.firestore
+  .document('announces/{announceID}/posts/{postID}')
+  .onCreate((qs, context) => {
+    return firestoreCreatePost(qs, context, adminApp);
   });
