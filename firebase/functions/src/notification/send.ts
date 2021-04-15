@@ -62,6 +62,7 @@ export const firestoreCreatePost = async (
   const postData = qs.data() as Post;
   const msgs = [] as admin.messaging.MulticastMessage[];
   const notification = { title: announceMeta.name, body: postData.title || postData.body };
+  const data = { announceID, ...(announceMeta.icon && { icon: announceMeta.icon }) };
 
   const membersArray = [...members];
   let tokens = [] as string[];
@@ -74,12 +75,12 @@ export const firestoreCreatePost = async (
     }
     tokens.push(token);
     if (tokens.length == 500) {
-      msgs.push({ notification, tokens: [...tokens] });
+      msgs.push({ data, notification, tokens: [...tokens] });
       tokens = [];
     }
   }
   if (tokens.length > 0) {
-    msgs.push({ notification, tokens: [...tokens] });
+    msgs.push({ data, notification, tokens: [...tokens] });
   }
 
   const messaging = admin.messaging();
