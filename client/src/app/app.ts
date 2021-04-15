@@ -25,7 +25,7 @@ export class App {
     if (Build.isDev) {
       this.apiSite = `http://${location.hostname}:5000`;
     } else {
-      this.apiSite = location.origin.replace('console', 'api');
+      this.apiSite = location.origin.replace('client', 'api');
     }
   }
 
