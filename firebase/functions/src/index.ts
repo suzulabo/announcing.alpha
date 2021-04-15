@@ -12,7 +12,7 @@ import {
   httpsGetImageData,
 } from './data/get-data';
 import { callPutPost } from './data/put-post';
-import { callRegisterNotification } from './notification/register-notification';
+import { callRegisterNotification } from './notification/register';
 import { firestoreCreatePost } from './notification/send';
 import { AppEnv } from './shared';
 
