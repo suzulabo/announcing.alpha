@@ -29,7 +29,6 @@ export class App {
 
   async init() {
     await this.appFirebase.init();
-    this.appState.state.signIn = this.appFirebase.user != null;
   }
 
   setTitle(v: string) {
@@ -96,7 +95,6 @@ export class App {
   async signOut() {
     this.appFirebase.releaseListeners();
     await this.appFirebase.signOut();
-    this.appState.state.signIn = this.appFirebase.user != null;
   }
 
   signInGoogle() {

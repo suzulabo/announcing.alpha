@@ -16,6 +16,7 @@ import {
   UserConverter,
 } from 'src/shared';
 import { AppMsg } from './msg';
+import { AppState } from './state';
 
 export const converters = {
   announce: new AnnounceConverter(),
@@ -55,6 +56,7 @@ export class AppFirebase {
 
   constructor(
     private appEnv: AppEnv,
+    private appState: AppState,
     private appMsg: AppMsg,
     private _firebaseApp?: firebase.app.App,
   ) {}
@@ -87,7 +89,8 @@ export class AppFirebase {
     }
 
     await new Promise<void>(resolve => {
-      this.auth.onAuthStateChanged(() => {
+      this.auth.onAuthStateChanged(user => {
+        this.appState.state.signIn = user != null;
         resolve();
       });
     });
