@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 
 @Component({
@@ -9,17 +9,31 @@ export class AppSignIn {
   @Prop()
   app: App;
 
+  @State()
+  keepSignedIn = false;
+
   private handleGoogleClick = () => {
-    return this.app.signInGoogle();
+    return this.app.signInGoogle(this.keepSignedIn);
+  };
+
+  private handleKeepSignedIn = () => {
+    this.keepSignedIn = !this.keepSignedIn;
   };
 
   render() {
+    const msgs = this.app.msgs;
+
     return (
       <Host>
         <button onClick={this.handleGoogleClick}>
           <ap-icon icon="google"></ap-icon>
-          {this.app.msgs.signIn.social.google}
+          {msgs.signIn.googleBtn}
         </button>
+        <ap-checkbox
+          label={msgs.signIn.keepSignedIn}
+          checked={this.keepSignedIn}
+          onClick={this.handleKeepSignedIn}
+        />
       </Host>
     );
   }

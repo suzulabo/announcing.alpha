@@ -97,8 +97,8 @@ export class App {
     await this.appFirebase.signOut();
   }
 
-  signInGoogle() {
-    return this.appFirebase.signInGoogle();
+  signInGoogle(keep: boolean) {
+    return this.appFirebase.signInGoogle(keep);
   }
 
   createAnnounce(name: string, desc: string) {

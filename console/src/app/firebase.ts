@@ -101,7 +101,9 @@ export class AppFirebase {
     return this.auth.currentUser;
   }
 
-  async signInGoogle() {
+  async signInGoogle(keep: boolean) {
+    await this.auth.setPersistence(keep ? 'local' : 'session');
+
     const provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({
       prompt: 'select_account',
