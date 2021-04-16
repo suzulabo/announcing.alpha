@@ -13,7 +13,7 @@ import {
 } from './data/get-data';
 import { callPutPost } from './data/put-post';
 import { callRegisterNotification } from './notification/register';
-import { firestoreCreatePost } from './notification/send';
+import { firestoreCreatePost, pubsubSendNotification } from './notification/send';
 import { AppEnv } from './shared';
 
 const adminApp = initializeApp();
@@ -72,4 +72,10 @@ export const onFirestoreCreatePost = region.firestore
   .document('announces/{announceID}/posts/{postID}')
   .onCreate((qs, context) => {
     return firestoreCreatePost(qs, context, adminApp);
+  });
+
+export const onPubsubSendNotification = region.pubsub
+  .topic('send-notification')
+  .onPublish((msg, ctx) => {
+    return pubsubSendNotification(msg, ctx, adminApp);
   });
