@@ -10,12 +10,13 @@ import { getToken } from './token';
 const pubQueue = async (msgs: admin.messaging.MulticastMessage[]) => {
   const pubsub = new PubSub();
   const topic = pubsub.topic('send-notification', {
-    batching: { maxMessages: 100, maxMilliseconds: 1000 },
+    batching: { maxMessages: 100, maxMilliseconds: 50 },
   });
   for (const msg of msgs) {
     console.debug('pub', msg);
-    await topic.publishJSON({ msg });
+    void topic.publishJSON({ msg });
   }
+  await topic.flush();
 };
 
 export const pubsubSendNotification = async (
@@ -111,5 +112,9 @@ export const firestoreCreatePost = async (
     msgs.push({ data, notification, tokens: [...tokens] });
   }
 
+  if (msgs.length == 0) {
+    console.debug('no msgs');
+    return;
+  }
   await pubQueue(msgs);
 };
