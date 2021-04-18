@@ -21,7 +21,7 @@ const pubQueue = async (msgs: admin.messaging.MulticastMessage[]) => {
 
 export const pubsubSendNotification = async (
   msg: Message,
-  ctx: EventContext,
+  _ctx: EventContext,
   adminApp: admin.app.App,
 ): Promise<number> => {
   const messaging = adminApp.messaging();
@@ -29,7 +29,7 @@ export const pubsubSendNotification = async (
   console.debug('send', nmsg);
   const result = await messaging.sendMulticast(nmsg);
   if (result.failureCount > 0) {
-    // TOOD
+    // TODO
   }
   return 0;
 };
