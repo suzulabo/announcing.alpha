@@ -24,6 +24,7 @@
   },
   "main": "lib/index.js",
   "devDependencies": {
+    "@google-cloud/pubsub": "^2.11.0",
     "@types/cors": "^2.8.10",
     "@types/jest": "^26.0.22",
     "base-x": "^3.0.8",
