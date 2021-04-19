@@ -5,7 +5,6 @@ import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestor
 import { Message } from 'firebase-functions/lib/providers/pubsub';
 import { Post } from '../shared';
 import { converters } from '../utils/firestore';
-import { getToken } from './token';
 
 const pubQueue = async (msgs: admin.messaging.MulticastMessage[]) => {
   const pubsub = new PubSub();
@@ -52,19 +51,19 @@ export const firestoreCreatePost = async (
     .collection('notifications')
     .withConverter(converters.notification);
 
-  const members = new Set<string>();
+  const tokensSet = new Set<string>();
   {
-    const qs = await notificationsRef.where('announceID', '==', announceID).limit(10).get();
+    const updated = 0; // TODO
+    const qs = await notificationsRef
+      .where('anytime', 'array-contains', announceID)
+      .where('uT', '>', admin.firestore.Timestamp.fromMillis(updated))
+      .limit(10)
+      .get();
     qs.forEach(d => {
-      const n = d.data();
-      Object.entries(n.members || {}).forEach(([k, v]) => {
-        if (v.length == 0) {
-          members.add(k);
-        }
-      });
+      tokensSet.add(d.id);
     });
-    if (members.size == 0) {
-      console.debug('no members', announceID);
+    if (tokensSet.size == 0) {
+      console.debug('no followers', announceID);
       return;
     }
   }
@@ -93,23 +92,9 @@ export const firestoreCreatePost = async (
   const notification = { title: announceMeta.name, body: postData.title || postData.body };
   const data = { announceID, ...(announceMeta.icon && { icon: announceMeta.icon }) };
 
-  const membersArray = [...members];
-  let tokens = [] as string[];
-  while (membersArray.length > 0) {
-    const hash = membersArray.shift()!;
-    const token = await getToken(hash, firestore);
-    if (!token) {
-      console.warn('missing token', announceID, hash);
-      continue;
-    }
-    tokens.push(token);
-    if (tokens.length == 500) {
-      msgs.push({ data, notification, tokens: [...tokens] });
-      tokens = [];
-    }
-  }
-  if (tokens.length > 0) {
-    msgs.push({ data, notification, tokens: [...tokens] });
+  let tokens = [...tokensSet] as string[];
+  while (tokens.length > 0) {
+    msgs.push({ data, notification, tokens: tokens.splice(0, 500) });
   }
 
   if (msgs.length == 0) {

@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { isLang, RegisterNotificationParams } from '../shared';
-import { Device } from '../utils/firestore';
+import { Notification } from '../utils/firestore';
 
 const sortNum = (a: number[]) => {
   a.sort((a, b) => {
@@ -34,34 +34,36 @@ export const callRegisterNotification = async (
     throw new Error('missing notifs');
   }
 
-  const hoursSet = new Set<number>();
+  const anytimeSet = new Set<string>();
+  const hoursIndexSet = new Set<number>();
+  const scheduled = [] as { id: string; hours: number[] }[];
   for (const notif of notifs) {
     if (!notif.id || notif.id.length != 12 || !notif.hours) {
       throw new Error(`invalid follow (${notif})`);
     }
-    for (const hour of notif.hours) {
-      if (!(hour >= 0 && hour <= 23)) {
-        throw new Error(`invalid hour (${notif})`);
+    if (notif.hours.length == 0) {
+      anytimeSet.add(notif.id);
+    } else {
+      for (const hour of notif.hours) {
+        if (!(hour >= 0 && hour <= 23)) {
+          throw new Error(`invalid hour (${notif})`);
+        }
+        hoursIndexSet.add(hour);
+        scheduled.push({ id: notif.id, hours: notif.hours });
       }
-      hoursSet.add(hour);
     }
   }
 
   const firestore = adminApp.firestore();
 
-  const device: Device = {
+  const notification: Notification = {
     lang,
-    hours: sortNum([...hoursSet]),
-    notifs: notifs.map(v => {
-      return {
-        id: v.id!,
-        hours: sortNum(v.hours!),
-      };
-    }),
+    ...(anytimeSet.size > 0 && { anytime: [...anytimeSet] }),
+    ...(hoursIndexSet.size > 0 && { scheduled: { i: sortNum([...hoursIndexSet]), v: scheduled } }),
     uT: admin.firestore.FieldValue.serverTimestamp() as any,
   };
 
-  await firestore.doc(`devices/${fcmToken}`).set(device);
+  await firestore.doc(`notifications/${fcmToken}`).set(notification);
 
-  console.info(`SET DEVICE: ${fcmToken} ${device}`);
+  console.info(`SET NOTIFICATION: ${fcmToken} ${notification}`);
 };
