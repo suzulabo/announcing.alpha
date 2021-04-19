@@ -45,11 +45,6 @@ export const ImageRule = {
   d: { length: 1000 * 1000 },
 };
 
-export interface Device {
-  fcmToken: string;
-  signKey: string;
-}
-
 export interface CreateAnnounceParams {
   name?: string;
   desc?: string;
@@ -82,9 +77,14 @@ export interface DeletePostParams {
   postID?: string;
 }
 
+const languages = ['en', 'ja'] as const;
+export type Lang = typeof languages[number];
+export const isLang = (s: any): s is Lang => {
+  return languages.includes(s);
+};
+
 export interface RegisterNotificationParams {
   fcmToken?: string;
-  announceID?: string;
-  enable?: boolean;
-  hours?: number[];
+  lang?: Lang;
+  notifs?: { id?: string; hours?: number[] }[];
 }

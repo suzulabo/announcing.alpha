@@ -157,25 +157,38 @@ export class App {
   }
 
   async deleteFollow(id: string) {
-    if ((await this.appFirebase.checkNotifyPermission()) == 'allow') {
-      await this.appFirebase.registerMessaging(id, false);
-    }
     await this.appStorage.follows.remove(id);
+    if ((await this.appFirebase.checkNotifyPermission()) == 'allow') {
+      await this.registerMessaging();
+    }
   }
 
   async checkNotifyPermission() {
     return this.appFirebase.checkNotifyPermission();
   }
 
-  async registerMessaging(announceID: string, enable: boolean, hours?: number[]) {
+  async setNotify(announceID: string, enable: boolean, hours?: number[]) {
     const follow = await this.getFollow(announceID);
     if (!follow && enable) {
       return;
     }
-    await this.appFirebase.registerMessaging(announceID, enable, hours);
     await this.appStorage.follows.set(announceID, {
       ...follow,
       notify: { enable, hours },
     });
+    await this.registerMessaging();
+  }
+
+  private async registerMessaging() {
+    const follows = await this.appStorage.follows.entries();
+
+    const notifs = [] as { id: string; hours: number[] }[];
+    for (const [id, follow] of follows) {
+      if (follow.notify.enable) {
+        notifs.push({ id, hours: follow.notify.hours });
+      }
+    }
+
+    await this.appFirebase.registerMessaging(notifs, this.appMsg.lang);
   }
 }

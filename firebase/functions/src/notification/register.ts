@@ -1,8 +1,14 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { RegisterNotificationParams } from '../shared';
-import { converters } from '../utils/firestore';
-import { getTokenHash } from './token';
+import { isLang, RegisterNotificationParams } from '../shared';
+import { Device } from '../utils/firestore';
+
+const sortNum = (a: number[]) => {
+  a.sort((a, b) => {
+    return a - b;
+  });
+  return a;
+};
 
 export const callRegisterNotification = async (
   params: RegisterNotificationParams,
@@ -10,7 +16,7 @@ export const callRegisterNotification = async (
   adminApp: admin.app.App,
 ): Promise<void> => {
   console.debug('params:', params);
-  const { fcmToken, announceID, enable, hours: _hours } = params;
+  const { fcmToken, lang, notifs } = params;
 
   if (!fcmToken) {
     throw new Error('missing fcmToken');
@@ -18,66 +24,44 @@ export const callRegisterNotification = async (
   if (fcmToken.length > 300) {
     throw new Error(`fcmToken is too long (${fcmToken.length})`);
   }
-  if (!announceID) {
-    throw new Error('missing announceID');
+  if (!lang) {
+    throw new Error('missing lang');
   }
-  if (_hours) {
-    _hours.forEach(v => {
-      if (v < 0 || v > 23) {
-        throw new Error(`invalid hour: [${hours.join(',')}]`);
-      }
-    });
+  if (!isLang(lang)) {
+    throw new Error(`invalid lang (${lang})`);
+  }
+  if (!notifs) {
+    throw new Error('missing notifs');
   }
 
-  const hours = _hours || [];
+  const hoursSet = new Set<number>();
+  for (const notif of notifs) {
+    if (!notif.id || notif.id.length != 12 || !notif.hours) {
+      throw new Error(`invalid follow (${notif})`);
+    }
+    for (const hour of notif.hours) {
+      if (!(hour >= 0 && hour <= 23)) {
+        throw new Error(`invalid hour (${notif})`);
+      }
+      hoursSet.add(hour);
+    }
+  }
 
   const firestore = adminApp.firestore();
-  const hash = await getTokenHash(fcmToken, firestore);
 
-  const notificationsRef = firestore
-    .collection('notifications')
-    .withConverter(converters.notification);
-  const curHours: number[] = [];
-  let curDocRef!: admin.firestore.DocumentReference;
-  {
-    const qs = await notificationsRef
-      .where('announceID', '==', announceID)
-      .orderBy(`members.${hash}`)
-      .limit(1)
-      .get();
-    if (!qs.empty) {
-      const doc = qs.docs[0];
-      curDocRef = doc.ref;
-      const n = doc.data();
-      curHours.push(...n.members[hash]);
-    }
-  }
+  const device: Device = {
+    lang,
+    hours: sortNum([...hoursSet]),
+    notifs: notifs.map(v => {
+      return {
+        id: v.id!,
+        hours: sortNum(v.hours!),
+      };
+    }),
+    uT: admin.firestore.FieldValue.serverTimestamp() as any,
+  };
 
-  // check same
-  if (enable && curDocRef && hours.join(':') == curHours.join(':')) {
-    console.debug('same hours', announceID, hash);
-    return;
-  }
+  await firestore.doc(`devices/${fcmToken}`).set(device);
 
-  const batch = firestore.batch();
-  if (enable) {
-    batch.set(
-      notificationsRef.doc(`${announceID}`),
-      {
-        announceID,
-        members: { [hash]: hours },
-      },
-      { merge: true },
-    );
-  }
-
-  if (curDocRef) {
-    if (!enable || curDocRef?.id != announceID) {
-      batch.update(curDocRef, { [`members.${hash}`]: admin.firestore.FieldValue.delete() });
-    }
-  }
-
-  await batch.commit();
-
-  console.info(`SET NOTIFICATION: ${announceID} ${hash} ${hours.join(':')}`);
+  console.info(`SET DEVICE: ${fcmToken} ${device}`);
 };

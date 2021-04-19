@@ -119,7 +119,7 @@ export class AppAnnounceConfig {
     this.app.loading = true;
     try {
       const hours = this.values.enable ? this.values.hours : [];
-      await this.app.registerMessaging(this.announceID, this.values.enable, hours);
+      await this.app.setNotify(this.announceID, this.values.enable, hours);
       this.app.pushRoute(`/${this.announceID}`);
     } finally {
       this.app.loading = false;

@@ -5,11 +5,11 @@ import {
   AnnounceConverter,
   AnnounceMeta,
   AnnounceMetaConverter,
+  ConverterBase,
   Post,
   PostConverter,
   User,
   UserConverter,
-  ConverterBase,
 } from '../shared';
 import { toMD5Base62 } from './util';
 
@@ -33,6 +33,12 @@ export interface Notification {
     [hash: string]: number[];
   };
 }
+export interface Device {
+  lang: 'en' | 'ja';
+  notifs: { id: string; hours: number[] }[];
+  hours: number[];
+  uT: Timestamp;
+}
 
 export const converters = {
   announce: new AnnounceConverter(),
@@ -41,6 +47,7 @@ export const converters = {
   user: new UserConverter(),
   fcmToken: new ConverterBase<FcmToken>(),
   notification: new ConverterBase<Notification>(),
+  device: new ConverterBase<Device>(),
 };
 
 const serialize = (...args: (string | undefined)[]) => {

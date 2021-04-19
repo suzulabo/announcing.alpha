@@ -1,6 +1,7 @@
+import { Lang } from 'src/shared';
 import { msgs as jaMsgs } from './msgs/msg.ja';
 
-const lang = 'ja';
+const lang: Lang = 'ja';
 
 const msgsMap = {
   ja: jaMsgs,

@@ -3,7 +3,7 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/functions';
 import 'firebase/messaging';
-import { AnnounceConverter, AppEnv, RegisterNotificationParams } from 'src/shared';
+import { AnnounceConverter, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 
 export const converters = {
   announce: new AnnounceConverter(),
@@ -142,13 +142,12 @@ export class AppFirebase {
     }
   }
 
-  async registerMessaging(announceID: string, enable: boolean, hours?: number[]) {
+  async registerMessaging(notifs: { id: string; hours: number[] }[], lang: Lang) {
     const fcmToken = await this.messageToken();
     const params: RegisterNotificationParams = {
       fcmToken,
-      announceID,
-      enable,
-      hours,
+      lang,
+      notifs,
     };
     await this.callFunc<void>('registerNotification', params);
   }
