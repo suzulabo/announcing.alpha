@@ -76,6 +76,7 @@ export const onFirestoreCreatePost = region.firestore
 
 export const onPubsubSendNotification = region.pubsub
   .topic('send-notification')
-  .onPublish((msg, ctx) => {
-    return pubsubSendNotification(msg, ctx, adminApp);
+  .onPublish(async (msg, context) => {
+    await pubsubSendNotification(msg, context, adminApp);
+    return 0;
   });

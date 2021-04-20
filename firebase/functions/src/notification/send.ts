@@ -20,9 +20,9 @@ const pubQueue = async (msgs: admin.messaging.MulticastMessage[]) => {
 
 export const pubsubSendNotification = async (
   msg: Message,
-  _ctx: EventContext,
+  context: EventContext,
   adminApp: admin.app.App,
-): Promise<number> => {
+) => {
   const messaging = adminApp.messaging();
   const nmsg = msg.json.msg as admin.messaging.MulticastMessage;
   console.debug('send', nmsg);
@@ -30,7 +30,6 @@ export const pubsubSendNotification = async (
   if (result.failureCount > 0) {
     // TODO
   }
-  return 0;
 };
 
 export const firestoreCreatePost = async (
