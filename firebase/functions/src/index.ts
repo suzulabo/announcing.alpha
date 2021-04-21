@@ -94,3 +94,25 @@ const hourlyTask = (hour: number) => {
 
 export const onPubsubHourly0 = hourlyTask(0);
 export const onPubsubHourly1 = hourlyTask(1);
+export const onPubsubHourly2 = hourlyTask(2);
+export const onPubsubHourly3 = hourlyTask(3);
+export const onPubsubHourly4 = hourlyTask(4);
+export const onPubsubHourly5 = hourlyTask(5);
+export const onPubsubHourly6 = hourlyTask(6);
+export const onPubsubHourly7 = hourlyTask(7);
+export const onPubsubHourly8 = hourlyTask(8);
+export const onPubsubHourly9 = hourlyTask(9);
+export const onPubsubHourly10 = hourlyTask(10);
+export const onPubsubHourly11 = hourlyTask(11);
+export const onPubsubHourly12 = hourlyTask(12);
+export const onPubsubHourly13 = hourlyTask(13);
+export const onPubsubHourly14 = hourlyTask(14);
+export const onPubsubHourly15 = hourlyTask(15);
+export const onPubsubHourly16 = hourlyTask(16);
+export const onPubsubHourly17 = hourlyTask(17);
+export const onPubsubHourly18 = hourlyTask(18);
+export const onPubsubHourly19 = hourlyTask(19);
+export const onPubsubHourly20 = hourlyTask(20);
+export const onPubsubHourly21 = hourlyTask(21);
+export const onPubsubHourly22 = hourlyTask(22);
+export const onPubsubHourly23 = hourlyTask(23);
