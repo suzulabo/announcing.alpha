@@ -12,8 +12,10 @@ import {
   httpsGetImageData,
 } from './data/get-data';
 import { callPutPost } from './data/put-post';
+import { pubsubSendNotification } from './notification/pubsub';
 import { callRegisterNotification } from './notification/register';
-import { firestoreCreatePost, pubsubSendNotification } from './notification/send';
+import { firestoreCreatePost } from './notification/send';
+import { pubsubHourly } from './notification/send-hourly';
 import { AppEnv } from './shared';
 
 const adminApp = initializeApp();
@@ -80,3 +82,15 @@ export const onPubsubSendNotification = region.pubsub
     await pubsubSendNotification(msg, context, adminApp);
     return 0;
   });
+
+const hourlyTask = (hour: number) => {
+  return region.pubsub
+    .schedule(`0 0 ${hour} * *`)
+    .timeZone('UTC')
+    .onRun(async context => {
+      await pubsubHourly(hour, context, adminApp);
+    });
+};
+
+export const onPubsubHourly0 = hourlyTask(0);
+export const onPubsubHourly1 = hourlyTask(1);

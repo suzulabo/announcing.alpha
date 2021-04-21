@@ -28,7 +28,8 @@ export type User_FS = Merge<User, { announces: string[] | FieldValue }>;
 export interface Notification {
   lang: Lang;
   anytime?: string[];
-  scheduled?: { i: number[]; v: { id: string; hours: number[] }[] };
+  scheduled?: { id: string; hours: number[] }[];
+  hours?: number[]; // for query
   uT: Timestamp;
 }
 

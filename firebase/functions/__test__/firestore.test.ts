@@ -1,4 +1,4 @@
-import { announceMetaHash, AnnounceMeta_FS, _serialize } from '../src/firestore';
+import { announceMetaHash, AnnounceMeta_FS, _serialize } from '../src/utils/firestore';
 
 describe('firestore', () => {
   it('_serialize', () => {

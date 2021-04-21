@@ -49,7 +49,7 @@ export const callRegisterNotification = async (
           throw new Error(`invalid hour (${notif})`);
         }
         hoursIndexSet.add(hour);
-        scheduled.push({ id: notif.id, hours: notif.hours });
+        scheduled.push({ id: notif.id, hours: sortNum(notif.hours) });
       }
     }
   }
@@ -59,7 +59,8 @@ export const callRegisterNotification = async (
   const notification: Notification = {
     lang,
     ...(anytimeSet.size > 0 && { anytime: [...anytimeSet] }),
-    ...(hoursIndexSet.size > 0 && { scheduled: { i: sortNum([...hoursIndexSet]), v: scheduled } }),
+    ...(hoursIndexSet.size > 0 && { hours: sortNum([...hoursIndexSet]) }),
+    ...(hoursIndexSet.size > 0 && { scheduled }),
     uT: admin.firestore.FieldValue.serverTimestamp() as any,
   };
 

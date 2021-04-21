@@ -12,11 +12,11 @@ self.addEventListener('push', event => {
   console.log(`Push received with data "${JSON.stringify(data, null, 2)}"`);
 
   const title = data.notification.title;
-  const icon = data.data.icon ? `${apiSite}/image/${data.data.icon}` : null;
+  const icon = data.data?.icon ? `${apiSite}/image/${data.data.icon}` : null;
   const options = {
     body: data.notification.body,
     icon,
-    data: { href: `/${data.data.announceID}` },
+    data: { href: `/${data.data?.announceID || ''}` },
   };
 
   event.waitUntil(self.registration.showNotification(title, options));

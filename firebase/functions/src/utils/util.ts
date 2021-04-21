@@ -10,10 +10,14 @@ export const toMD5Base62 = (v: Buffer | string) => {
 };
 
 export const millisToBase62 = (v: number) => {
-  const b = new Uint8Array(8);
-  const view = new DataView(b.buffer);
-  view.setFloat64(0, v);
+  const b = Buffer.alloc(8);
+  b.writeDoubleBE(v, 0);
   return bs62.encode(b);
+};
+
+export const postIDtoMillis = (s: string) => {
+  const b = bs62.decode(s.split('-')[0]);
+  return b.readDoubleBE(0);
 };
 
 export const autoID = (len = 12) => {

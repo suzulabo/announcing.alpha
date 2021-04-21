@@ -1,36 +1,9 @@
-import { PubSub } from '@google-cloud/pubsub';
 import * as admin from 'firebase-admin';
 import { EventContext } from 'firebase-functions/lib/cloud-functions';
 import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
-import { Message } from 'firebase-functions/lib/providers/pubsub';
 import { Post } from '../shared';
 import { converters } from '../utils/firestore';
-
-const pubQueue = async (msgs: admin.messaging.MulticastMessage[]) => {
-  const pubsub = new PubSub();
-  const topic = pubsub.topic('send-notification', {
-    batching: { maxMessages: 100, maxMilliseconds: 50 },
-  });
-  for (const msg of msgs) {
-    console.debug('pub', msg);
-    void topic.publishJSON({ msg });
-  }
-  await topic.flush();
-};
-
-export const pubsubSendNotification = async (
-  msg: Message,
-  context: EventContext,
-  adminApp: admin.app.App,
-) => {
-  const messaging = adminApp.messaging();
-  const nmsg = msg.json.msg as admin.messaging.MulticastMessage;
-  console.debug('send', nmsg);
-  const result = await messaging.sendMulticast(nmsg);
-  if (result.failureCount > 0) {
-    // TODO
-  }
-};
+import { pubMulticastMessages } from './pubsub';
 
 export const firestoreCreatePost = async (
   qs: QueryDocumentSnapshot,
@@ -100,5 +73,6 @@ export const firestoreCreatePost = async (
     console.debug('no msgs');
     return;
   }
-  await pubQueue(msgs);
+
+  await pubMulticastMessages(msgs);
 };
