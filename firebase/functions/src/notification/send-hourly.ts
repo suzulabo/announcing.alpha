@@ -46,8 +46,6 @@ const genMessage = async (
       continue;
     }
 
-    const latestPostID = posts[posts.length - 1];
-    console.log('latestPostID', latestPostID);
     const latestPostTime = postIDtoMillis(posts[posts.length - 1]);
     if (latestPostTime <= now - H24) {
       continue;
@@ -103,7 +101,6 @@ export const pubsubHourly = async (
     .get();
 
   const now = Date.now();
-  console.log('now', now);
   for (const doc of qs.docs) {
     const data = doc.data();
     const msg = await genMessage(hour, now, doc.id, data, firestore);
