@@ -12,6 +12,7 @@ import {
   User,
   UserConverter,
 } from '../shared';
+import { logger } from '../utils/logger';
 import { toMD5Base62 } from './util';
 
 import FieldValue = admin.firestore.FieldValue;
@@ -56,11 +57,11 @@ export const checkOwner = async (firestore: admin.firestore.Firestore, uid: stri
   const userRef = firestore.doc(`users/${uid}`).withConverter(converters.user);
   const userData = (await userRef.get()).data();
   if (!userData) {
-    console.warn('no user', uid);
+    logger.warn('no user', uid);
     return false;
   }
   if (!userData.announces || userData.announces.indexOf(id) < 0) {
-    console.warn('not owner', uid, id);
+    logger.warn('not owner', { uid, id });
     return false;
   }
   return true;

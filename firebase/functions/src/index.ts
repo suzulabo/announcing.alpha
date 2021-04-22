@@ -2,6 +2,7 @@ import _cors from 'cors';
 import { initializeApp } from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { config, Request, Response } from 'firebase-functions';
+import 'firebase-functions/lib/logger/compat';
 import { callCreateAnnounce } from './data/create-announce';
 import { callDeleteAnnounce, firestoreDeleteAnnounce } from './data/delete-announce';
 import { callDeletePost } from './data/delete-post';
@@ -17,6 +18,7 @@ import { callRegisterNotification } from './notification/register';
 import { firestoreCreatePost } from './notification/send';
 import { pubsubHourly } from './notification/send-hourly';
 import { AppEnv } from './shared';
+import { logger } from './utils/logger';
 
 const adminApp = initializeApp();
 const appEnv = new AppEnv().env;
@@ -54,7 +56,7 @@ const onHttpsRequest = (handler: httpsHandler) => {
       cors(req, res, () => {});
       await handler(req, res, adminApp);
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       res.sendStatus(500);
     }
   });

@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { EventContext } from 'firebase-functions/lib/cloud-functions';
 import { announceCache, announceMetaCache } from '../utils/cache';
 import { converters, Notification } from '../utils/firestore';
+import { logger } from '../utils/logger';
 import { postIDtoMillis } from '../utils/util';
 import { pubTokenMessages } from './pubsub';
 
@@ -21,7 +22,7 @@ const genMessage = async (
   firestore: admin.firestore.Firestore,
 ) => {
   if (!notif.scheduled) {
-    console.debug('no notif.scheduled');
+    logger.debug('no notif.scheduled');
     return;
   }
 
@@ -31,18 +32,18 @@ const genMessage = async (
     const hours = scheduled.hours;
     const idx = hours.indexOf(hour);
     if (idx < 0) {
-      console.debug('no hours');
+      logger.debug('no hours');
       continue;
     }
     const annouceData = await announceCache(scheduled.id, firestore);
     if (!annouceData) {
-      console.debug('missing announce', scheduled.id);
+      logger.debug('missing announce', scheduled.id);
       // TODO : should delete
       continue;
     }
     const posts = annouceData.posts;
     if (!posts || posts.length == 0) {
-      console.debug('no posts', scheduled.id);
+      logger.debug('no posts', scheduled.id);
       continue;
     }
 
@@ -60,7 +61,7 @@ const genMessage = async (
 
     const metaData = await announceMetaCache(scheduled.id, annouceData.mid, firestore);
     if (!metaData) {
-      console.warn('missing meta', scheduled.id, annouceData.mid);
+      logger.warn('missing meta', { id: scheduled.id, mid: annouceData.mid });
       continue;
     }
     names.push(metaData.name);

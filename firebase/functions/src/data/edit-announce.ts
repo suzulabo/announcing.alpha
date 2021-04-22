@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { AnnounceMetaRule, EditAnnounceParams, ImageRule } from '../shared';
 import { announceMetaHash, AnnounceMeta_FS, Announce_FS, converters } from '../utils/firestore';
+import { logger } from '../utils/logger';
 import { toMD5Base62 } from '../utils/util';
 
 export const callEditAnnounce = async (
@@ -48,11 +49,11 @@ const editAnnounce = async (
     const userRef = firestore.doc(`users/${uid}`).withConverter(converters.user);
     const userData = (await userRef.get()).data();
     if (!userData) {
-      console.warn('no user', uid);
+      logger.warn('no user', uid);
       return;
     }
     if (!userData.announces || userData.announces.indexOf(id) < 0) {
-      console.warn('not owner', uid, id);
+      logger.warn('not owner', { uid, id });
       return;
     }
   }
@@ -87,11 +88,11 @@ const editAnnounce = async (
   const announceRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
   const announceData = (await announceRef.get()).data();
   if (!announceData) {
-    console.log('no data', id);
+    logger.debug('no data', id);
     return;
   }
   if (announceData.mid == newMetaID) {
-    console.log('same meta', announceData.mid, newMetaID);
+    logger.debug('same meta', { mid: announceData.mid, newMetaID });
     return;
   }
 

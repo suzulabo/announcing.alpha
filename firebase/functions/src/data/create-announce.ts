@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { AnnounceMetaRule, CreateAnnounceParams } from '../shared';
 import { announceMetaHash, AnnounceMeta_FS, Announce_FS, User_FS } from '../utils/firestore';
+import { logger } from '../utils/logger';
 import { autoID } from '../utils/util';
 
 export const callCreateAnnounce = async (
@@ -55,5 +56,5 @@ const createAnnounce = async (
   batch.create(firestore.doc(`announces/${id}/meta/${mid}`), metaData);
   batch.set(firestore.doc(`users/${uid}`), userData, { merge: true });
   await batch.commit();
-  console.log('CREATE ANNOUNCE', announceData, metaData);
+  logger.info('CREATE ANNOUNCE', { announceData, metaData });
 };

@@ -3,6 +3,7 @@ import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { ImageRule, PostRule, PutPostParams } from '../shared';
 import { Announce_FS, checkOwner, converters, Post_FS, storeImage } from '../utils/firestore';
 import { incString } from '../utils/incstring';
+import { logger } from '../utils/logger';
 import { millisToBase62 } from '../utils/util';
 
 export const callPutPost = async (
@@ -74,7 +75,7 @@ const putPost = async (
     const announceRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
     const announceData = (await t.get(announceRef)).data();
     if (!announceData) {
-      console.log('no data', id);
+      logger.debug('no data', id);
       return;
     }
 

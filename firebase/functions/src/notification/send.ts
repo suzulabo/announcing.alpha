@@ -3,6 +3,7 @@ import { EventContext } from 'firebase-functions/lib/cloud-functions';
 import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import { Post } from '../shared';
 import { converters } from '../utils/firestore';
+import { logger } from '../utils/logger';
 import { pubMulticastMessages } from './pubsub';
 
 export const firestoreCreatePost = async (
@@ -12,7 +13,7 @@ export const firestoreCreatePost = async (
 ): Promise<void> => {
   // check edited post
   if (qs.id.includes('-')) {
-    console.debug('edited post');
+    logger.debug('edited post');
     return;
   }
 
@@ -35,7 +36,7 @@ export const firestoreCreatePost = async (
       tokensSet.add(d.id);
     });
     if (tokensSet.size == 0) {
-      console.debug('no followers', announceID);
+      logger.debug('no followers', announceID);
       return;
     }
   }
@@ -44,7 +45,7 @@ export const firestoreCreatePost = async (
     const announceRef = firestore.doc(`announces/${announceID}`).withConverter(converters.announce);
     const a = (await announceRef.get()).data();
     if (!a) {
-      console.warn('missing announce', announceID);
+      logger.warn('missing announce', announceID);
       return;
     }
     const m = (
@@ -55,7 +56,7 @@ export const firestoreCreatePost = async (
   })();
 
   if (!announceMeta) {
-    console.warn('missing announce meta', announceID);
+    logger.warn('missing announce meta', announceID);
     return;
   }
 
@@ -70,7 +71,7 @@ export const firestoreCreatePost = async (
   }
 
   if (msgs.length == 0) {
-    console.debug('no msgs');
+    logger.debug('no msgs');
     return;
   }
 

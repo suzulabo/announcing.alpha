@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { isLang, RegisterNotificationParams } from '../shared';
 import { Notification } from '../utils/firestore';
+import { logger } from '../utils/logger';
 
 const sortNum = (a: number[]) => {
   a.sort((a, b) => {
@@ -15,7 +16,7 @@ export const callRegisterNotification = async (
   context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
-  console.debug('params:', params);
+  logger.debug('params:', params);
   const { fcmToken, lang, notifs } = params;
 
   if (!fcmToken) {
@@ -66,5 +67,5 @@ export const callRegisterNotification = async (
 
   await firestore.doc(`notifications/${fcmToken}`).set(notification);
 
-  console.info('SET NOTIFICATION:', fcmToken, notification);
+  logger.info('SET NOTIFICATION:', { fcmToken, notification });
 };

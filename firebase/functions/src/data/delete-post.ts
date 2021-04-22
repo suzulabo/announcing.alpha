@@ -2,6 +2,7 @@ import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { DeletePostParams } from '../shared';
 import { Announce_FS, checkOwner, converters } from '../utils/firestore';
+import { logger } from '../utils/logger';
 
 export const callDeletePost = async (
   params: DeletePostParams,
@@ -42,11 +43,11 @@ const deletePost = async (
     const announceRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
     const announceData = (await t.get(announceRef)).data();
     if (!announceData) {
-      console.log('no data', id);
+      logger.debug('no data', id);
       return;
     }
     if (!announceData.posts || announceData.posts.indexOf(postID) < 0) {
-      console.log('no post data', id, postID);
+      logger.debug('no post data', { id, postID });
       return;
     }
 
