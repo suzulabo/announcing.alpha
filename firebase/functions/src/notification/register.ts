@@ -39,18 +39,18 @@ export const callRegisterNotification = async (
   const scheduled = [] as { id: string; hours: number[] }[];
   for (const notif of notifs) {
     if (!notif.id || notif.id.length != 12 || !notif.hours) {
-      throw new Error(`invalid follow (${notif})`);
+      throw new Error(`invalid follow (${JSON.stringify(notif)})`);
     }
     if (notif.hours.length == 0) {
       anytimeSet.add(notif.id);
     } else {
       for (const hour of notif.hours) {
         if (!(hour >= 0 && hour <= 23)) {
-          throw new Error(`invalid hour (${notif})`);
+          throw new Error(`invalid hour (${JSON.stringify(notif)})`);
         }
         hoursIndexSet.add(hour);
-        scheduled.push({ id: notif.id, hours: sortNum(notif.hours) });
       }
+      scheduled.push({ id: notif.id, hours: sortNum(notif.hours) });
     }
   }
 
@@ -66,5 +66,5 @@ export const callRegisterNotification = async (
 
   await firestore.doc(`notifications/${fcmToken}`).set(notification);
 
-  console.info(`SET NOTIFICATION: ${fcmToken} ${notification}`);
+  console.info('SET NOTIFICATION:', fcmToken, notification);
 };
