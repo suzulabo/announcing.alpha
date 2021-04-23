@@ -3,16 +3,16 @@ import { initializeApp } from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { config, Request, Response } from 'firebase-functions';
 import 'firebase-functions/lib/logger/compat';
-import { callCreateAnnounce } from './data/create-announce';
-import { callDeleteAnnounce, firestoreDeleteAnnounce } from './data/delete-announce';
-import { callDeletePost } from './data/delete-post';
-import { callEditAnnounce } from './data/edit-announce';
+import { callCreateAnnounce } from './announce/create-announce';
+import { callDeleteAnnounce, firestoreDeleteAnnounce } from './announce/delete-announce';
+import { callDeletePost } from './announce/delete-post';
+import { callEditAnnounce } from './announce/edit-announce';
 import {
   httpsGetAnnounceMetaData,
   httpsGetAnnouncePostData,
   httpsGetImageData,
-} from './data/get-data';
-import { callPutPost } from './data/put-post';
+} from './announce/get-data';
+import { callPutPost } from './announce/put-post';
 import { pubsubSendNotification } from './notification/pubsub';
 import { callRegisterNotification } from './notification/register';
 import { firestoreCreatePost } from './notification/send';
