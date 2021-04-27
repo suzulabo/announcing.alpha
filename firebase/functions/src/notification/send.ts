@@ -1,9 +1,8 @@
 import * as admin from 'firebase-admin';
 import { EventContext } from 'firebase-functions/lib/cloud-functions';
 import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
-import { Lang, Post } from '../shared';
+import { Announce, AnnounceMeta, Lang, Post } from '../shared';
 import { ImmediateNotification, ImmediateNotificationArchive } from '../utils/datatypes';
-import { converters } from '../utils/firestore';
 import { logger } from '../utils/logger';
 import { pubMulticastMessages } from './pubsub';
 
@@ -66,16 +65,13 @@ export const firestoreCreatePost = async (
   const tokensSet = new Set<string>(followers.keys());
 
   const announceMeta = await (async () => {
-    const announceRef = firestore.doc(`announces/${announceID}`).withConverter(converters.announce);
-    const a = (await announceRef.get()).data();
+    const announceRef = firestore.doc(`announces/${announceID}`);
+    const a = (await announceRef.get()).data() as Announce;
     if (!a) {
       logger.warn('missing announce', announceID);
       return;
     }
-    const m = (
-      await announceRef.collection('meta').withConverter(converters.announceMeta).doc(a.mid).get()
-    ).data();
-
+    const m = (await announceRef.collection('meta').doc(a.mid).get()).data() as AnnounceMeta;
     return m;
   })();
 

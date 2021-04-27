@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { ImageRule, PostRule, PutPostParams } from '../shared';
-import { Announce_FS, checkOwner, converters, Post_FS, storeImage } from '../utils/firestore';
+import { Announce, ImageRule, Post, PostRule, PutPostParams } from '../shared';
+import { checkOwner, storeImage } from '../utils/firestore';
 import { incString } from '../utils/incstring';
 import { logger } from '../utils/logger';
 import { millisToBase62 } from '../utils/util';
@@ -40,7 +40,7 @@ const putPost = async (
   if (link && link.length > PostRule.link.length) {
     throw new Error('link is too long');
   }
-  if (imgData && imgData.length > ImageRule.d.length) {
+  if (imgData && imgData.length > ImageRule.data.length) {
     throw new Error('imgData is too long');
   }
 
@@ -55,7 +55,7 @@ const putPost = async (
 
   const now = admin.firestore.Timestamp.now();
 
-  const postData: Post_FS = {
+  const postData: Post = {
     ...(!!title && { title }),
     ...(!!body && { body }),
     ...(!!link && { link }),
@@ -63,17 +63,17 @@ const putPost = async (
   };
 
   if (editID) {
-    const postRef = firestore.doc(`announces/${id}/posts/${editID}`).withConverter(converters.post);
-    const data = (await postRef.get()).data();
+    const postRef = firestore.doc(`announces/${id}/posts/${editID}`);
+    const data = (await postRef.get()).data() as Post;
     if (!data) {
       throw new Error(`missing edit data: ${id}/${editID}`);
     }
-    postData.pT = admin.firestore.Timestamp.fromMillis(data.pT);
+    postData.pT = data.pT as any;
   }
 
   await firestore.runTransaction<void>(async t => {
-    const announceRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
-    const announceData = (await t.get(announceRef)).data();
+    const announceRef = firestore.doc(`announces/${id}`);
+    const announceData = (await t.get(announceRef)).data() as Announce;
     if (!announceData) {
       logger.debug('no data', id);
       return;
@@ -115,7 +115,7 @@ const putPost = async (
     }
 
     {
-      const updateData: Partial<Announce_FS> = {
+      const updateData = {
         pid: postID,
         posts,
         uT: admin.firestore.FieldValue.serverTimestamp(),

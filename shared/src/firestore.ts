@@ -1,3 +1,4 @@
+/*
 import { Announce, AnnounceMeta, Post, User } from './datatypes';
 
 type Timestamp = {
@@ -52,3 +53,4 @@ export class UserConverter extends ConverterBase<User> {
     return { ...data };
   }
 }
+*/

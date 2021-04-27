@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { AnnounceMetaRule, CreateAnnounceParams } from '../shared';
-import { announceMetaHash, AnnounceMeta_FS, Announce_FS, User_FS } from '../utils/firestore';
+import { announceMetaHash } from '../utils/firestore';
 import { logger } from '../utils/logger';
 import { autoID } from '../utils/util';
 
@@ -33,20 +33,20 @@ const createAnnounce = async (
     throw new Error('desc is too long');
   }
 
-  const metaData: AnnounceMeta_FS = {
+  const metaData = {
     name,
     ...(!!desc && { desc }),
-    cT: admin.firestore.FieldValue.serverTimestamp(),
+    cT: admin.firestore.FieldValue.serverTimestamp() as any,
   };
 
   const id = autoID();
   const mid = announceMetaHash(metaData);
 
-  const announceData: Announce_FS = {
+  const announceData = {
     mid,
     uT: admin.firestore.FieldValue.serverTimestamp(),
   };
-  const userData: User_FS = {
+  const userData = {
     announces: admin.firestore.FieldValue.arrayUnion(id),
   };
 

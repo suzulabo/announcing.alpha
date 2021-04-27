@@ -1,9 +1,8 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { AnnounceMetaRule, EditAnnounceParams, ImageRule } from '../shared';
-import { announceMetaHash, AnnounceMeta_FS, Announce_FS, converters } from '../utils/firestore';
+import { Announce, AnnounceMetaRule, EditAnnounceParams, ImageRule, User } from '../shared';
+import { announceMetaHash, storeImage } from '../utils/firestore';
 import { logger } from '../utils/logger';
-import { toMD5Base62 } from '../utils/util';
 
 export const callEditAnnounce = async (
   params: EditAnnounceParams,
@@ -39,15 +38,15 @@ const editAnnounce = async (
   if (link && link.length > AnnounceMetaRule.link.length) {
     throw new Error('link is too long');
   }
-  if (newIcon && newIcon.length > ImageRule.d.length) {
+  if (newIcon && newIcon.length > ImageRule.data.length) {
     throw new Error('newIcon is too long');
   }
 
   const firestore = adminApp.firestore();
 
   {
-    const userRef = firestore.doc(`users/${uid}`).withConverter(converters.user);
-    const userData = (await userRef.get()).data();
+    const userRef = firestore.doc(`users/${uid}`);
+    const userData = (await userRef.get()).data() as User;
     if (!userData) {
       logger.warn('no user', uid);
       return;
@@ -58,35 +57,30 @@ const editAnnounce = async (
     }
   }
 
-  const newMeta: AnnounceMeta_FS = {
+  const newMeta = {
     name,
     ...(!!desc && { desc }),
     ...(!!link && { link }),
     ...(!!icon && { icon }),
-    cT: admin.firestore.FieldValue.serverTimestamp(),
+    cT: admin.firestore.FieldValue.serverTimestamp() as any,
   };
 
   if (newIcon) {
-    const img = Buffer.from(newIcon, 'base64');
-    const newIconID = toMD5Base62(img);
-
-    const imgRef = firestore.doc(`images/${newIconID}`);
-    const doc = await imgRef.get();
-    if (!doc.exists) {
-      await imgRef.create({ d: img });
+    const imgID = await storeImage(firestore, newIcon);
+    if (imgID) {
+      newMeta.icon = imgID;
     }
-    newMeta.icon = newIconID;
   }
 
   const newMetaID = announceMetaHash(newMeta);
 
-  const updateAnnounce: Partial<Announce_FS> = {
+  const updateAnnounce = {
     mid: newMetaID,
     uT: admin.firestore.FieldValue.serverTimestamp(),
   };
 
-  const announceRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
-  const announceData = (await announceRef.get()).data();
+  const announceRef = firestore.doc(`announces/${id}`);
+  const announceData = (await announceRef.get()).data() as Announce;
   if (!announceData) {
     logger.debug('no data', id);
     return;

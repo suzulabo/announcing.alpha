@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import { Request, Response } from 'firebase-functions';
-import { converters } from '../utils/firestore';
+import { AnnounceMeta, Post } from '../shared';
 
 const cacheControl = 'public, max-age=31556952, s-maxage=86400, immutable';
 const announceMetaPattern = new RegExp('^/announce/([a-zA-Z0-9]{12})/meta/([a-zA-Z0-9]{8})$');
@@ -20,17 +20,15 @@ export const httpsGetAnnounceMetaData = async (
   const [, id, metaID] = m;
 
   const firestore = admin.firestore();
-  const docRef = firestore
-    .doc(`announces/${id}/meta/${metaID}`)
-    .withConverter(converters.announceMeta);
-  const data = (await docRef.get()).data();
+  const docRef = firestore.doc(`announces/${id}/meta/${metaID}`);
+  const data = (await docRef.get()).data() as AnnounceMeta;
   if (!data) {
     res.sendStatus(404);
     return;
   }
 
   res.setHeader('Cache-Control', cacheControl);
-  res.json(data);
+  res.json({ ...data, cT: data.cT.toMillis() });
 };
 
 export const httpsGetAnnouncePostData = async (
@@ -46,15 +44,15 @@ export const httpsGetAnnouncePostData = async (
   const [, id, postID] = m;
 
   const firestore = admin.firestore();
-  const docRef = firestore.doc(`announces/${id}/posts/${postID}`).withConverter(converters.post);
-  const data = (await docRef.get()).data();
+  const docRef = firestore.doc(`announces/${id}/posts/${postID}`);
+  const data = (await docRef.get()).data() as Post;
   if (!data) {
     res.sendStatus(404);
     return;
   }
 
   res.setHeader('Cache-Control', cacheControl);
-  res.json(data);
+  res.json({ ...data, pT: data.pT.toMillis() });
 };
 
 export const httpsGetImageData = async (req: Request, res: Response, adminApp: admin.app.App) => {

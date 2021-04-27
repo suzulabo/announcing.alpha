@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { DeletePostParams } from '../shared';
-import { Announce_FS, checkOwner, converters } from '../utils/firestore';
+import { Announce, DeletePostParams } from '../shared';
+import { checkOwner } from '../utils/firestore';
 import { logger } from '../utils/logger';
 
 export const callDeletePost = async (
@@ -40,8 +40,8 @@ const deletePost = async (
   }
 
   await firestore.runTransaction<void>(async t => {
-    const announceRef = firestore.doc(`announces/${id}`).withConverter(converters.announce);
-    const announceData = (await t.get(announceRef)).data();
+    const announceRef = firestore.doc(`announces/${id}`);
+    const announceData = (await t.get(announceRef)).data() as Announce;
     if (!announceData) {
       logger.debug('no data', id);
       return;
@@ -53,7 +53,7 @@ const deletePost = async (
 
     t.delete(announceRef.collection('posts').doc(postID));
     {
-      const updateData: Partial<Announce_FS> = {
+      const updateData = {
         posts: admin.firestore.FieldValue.arrayRemove(postID),
         uT: admin.firestore.FieldValue.serverTimestamp(),
       };

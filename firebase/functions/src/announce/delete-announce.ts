@@ -3,7 +3,6 @@ import { EventContext } from 'firebase-functions/lib/cloud-functions';
 import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { Announce, DeleteAnnounceParams } from '../shared';
-import { User_FS } from '../utils/firestore';
 import { logger } from '../utils/logger';
 
 export const callDeleteAnnounce = async (
@@ -39,7 +38,7 @@ const deleteAnnounce = async (
     if (d.id == uid) {
       isOwner = true;
     }
-    batch.update(d.ref, { announces: admin.firestore.FieldValue.arrayRemove(id) } as User_FS);
+    batch.update(d.ref, { announces: admin.firestore.FieldValue.arrayRemove(id) });
   }
   if (!isOwner) {
     logger.warn('not owner', { uid, id });

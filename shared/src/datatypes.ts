@@ -1,9 +1,16 @@
+type Timestamp = {
+  toMillis: () => number;
+};
+
+const languages = ['en', 'ja'] as const;
+export type Lang = typeof languages[number];
+
 export interface Post {
   title?: string;
   body?: string;
   link?: string;
   img?: string;
-  pT: number; // published time
+  pT: Timestamp; // published time
 }
 
 export const PostRule = {
@@ -16,7 +23,7 @@ export interface Announce {
   mid: string; // meta id
   posts?: string[];
   pid?: string; // (current) post id
-  uT: number; // updated time
+  uT: Timestamp; // updated time
 }
 
 export interface AnnounceMeta {
@@ -24,7 +31,7 @@ export interface AnnounceMeta {
   desc?: string;
   link?: string;
   icon?: string;
-  cT: number; // created time
+  cT: Timestamp; // created time
 }
 
 export const AnnounceMetaRule = {
@@ -38,11 +45,11 @@ export interface User {
 }
 
 export interface Image {
-  d: Uint8Array;
+  data: Uint8Array;
 }
 
 export const ImageRule = {
-  d: { length: 1000 * 1000 },
+  data: { length: 1000 * 1000 },
 };
 
 export interface CreateAnnounceParams {
@@ -77,8 +84,6 @@ export interface DeletePostParams {
   postID?: string;
 }
 
-const languages = ['en', 'ja'] as const;
-export type Lang = typeof languages[number];
 export const isLang = (s: any): s is Lang => {
   return languages.includes(s);
 };
