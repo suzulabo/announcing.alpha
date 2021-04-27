@@ -16,7 +16,7 @@ import { callPutPost } from './announce/put-post';
 import { pubsubSendNotification } from './notification/pubsub';
 import { callRegisterNotification } from './notification/register';
 import { firestoreCreatePost } from './notification/send';
-import { pubsubHourly } from './notification/send-hourly';
+//import { pubsubHourly } from './notification/send-hourly';
 import { AppEnv } from './shared';
 import { logger } from './utils/logger';
 
@@ -86,7 +86,7 @@ export const onPubsubSendNotification = region.pubsub
   });
 
 export const onPubsubHourly = region.pubsub.schedule(`0 0 0 * *`).onRun(async context => {
-  await pubsubHourly(new Date().getUTCHours(), context, adminApp);
+  //  await pubsubHourly(new Date().getUTCHours(), context, adminApp);
 });
 
 /*

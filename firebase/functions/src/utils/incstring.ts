@@ -35,4 +35,15 @@ export const incString = {
     }
     return s1 < s2 ? -1 : 1;
   },
+  max: (v: string[]) => {
+    let s = FIRST_CHAR;
+    if (v) {
+      for (const c of v) {
+        if (incString.compare(s, c) > 0) {
+          s = c;
+        }
+      }
+    }
+    return s;
+  },
 };

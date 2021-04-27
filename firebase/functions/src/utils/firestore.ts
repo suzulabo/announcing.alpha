@@ -5,8 +5,6 @@ import {
   AnnounceConverter,
   AnnounceMeta,
   AnnounceMetaConverter,
-  ConverterBase,
-  Lang,
   Post,
   PostConverter,
   User,
@@ -26,20 +24,11 @@ export type AnnounceMeta_FS = Merge<AnnounceMeta, { cT: Timestamp | FieldValue }
 export type Post_FS = Merge<Post, { pT: Timestamp | FieldValue }>;
 export type User_FS = Merge<User, { announces: string[] | FieldValue }>;
 
-export interface Notification {
-  lang: Lang;
-  anytime?: string[];
-  scheduled?: { id: string; hours: number[] }[];
-  hours?: number[]; // for query
-  uT: Timestamp;
-}
-
 export const converters = {
   announce: new AnnounceConverter(),
   announceMeta: new AnnounceMetaConverter(),
   post: new PostConverter(),
   user: new UserConverter(),
-  notification: new ConverterBase<Notification>(),
 };
 
 const serialize = (...args: (string | undefined)[]) => {

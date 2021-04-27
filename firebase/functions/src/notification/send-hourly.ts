@@ -1,7 +1,11 @@
+// TODO: Later!!
+/* 
 import * as admin from 'firebase-admin';
 import { EventContext } from 'firebase-functions/lib/cloud-functions';
+import { Lang } from '../shared';
 import { announceCache, announceMetaCache } from '../utils/cache';
-import { converters, Notification } from '../utils/firestore';
+import { HourlyNotification, HourlyNotificationArchive } from '../utils/datatypes';
+import { converters } from '../utils/firestore';
 import { logger } from '../utils/logger';
 import { postIDtoMillis } from '../utils/util';
 import { pubTokenMessages } from './pubsub';
@@ -12,6 +16,45 @@ const H24 = H1 * 24;
 const titles = {
   ja: '新しいお知らせがあります',
   en: 'New posts',
+};
+
+const getHourlyNotificationFollowers = async (
+  firestore: admin.firestore.Firestore,
+  announceID: string,
+  hour: number,
+) => {
+  const hourlyRef = firestore.doc(`notification-hourly/${announceID}-${hour}`);
+  const hourly = (await hourlyRef.get()).data() as HourlyNotification;
+  if (!hourly) {
+    return;
+  }
+
+  const followers = [] as [
+    string,
+    [lang: Lang, follows: [announceID: string, prevHour?: number][]],
+  ][];
+  if (hourly.archives) {
+    const archivesRef = hourlyRef.collection('archives');
+    for (const archiveID of hourly.archives) {
+      const archive = (await archivesRef.doc(archiveID).get()).data() as HourlyNotificationArchive;
+      if (archive) {
+        followers.push(...Object.entries(archive.followers));
+      }
+    }
+  }
+
+  if (hourly.followers) {
+    followers.push(...Object.entries(hourly.followers));
+  }
+
+  if (!hourly.unfollows) {
+    return new Map(followers);
+  } else {
+    const filtered = followers.filter(([token]) => {
+      return !hourly.unfollows!.includes(token);
+    });
+    return new Map(filtered);
+  }
 };
 
 const genMessage = async (
@@ -114,3 +157,4 @@ export const pubsubHourly = async (
     await pubTokenMessages(msgs);
   }
 };
+*/

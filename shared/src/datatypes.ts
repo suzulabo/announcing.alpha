@@ -86,5 +86,5 @@ export const isLang = (s: any): s is Lang => {
 export interface RegisterNotificationParams {
   fcmToken?: string;
   lang?: Lang;
-  notifs?: { id?: string; hours?: number[] }[];
+  follows?: { id?: string; hours?: number[] }[];
 }

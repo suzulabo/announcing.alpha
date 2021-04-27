@@ -1,7 +1,6 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { isLang, RegisterNotificationParams } from '../shared';
-import { Notification } from '../utils/firestore';
 import { logger } from '../utils/logger';
 
 const sortNum = (a: number[]) => {
@@ -17,7 +16,7 @@ export const callRegisterNotification = async (
   adminApp: admin.app.App,
 ): Promise<void> => {
   logger.debug('params:', params);
-  const { fcmToken, lang, notifs } = params;
+  const { fcmToken, lang, follows: _follows } = params;
 
   if (!fcmToken) {
     throw new Error('missing fcmToken');
@@ -31,41 +30,35 @@ export const callRegisterNotification = async (
   if (!isLang(lang)) {
     throw new Error(`invalid lang (${lang})`);
   }
-  if (!notifs) {
-    throw new Error('missing notifs');
+  if (!_follows) {
+    throw new Error('missing follows');
   }
 
-  const anytimeSet = new Set<string>();
-  const hoursIndexSet = new Set<number>();
-  const scheduled = [] as { id: string; hours: number[] }[];
-  for (const notif of notifs) {
-    if (!notif.id || notif.id.length != 12 || !notif.hours) {
-      throw new Error(`invalid follow (${JSON.stringify(notif)})`);
+  const follows = [] as { id: string; hours?: number[] }[];
+  for (const follow of _follows) {
+    if (!follow.id || follow.id.length != 12) {
+      throw new Error(`invalid follow (${JSON.stringify(follow)})`);
     }
-    if (notif.hours.length == 0) {
-      anytimeSet.add(notif.id);
-    } else {
-      for (const hour of notif.hours) {
+    if (follow.hours) {
+      for (const hour of follow.hours) {
         if (!(hour >= 0 && hour <= 23)) {
-          throw new Error(`invalid hour (${JSON.stringify(notif)})`);
+          throw new Error(`invalid hour (${JSON.stringify(follow)})`);
         }
-        hoursIndexSet.add(hour);
       }
-      scheduled.push({ id: notif.id, hours: sortNum(notif.hours) });
+      sortNum(follow.hours);
+      follows.push({ id: follow.id, hours: sortNum(follow.hours) });
+    } else {
+      follows.push({ id: follow.id });
     }
   }
 
   const firestore = adminApp.firestore();
-
-  const notification: Notification = {
+  const data = {
     lang,
-    ...(anytimeSet.size > 0 && { anytime: [...anytimeSet] }),
-    ...(hoursIndexSet.size > 0 && { hours: sortNum([...hoursIndexSet]) }),
-    ...(hoursIndexSet.size > 0 && { scheduled }),
-    uT: admin.firestore.FieldValue.serverTimestamp() as any,
+    follows,
+    uT: admin.firestore.FieldValue.serverTimestamp(),
   };
+  await firestore.doc(`notification-followers/${fcmToken}`).set(data);
 
-  await firestore.doc(`notifications/${fcmToken}`).set(notification);
-
-  logger.info('SET NOTIFICATION:', { fcmToken, notification });
+  logger.info('SET NOTIFICATION:', { fcmToken, lang, follows });
 };

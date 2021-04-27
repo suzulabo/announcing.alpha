@@ -2,6 +2,27 @@ import * as admin from 'firebase-admin';
 import { Announce, AnnounceMeta } from '../shared';
 import { converters } from './firestore';
 
+type Miss = {};
+export const MISS: Miss = {};
+
+export class Cache<T extends object> {
+  constructor(private m = new Map<string, WeakRef<T | Miss>>()) {}
+  set(k: string, v: T | Miss) {
+    this.m.set(k, new WeakRef(v));
+  }
+  get(k: string): T | Miss | undefined {
+    const ref = this.m.get(k);
+    if (!ref) {
+      return;
+    }
+    const v = ref.deref();
+    if (!v) {
+      this.m.delete(k);
+    }
+    return v;
+  }
+}
+
 import Firestore = admin.firestore.Firestore;
 
 const _cache = async <T>(
