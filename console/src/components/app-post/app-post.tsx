@@ -1,7 +1,7 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
-import { Post } from 'src/shared';
+import { PostJSON } from 'src/shared';
 
 @Component({
   tag: 'app-post',
@@ -21,7 +21,7 @@ export class AppPost {
   showDelete = false;
 
   private announce: AnnounceState;
-  private post: Post & { imgData?: string };
+  private post: PostJSON & { imgData?: string };
 
   async componentWillLoad() {
     await this.app.loadAnnounce(this.announceID);
@@ -33,11 +33,12 @@ export class AppPost {
     }
     this.announce = as;
 
-    this.post = await this.app.getPost(this.announceID, this.postID);
-    if (!this.post) {
+    const post = await this.app.getPost(this.announceID, this.postID);
+    if (!post) {
       this.app.pushRoute(`/${this.announceID}`, true);
       return;
     }
+    this.post = { ...post, pT: post.pT.toMillis() };
 
     if (this.post.img) {
       this.post.imgData = await this.app.getImage(this.post.img);

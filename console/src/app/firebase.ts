@@ -4,37 +4,31 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/functions';
 import {
-  AnnounceConverter,
-  AnnounceMetaConverter,
+  Announce,
+  AnnounceMeta,
   AppEnv,
   CreateAnnounceParams,
   DeleteAnnounceParams,
   DeletePostParams,
   EditAnnounceParams,
-  PostConverter,
+  Image,
+  Post,
   PutPostParams,
-  UserConverter,
+  User,
 } from 'src/shared';
 import { AppMsg } from './msg';
 import { AppState } from './state';
 
-export const converters = {
-  announce: new AnnounceConverter(),
-  announceMeta: new AnnounceMetaConverter(),
-  post: new PostConverter(),
-  user: new UserConverter(),
-};
-
 const getCacheFirst = async <T>(
-  docRef: firebase.firestore.DocumentReference<T>,
+  docRef: firebase.firestore.DocumentReference,
   cacheOnly = false,
-) => {
+): Promise<T> => {
   {
     try {
       const doc = await docRef.get({ source: 'cache' });
       if (doc.exists) {
         console.debug('hit cache:', docRef.path);
-        return doc.data();
+        return doc.data() as T;
       }
     } catch {}
   }
@@ -44,7 +38,7 @@ const getCacheFirst = async <T>(
   {
     const doc = await docRef.get({ source: 'default' });
     if (doc.exists) {
-      return doc.data();
+      return doc.data() as T;
     }
   }
 };
@@ -198,33 +192,31 @@ export class AppFirebase {
       return;
     }
 
-    const docRef = this.firestore.doc(`users/${this.user.uid}`).withConverter(converters.user);
-    return getCacheFirst(docRef, true);
+    const docRef = this.firestore.doc(`users/${this.user.uid}`);
+    return getCacheFirst<User>(docRef, true);
   }
 
   async getAnnounce(id: string) {
-    const docRef = this.firestore.doc(`announces/${id}`).withConverter(converters.announce);
-    return getCacheFirst(docRef, true);
+    const docRef = this.firestore.doc(`announces/${id}`);
+    return getCacheFirst<Announce>(docRef, true);
   }
 
   async getAnnounceMeta(id: string, metaID: string) {
-    const docRef = this.firestore
-      .doc(`announces/${id}/meta/${metaID}`)
-      .withConverter(converters.announceMeta);
-    return getCacheFirst(docRef);
+    const docRef = this.firestore.doc(`announces/${id}/meta/${metaID}`);
+    return getCacheFirst<AnnounceMeta>(docRef);
   }
 
   async getPost(id: string, postID: string) {
-    const docRef = this.firestore
-      .doc(`announces/${id}/posts/${postID}`)
-      .withConverter(converters.post);
-    return getCacheFirst(docRef);
+    const docRef = this.firestore.doc(`announces/${id}/posts/${postID}`);
+    return getCacheFirst<Post>(docRef);
   }
 
   async getImage(id: string) {
     const docRef = this.firestore.doc(`images/${id}`);
-    const doc = await getCacheFirst(docRef);
-    const data = doc.d as firebase.firestore.Blob;
-    return `data:image/jpeg;base64,${data.toBase64()}`;
+    const doc = await getCacheFirst<Image>(docRef);
+    if (doc) {
+      console.log(doc);
+      return `data:image/jpeg;base64,${doc.data.toBase64()}`;
+    }
   }
 }

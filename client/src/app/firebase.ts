@@ -3,19 +3,15 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/functions';
 import 'firebase/messaging';
-import { AnnounceConverter, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
+import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 
-export const converters = {
-  announce: new AnnounceConverter(),
-};
-
-const getCache = async <T>(docRef: firebase.firestore.DocumentReference<T>) => {
+const getCache = async <T>(docRef: firebase.firestore.DocumentReference): Promise<T> => {
   {
     try {
       const doc = await docRef.get({ source: 'cache' });
       if (doc.exists) {
         console.debug('hit cache:', docRef.path);
-        return doc.data();
+        return doc.data() as T;
       }
     } catch {}
   }
@@ -110,8 +106,8 @@ export class AppFirebase {
   }
 
   async getAnnounce(id: string) {
-    const docRef = this.firestore.doc(`announces/${id}`).withConverter(converters.announce);
-    return getCache(docRef);
+    const docRef = this.firestore.doc(`announces/${id}`);
+    return getCache<Announce>(docRef);
   }
 
   private async messageToken() {
@@ -142,12 +138,12 @@ export class AppFirebase {
     }
   }
 
-  async registerMessaging(_notifs: { id: string; hours: number[] }[], lang: Lang) {
+  async registerMessaging(_follows: { id: string; hours: number[] }[], lang: Lang) {
     const offset = new Date().getTimezoneOffset() / 60;
     if (!Number.isInteger(offset)) {
       throw new Error('offset it not integer');
     }
-    const notifs = _notifs.map(v => {
+    const follows = _follows.map(v => {
       return {
         id: v.id,
         hours: v.hours.map(x => {
@@ -155,13 +151,13 @@ export class AppFirebase {
         }),
       };
     });
-    console.log(notifs);
+    console.log(follows);
 
     const fcmToken = await this.messageToken();
     const params: RegisterNotificationParams = {
       fcmToken,
       lang,
-      notifs,
+      follows,
     };
     await this.callFunc<void>('registerNotification', params);
   }

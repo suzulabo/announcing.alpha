@@ -1,16 +1,25 @@
 type Timestamp = {
   toMillis: () => number;
 };
+type Blob = {
+  toBase64: () => string;
+};
 
 const languages = ['en', 'ja'] as const;
 export type Lang = typeof languages[number];
 
-export interface Post {
+interface PostBase {
   title?: string;
   body?: string;
   link?: string;
   img?: string;
+}
+
+export interface Post extends PostBase {
   pT: Timestamp; // published time
+}
+export interface PostJSON extends PostBase {
+  pT: number; // published time
 }
 
 export const PostRule = {
@@ -26,12 +35,17 @@ export interface Announce {
   uT: Timestamp; // updated time
 }
 
-export interface AnnounceMeta {
+export interface AnnounceMetaBase {
   name: string;
   desc?: string;
   link?: string;
   icon?: string;
+}
+export interface AnnounceMeta extends AnnounceMetaBase {
   cT: Timestamp; // created time
+}
+export interface AnnounceMetaJSON extends AnnounceMetaBase {
+  cT: number; // created time
 }
 
 export const AnnounceMetaRule = {
@@ -45,7 +59,7 @@ export interface User {
 }
 
 export interface Image {
-  data: Uint8Array;
+  data: Blob;
 }
 
 export const ImageRule = {

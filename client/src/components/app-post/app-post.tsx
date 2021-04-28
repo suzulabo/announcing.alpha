@@ -1,6 +1,6 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { Post } from 'src/shared';
+import { PostJSON } from 'src/shared';
 
 @Component({
   tag: 'app-post',
@@ -17,7 +17,7 @@ export class AppPost {
   postID: string;
 
   @State()
-  post: Post & { imgData?: string };
+  post: PostJSON & { imgData?: string };
 
   async componentWillLoad() {
     this.app.loading = true;

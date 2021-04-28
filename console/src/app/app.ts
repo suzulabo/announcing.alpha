@@ -192,7 +192,7 @@ export class App {
     }
 
     result.sort((v1, v2) => {
-      return v2.uT - v1.uT;
+      return v2.uT.toMillis() - v1.uT.toMillis();
     });
 
     return result;

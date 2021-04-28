@@ -1,4 +1,4 @@
-import { Announce, AnnounceMeta } from 'src/shared';
+import { Announce, AnnounceMetaJSON } from 'src/shared';
 
 export interface Follow {
   name: string; // Needed after deleted
@@ -6,7 +6,7 @@ export interface Follow {
   readTime: number;
 }
 
-export interface AnnounceState extends Announce, AnnounceMeta {
+export interface AnnounceState extends Announce, AnnounceMetaJSON {
   id: string;
   iconData?: string;
 }

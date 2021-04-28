@@ -66,13 +66,13 @@ export const httpsGetImageData = async (req: Request, res: Response, adminApp: a
 
   const firestore = admin.firestore();
   const docRef = firestore.doc(`images/${id}`);
-  const data = (await docRef.get()).data();
+  const data = (await docRef.get()).data() as { data: Buffer };
   if (!data) {
     res.sendStatus(404);
     return;
   }
 
-  const img = data.d as Buffer;
+  const img = data.data;
 
   res.setHeader('Cache-Control', cacheControl);
   res.setHeader('Content-Type', 'image/jpeg');

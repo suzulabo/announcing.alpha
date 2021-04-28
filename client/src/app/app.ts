@@ -1,5 +1,5 @@
 import { Build } from '@stencil/core';
-import { Announce, AnnounceMeta, Post } from 'src/shared';
+import { Announce, AnnounceMetaJSON, PostJSON } from 'src/shared';
 import { AnnounceState, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
@@ -123,11 +123,11 @@ export class App {
   }
 
   fetchAnnounceMeta(id: string, metaID: string) {
-    return this.fetchApi<AnnounceMeta>(`announce/${id}/meta/${metaID}`);
+    return this.fetchApi<AnnounceMetaJSON>(`announce/${id}/meta/${metaID}`);
   }
 
   fetchPost(id: string, postID: string) {
-    return this.fetchApi<Post>(`announce/${id}/post/${postID}`);
+    return this.fetchApi<PostJSON>(`announce/${id}/post/${postID}`);
   }
 
   getImageURI(id: string) {

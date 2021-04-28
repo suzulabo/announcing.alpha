@@ -51,7 +51,11 @@ export class AppAnnounce {
     if (!post) {
       return;
     }
-    return { ...post, anchorAttrs: this.app.href(`/${this.announceID}/${postID}`) };
+    return {
+      ...post,
+      pT: post.pT.toMillis(),
+      anchorAttrs: this.app.href(`/${this.announceID}/${postID}`),
+    };
   };
 
   private get clientURL() {
