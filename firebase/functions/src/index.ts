@@ -3,19 +3,19 @@ import { initializeApp } from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { config, Request, Response } from 'firebase-functions';
 import 'firebase-functions/lib/logger/compat';
-import { callCreateAnnounce } from './announce/create-announce';
-import { callDeleteAnnounce, firestoreDeleteAnnounce } from './announce/delete-announce';
-import { callDeletePost } from './announce/delete-post';
-import { callEditAnnounce } from './announce/edit-announce';
+import { callCreateAnnounce } from './call/create-announce';
+import { callDeleteAnnounce, firestoreDeleteAnnounce } from './call/delete-announce';
+import { callDeletePost } from './call/delete-post';
+import { callEditAnnounce } from './call/edit-announce';
+import { callPutPost } from './call/put-post';
+import { callRegisterNotification } from './call/register-notification';
+import { firestoreCreatePost } from './firestore/post';
 import {
   httpsGetAnnounceMetaData,
   httpsGetAnnouncePostData,
   httpsGetImageData,
-} from './announce/get-data';
-import { callPutPost } from './announce/put-post';
-import { pubsubSendNotification } from './notification/pubsub';
-import { callRegisterNotification } from './notification/register';
-import { firestoreCreatePost } from './notification/send';
+} from './https/get-data';
+import { pubsubSendNotification } from './pubsub/send-notification';
 //import { pubsubHourly } from './notification/send-hourly';
 import { AppEnv } from './shared';
 import { logger } from './utils/logger';
