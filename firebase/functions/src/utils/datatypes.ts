@@ -20,12 +20,17 @@ export interface ImmediateNotificationArchive {
 }
 
 export interface HourlyNotification {
-  followers: { [token: string]: [lang: Lang, follows: [announceID: string, prevHour?: number][]] };
+  hour: number;
+  followers: {
+    [token: string]: [lang: Lang, follows: { [announceID: string]: [prevHour?: number] }];
+  };
   unfollows?: string[];
   archives?: string[];
   uT: admin.firestore.Timestamp;
 }
 
 export interface HourlyNotificationArchive {
-  followers: { [token: string]: [lang: Lang, follows: [announceID: string, prevHour?: number][]] };
+  followers: {
+    [token: string]: [lang: Lang, follows: { [announceID: string]: [prevHour?: number] }];
+  };
 }

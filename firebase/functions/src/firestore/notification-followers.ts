@@ -47,19 +47,18 @@ const unsetImmediateNotification = (
 const setHourlyNotification = (
   firestore: Firestore,
   batch: Batch,
-  announceID: string,
   hour: number,
   token: string,
   lang: Lang,
-  prevHour?: number,
+  follows: { [announceID: string]: [prevHour?: number] },
 ) => {
   const data = {
-    announceID,
-    followers: { [token]: prevHour == null ? [lang] : [lang, prevHour] },
+    hour,
+    followers: { [token]: [lang, follows] },
     unfollows: FieldValue.arrayRemove(token),
     uT: FieldValue.serverTimestamp(),
   };
-  batch.set(firestore.doc(`notification-hourly/${announceID}-${hour}`), data, {
+  batch.set(firestore.doc(`notification-hourly/${hour}`), data, {
     merge: true,
   });
 };
@@ -67,7 +66,6 @@ const setHourlyNotification = (
 const unsetHourlyNotification = (
   firestore: Firestore,
   batch: Batch,
-  announceID: string,
   hour: number,
   token: string,
 ) => {
@@ -76,7 +74,7 @@ const unsetHourlyNotification = (
     unfollows: FieldValue.arrayUnion(token),
     uT: FieldValue.serverTimestamp(),
   };
-  batch.set(firestore.doc(`notification-hourly/${announceID}-${hour}`), data, {
+  batch.set(firestore.doc(`notification-hourly/${hour}`), data, {
     merge: true,
   });
 };
@@ -92,6 +90,9 @@ const genUpdators = (
     update: () => void;
     remove: () => void;
   }[];
+
+  const houlryMap = new Map<number, { [announceID: string]: [prevHour?: number] }>();
+
   for (const follow of follower.follows) {
     const announceID = follow.id;
     const hours = follow.hours || [];
@@ -99,37 +100,41 @@ const genUpdators = (
     if (hours.length == 0) {
       const prefix = `${announceID}-imm`;
       const update = () => {
-        return setImmediateNotification(firestore, batch, announceID, token, follower.lang);
+        setImmediateNotification(firestore, batch, announceID, token, follower.lang);
       };
       const remove = () => {
-        return unsetImmediateNotification(firestore, batch, announceID, token);
+        unsetImmediateNotification(firestore, batch, announceID, token);
       };
       result.push({ prefix, update, remove });
     } else {
       hours.forEach((hour, i) => {
-        const prefix = `${announceID}-${hour}`;
-        const update = () => {
-          let prevHour = undefined;
-          if (hours.length >= 2) {
-            prevHour = i == 0 ? hours[hours.length - 1] : hours[i - 1];
-          }
-          return setHourlyNotification(
-            firestore,
-            batch,
-            announceID,
-            hour,
-            token,
-            follower.lang,
-            prevHour,
-          );
-        };
-        const remove = () => {
-          return unsetHourlyNotification(firestore, batch, announceID, hour, token);
-        };
-        result.push({ prefix, update, remove });
+        const hourly = houlryMap.get(hour) || {};
+        if (hours.length >= 2) {
+          const prevHour = i == 0 ? hours[hours.length - 1] : hours[i - 1];
+          hourly[announceID] = [prevHour];
+        } else {
+          hourly[announceID] = [];
+        }
+        houlryMap.set(hour, hourly);
       });
     }
   }
+
+  for (const [hour, follows] of houlryMap.entries()) {
+    result.push({
+      prefix: `hourly-${hour}`,
+      update: () => {
+        setHourlyNotification(firestore, batch, hour, token, follower.lang, follows);
+      },
+      remove: () => {
+        unsetHourlyNotification(firestore, batch, hour, token);
+      },
+    });
+  }
+
+  if (houlryMap.size > 0) {
+  }
+
   return result;
 };
 
