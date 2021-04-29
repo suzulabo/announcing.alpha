@@ -25,7 +25,9 @@ class FirestoreUpdator {
   setImmediateNotification(announceID: string, token: string, lang: Lang) {
     const data = {
       announceID,
-      [`followers.${token}`]: [lang],
+      followers: {
+        [token]: [lang],
+      },
       unfollows: FieldValue.arrayRemove(token),
       uT: FieldValue.serverTimestamp(),
     };
@@ -36,10 +38,11 @@ class FirestoreUpdator {
 
   unsetImmediateNotification(announceID: string, token: string) {
     const data = {
-      [`followers.${token}`]: FieldValue.delete(),
+      followers: { [token]: FieldValue.delete() },
       unfollows: FieldValue.arrayUnion(token),
       uT: FieldValue.serverTimestamp(),
     };
+    logger.info('**DATA**');
     this.batch.set(this.firestore.doc(`notification-immediate/${announceID}`), data, {
       merge: true,
     });
@@ -137,7 +140,7 @@ class FirestoreUpdator {
   ) {
     const data = {
       announceID,
-      [`followers.${token}`]: prevHour == null ? [lang] : [lang, prevHour],
+      followers: { [token]: prevHour == null ? [lang] : [lang, prevHour] },
       unfollows: FieldValue.arrayRemove(token),
       uT: FieldValue.serverTimestamp(),
     };
@@ -148,8 +151,9 @@ class FirestoreUpdator {
 
   unsetHourlyNotification(announceID: string, hour: number, token: string) {
     const data = {
-      [`followers.${token}`]: FieldValue.delete(),
+      followers: { [token]: FieldValue.delete() },
       unfollows: FieldValue.arrayUnion(token),
+      uT: FieldValue.serverTimestamp(),
     };
     this.batch.set(this.firestore.doc(`notification-hourly/${announceID}-${hour}`), data, {
       merge: true,

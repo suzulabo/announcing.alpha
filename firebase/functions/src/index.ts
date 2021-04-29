@@ -85,17 +85,17 @@ export const onFirestoreCreatePost = region.firestore
   });
 
 export const onFirestoreNotificationFollowersCreate = region.firestore
-  .document('notification-followers')
+  .document('notification-followers/{token}')
   .onCreate((qds, context) => {
     return firestoreNotificationFollowerCreate(qds, context, adminApp);
   });
 export const onFirestoreNotificationFollowersUpdate = region.firestore
-  .document('notification-followers')
+  .document('notification-followers/{token}')
   .onUpdate((change, context) => {
     return firestoreNotificationFollowerUpdate(change, context, adminApp);
   });
 export const onFirestoreNotificationFollowersDelete = region.firestore
-  .document('notification-followers')
+  .document('notification-followers/{token}')
   .onDelete((qds, context) => {
     return firestoreNotificationFollowerDelete(qds, context, adminApp);
   });
