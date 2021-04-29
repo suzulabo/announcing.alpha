@@ -4,11 +4,17 @@ import * as functions from 'firebase-functions';
 import { config, Request, Response } from 'firebase-functions';
 import 'firebase-functions/lib/logger/compat';
 import { callCreateAnnounce } from './call/create-announce';
-import { callDeleteAnnounce, firestoreDeleteAnnounce } from './call/delete-announce';
+import { callDeleteAnnounce } from './call/delete-announce';
 import { callDeletePost } from './call/delete-post';
 import { callEditAnnounce } from './call/edit-announce';
 import { callPutPost } from './call/put-post';
 import { callRegisterNotification } from './call/register-notification';
+import { firestoreDeleteAnnounce } from './firestore/announce';
+import {
+  firestoreNotificationFollowerCreate,
+  firestoreNotificationFollowerDelete,
+  firestoreNotificationFollowerUpdate,
+} from './firestore/notification-followers';
 import { firestoreCreatePost } from './firestore/post';
 import {
   httpsGetAnnounceMetaData,
@@ -68,14 +74,30 @@ export const getImageData = onHttpsRequest(httpsGetImageData);
 
 export const onFirestoreDeleteAnnounce = region.firestore
   .document('announces/{announceID}')
-  .onDelete((qs, context) => {
-    return firestoreDeleteAnnounce(qs, context, adminApp);
+  .onDelete((qds, context) => {
+    return firestoreDeleteAnnounce(qds, context, adminApp);
   });
 
 export const onFirestoreCreatePost = region.firestore
   .document('announces/{announceID}/posts/{postID}')
-  .onCreate((qs, context) => {
-    return firestoreCreatePost(qs, context, adminApp);
+  .onCreate((qds, context) => {
+    return firestoreCreatePost(qds, context, adminApp);
+  });
+
+export const onFirestoreNotificationFollowersCreate = region.firestore
+  .document('notification-followers')
+  .onCreate((qds, context) => {
+    return firestoreNotificationFollowerCreate(qds, context, adminApp);
+  });
+export const onFirestoreNotificationFollowersUpdate = region.firestore
+  .document('notification-followers')
+  .onUpdate((change, context) => {
+    return firestoreNotificationFollowerUpdate(change, context, adminApp);
+  });
+export const onFirestoreNotificationFollowersDelete = region.firestore
+  .document('notification-followers')
+  .onDelete((qds, context) => {
+    return firestoreNotificationFollowerDelete(qds, context, adminApp);
   });
 
 export const onPubsubSendNotification = region.pubsub

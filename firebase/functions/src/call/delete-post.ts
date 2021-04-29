@@ -10,14 +10,6 @@ export const callDeletePost = async (
   adminApp: admin.app.App,
 ): Promise<void> => {
   const uid = context.auth?.uid;
-  return deletePost(params, uid, adminApp);
-};
-
-const deletePost = async (
-  params: DeletePostParams,
-  uid: string | undefined,
-  adminApp: admin.app.App,
-): Promise<void> => {
   if (!uid) {
     throw new Error('missing uid');
   }

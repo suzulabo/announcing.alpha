@@ -11,14 +11,6 @@ export const callCreateAnnounce = async (
   adminApp: admin.app.App,
 ): Promise<void> => {
   const uid = context.auth?.uid;
-  return createAnnounce(params, uid, adminApp);
-};
-
-const createAnnounce = async (
-  params: CreateAnnounceParams,
-  uid: string | undefined,
-  adminApp: admin.app.App,
-): Promise<void> => {
   if (!uid) {
     throw new Error('missing uid');
   }

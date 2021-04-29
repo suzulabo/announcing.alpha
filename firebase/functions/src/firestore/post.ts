@@ -44,12 +44,12 @@ const getImmediateNotificationFollowers = async (
 };
 
 export const firestoreCreatePost = async (
-  qs: QueryDocumentSnapshot,
+  qds: QueryDocumentSnapshot,
   context: EventContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
   // check edited post
-  if (qs.id.includes('-')) {
+  if (qds.id.includes('-')) {
     logger.debug('edited post');
     return;
   }
@@ -80,7 +80,7 @@ export const firestoreCreatePost = async (
     return;
   }
 
-  const postData = qs.data() as Post;
+  const postData = qds.data() as Post;
   const msgs = [] as admin.messaging.MulticastMessage[];
   const notification = { title: announceMeta.name, body: postData.title || postData.body };
   const data = { announceID, ...(announceMeta.icon && { icon: announceMeta.icon }) };

@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
-import { Announce, AnnounceMetaRule, EditAnnounceParams, ImageRule, User } from '../shared';
-import { announceMetaHash, storeImage } from '../utils/firestore';
+import { Announce, AnnounceMetaRule, EditAnnounceParams, ImageRule } from '../shared';
+import { announceMetaHash, checkOwner, storeImage } from '../utils/firestore';
 import { logger } from '../utils/logger';
 
 export const callEditAnnounce = async (
@@ -10,14 +10,6 @@ export const callEditAnnounce = async (
   adminApp: admin.app.App,
 ): Promise<void> => {
   const uid = context.auth?.uid;
-  return editAnnounce(params, uid, adminApp);
-};
-
-const editAnnounce = async (
-  params: EditAnnounceParams,
-  uid: string | undefined,
-  adminApp: admin.app.App,
-): Promise<void> => {
   if (!uid) {
     throw new Error('missing uid');
   }
@@ -45,14 +37,8 @@ const editAnnounce = async (
   const firestore = adminApp.firestore();
 
   {
-    const userRef = firestore.doc(`users/${uid}`);
-    const userData = (await userRef.get()).data() as User;
-    if (!userData) {
-      logger.warn('no user', uid);
-      return;
-    }
-    if (!userData.announces || userData.announces.indexOf(id) < 0) {
-      logger.warn('not owner', { uid, id });
+    const isOwner = await checkOwner(firestore, uid, id);
+    if (!isOwner) {
       return;
     }
   }
