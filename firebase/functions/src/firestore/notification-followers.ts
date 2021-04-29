@@ -141,13 +141,13 @@ const genUpdators = (
 const updateSchedule = async (
   token: string,
   before: NotificationFollower | null,
-  current: NotificationFollower,
+  current: NotificationFollower | null,
   adminApp: admin.app.App,
 ) => {
   const firestore = adminApp.firestore();
   const batch = firestore.batch();
 
-  const updators = genUpdators(firestore, batch, token, current);
+  const updators = current ? genUpdators(firestore, batch, token, current) : [];
   if (before) {
     const prefixSet = new Set(
       updators.map(v => {
@@ -194,4 +194,6 @@ export const firestoreNotificationFollowerDelete = async (
   qds: QueryDocumentSnapshot,
   context: EventContext,
   adminApp: admin.app.App,
-): Promise<void> => {};
+): Promise<void> => {
+  return updateSchedule(qds.id, qds.data() as NotificationFollower, null, adminApp);
+};

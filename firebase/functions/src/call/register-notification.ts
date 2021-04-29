@@ -53,12 +53,17 @@ export const callRegisterNotification = async (
   }
 
   const firestore = adminApp.firestore();
-  const data = {
-    lang,
-    follows,
-    uT: admin.firestore.FieldValue.serverTimestamp(),
-  };
-  await firestore.doc(`notification-followers/${fcmToken}`).set(data);
+  if (follows.length > 0) {
+    const data = {
+      lang,
+      follows,
+      uT: admin.firestore.FieldValue.serverTimestamp(),
+    };
+    await firestore.doc(`notification-followers/${fcmToken}`).set(data);
 
-  logger.info('SET NOTIFICATION:', { fcmToken, lang, follows });
+    logger.info('SET NOTIFICATION:', { fcmToken, lang, follows });
+  } else {
+    await firestore.doc(`notification-followers/${fcmToken}`).delete();
+    logger.info('UNSET NOTIFICATION:', { fcmToken });
+  }
 };
