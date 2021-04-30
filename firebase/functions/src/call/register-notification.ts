@@ -1,3 +1,4 @@
+import { getTimezoneOffset } from 'date-fns-tz';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { isLang, RegisterNotificationParams } from '../shared';
@@ -16,7 +17,7 @@ export const callRegisterNotification = async (
   adminApp: admin.app.App,
 ): Promise<void> => {
   logger.debug('params:', params);
-  const { fcmToken, lang, follows: _follows } = params;
+  const { fcmToken, lang, tz, follows: _follows } = params;
 
   if (!fcmToken) {
     throw new Error('missing fcmToken');
@@ -27,6 +28,12 @@ export const callRegisterNotification = async (
   if (!lang) {
     throw new Error('missing lang');
   }
+  if (!tz) {
+    throw new Error('missing tz');
+  }
+
+  getTimezoneOffset(tz); // check timezone
+
   if (!isLang(lang)) {
     throw new Error(`invalid lang (${lang})`);
   }
@@ -56,6 +63,7 @@ export const callRegisterNotification = async (
   if (follows.length > 0) {
     const data = {
       lang,
+      tz,
       follows,
       uT: admin.firestore.FieldValue.serverTimestamp(),
     };

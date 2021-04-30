@@ -154,9 +154,11 @@ export class AppFirebase {
     console.log(follows);
 
     const fcmToken = await this.messageToken();
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const params: RegisterNotificationParams = {
       fcmToken,
       lang,
+      tz,
       follows,
     };
     await this.callFunc<void>('registerNotification', params);

@@ -3,6 +3,7 @@ import { Lang } from '../shared';
 
 export interface NotificationFollower {
   lang: Lang;
+  tz: string;
   follows: { id: string; hours?: number[] }[];
   uT: admin.firestore.Timestamp;
 }
