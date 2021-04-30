@@ -138,21 +138,7 @@ export class AppFirebase {
     }
   }
 
-  async registerMessaging(_follows: { id: string; hours: number[] }[], lang: Lang) {
-    const offset = new Date().getTimezoneOffset() / 60;
-    if (!Number.isInteger(offset)) {
-      throw new Error('offset it not integer');
-    }
-    const follows = _follows.map(v => {
-      return {
-        id: v.id,
-        hours: v.hours.map(x => {
-          return mod(x + offset, 24);
-        }),
-      };
-    });
-    console.log(follows);
-
+  async registerMessaging(follows: { id: string; hours: number[] }[], lang: Lang) {
     const fcmToken = await this.messageToken();
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const params: RegisterNotificationParams = {
@@ -164,8 +150,3 @@ export class AppFirebase {
     await this.callFunc<void>('registerNotification', params);
   }
 }
-
-// https://stackoverflow.com/questions/4467539/javascript-modulo-gives-a-negative-result-for-negative-numbers
-const mod = (v: number, n: number) => {
-  return ((v % n) + n) % n;
-};
