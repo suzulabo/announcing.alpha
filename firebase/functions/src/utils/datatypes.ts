@@ -22,9 +22,9 @@ export interface ImmediateNotificationArchive {
 }
 
 export interface HourlyNotification {
-  hour: number;
+  time: number;
   followers: {
-    [token: string]: [lang: Lang, follows: { [announceID: string]: [prevHour?: number] }];
+    [token: string]: [lang: Lang, follows: { [announceID: string]: [hoursBefore?: number] }];
   };
   unfollows?: string[];
   archives?: string[];
@@ -33,6 +33,6 @@ export interface HourlyNotification {
 
 export interface HourlyNotificationArchive {
   followers: {
-    [token: string]: [lang: Lang, follows: { [announceID: string]: [prevHour?: number] }];
+    [token: string]: [lang: Lang, follows: { [announceID: string]: [hoursBefore?: number] }];
   };
 }
