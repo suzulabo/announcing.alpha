@@ -2,9 +2,10 @@ import admin from 'firebase-admin';
 import { Lang } from '../shared';
 
 export interface NotificationFollower {
+  signKey: string;
   lang: Lang;
   tz: string;
-  follows: { id: string; hours?: number[] }[];
+  follows: { [id: string]: { hours?: number[] } };
   uT: admin.firestore.Timestamp;
 }
 

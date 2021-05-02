@@ -1,10 +1,12 @@
 import { Build } from '@stencil/core';
 import { Announce, AnnounceMetaJSON, PostJSON } from 'src/shared';
+import nacl from 'tweetnacl';
 import { AnnounceState, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
 import { AppStorage } from './storage';
+import { bs62 } from './utils';
 
 const BUILD_INFO = {
   src: '__BUILD_SRC__',
@@ -157,10 +159,14 @@ export class App {
   }
 
   async deleteFollow(id: string) {
-    await this.appStorage.follows.remove(id);
     if ((await this.appFirebase.checkNotifyPermission()) == 'allow') {
-      await this.registerMessaging();
+      await this.setNotify(id, false);
     }
+    await this.appStorage.follows.remove(id);
+  }
+
+  async getNotification(id: string) {
+    return this.appStorage.notifications.get(id);
   }
 
   async checkNotifyPermission() {
@@ -168,27 +174,36 @@ export class App {
   }
 
   async setNotify(announceID: string, enable: boolean, hours?: number[]) {
-    const follow = await this.getFollow(announceID);
-    if (!follow && enable) {
-      return;
-    }
-    await this.appStorage.follows.set(announceID, {
-      ...follow,
-      notify: { enable, hours },
-    });
-    await this.registerMessaging();
-  }
+    const follows = {} as { [id: string]: { hours?: number[] } };
 
-  private async registerMessaging() {
-    const follows = await this.appStorage.follows.entries();
-
-    const notifs = [] as { id: string; hours: number[] }[];
-    for (const [id, follow] of follows) {
-      if (follow.notify.enable) {
-        notifs.push({ id, hours: follow.notify.hours });
+    const notifications = await this.appStorage.notifications.entries();
+    for (const [k, v] of notifications) {
+      if (k != announceID) {
+        follows[k] = v;
       }
     }
+    if (enable) {
+      follows[announceID] = { hours };
+    }
 
-    await this.appFirebase.registerMessaging(notifs, this.appMsg.lang);
+    const signKey = await this.getSignKey();
+    await this.appFirebase.registerMessaging(signKey, this.appMsg.lang, follows);
+
+    if (enable) {
+      await this.appStorage.notifications.set(announceID, { hours });
+    } else {
+      await this.appStorage.notifications.remove(announceID);
+    }
+  }
+
+  private async getSignKey() {
+    const k = await this.appStorage.signKey.get();
+    if (k) {
+      return k;
+    }
+    const pair = nacl.sign.keyPair();
+    const s = bs62.encode(pair.secretKey);
+    await this.appStorage.signKey.set(s);
+    return s;
   }
 }

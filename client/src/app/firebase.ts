@@ -4,6 +4,8 @@ import 'firebase/firestore';
 import 'firebase/functions';
 import 'firebase/messaging';
 import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
+import nacl from 'tweetnacl';
+import { bs62 } from './utils';
 
 const getCache = async <T>(docRef: firebase.firestore.DocumentReference): Promise<T> => {
   {
@@ -138,15 +140,31 @@ export class AppFirebase {
     }
   }
 
-  async registerMessaging(follows: { id: string; hours: number[] }[], lang: Lang) {
+  async registerMessaging(
+    signSecKey: string,
+    lang: Lang,
+    follows: { [id: string]: { hours?: number[] } },
+  ) {
     const fcmToken = await this.messageToken();
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    const ids = Object.keys(follows);
+    ids.sort();
+
+    const signBody = [new Date().toISOString(), fcmToken, ...ids].join('\0');
+    const secKey = bs62.decode(signSecKey);
+    const sign = bs62.encode(nacl.sign(new TextEncoder().encode(signBody), secKey));
+    const signKey = bs62.encode(nacl.sign.keyPair.fromSecretKey(secKey).publicKey);
+
     const params: RegisterNotificationParams = {
       fcmToken,
+      signKey,
+      sign,
       lang,
       tz,
       follows,
     };
+
     await this.callFunc<void>('registerNotification', params);
   }
 }

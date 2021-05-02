@@ -26,6 +26,7 @@ export class AppAnnounceConfig {
   private permission: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
 
   private follow: Follow;
+  private notification: { hours?: number[] };
 
   async componentWillLoad() {
     this.app.loading = true;
@@ -41,9 +42,10 @@ export class AppAnnounceConfig {
         this.app.redirectRoute(`/${id}`);
         return;
       }
-      console.log(this.follow);
 
-      this.values = { enable: this.follow.notify.enable, hours: this.follow.notify.hours || [] };
+      this.notification = await this.app.getNotification(id);
+
+      this.values = { enable: !!this.notification, hours: this.notification?.hours || [] };
 
       this.permission = await this.app.checkNotifyPermission();
     } finally {
@@ -151,10 +153,10 @@ export class AppAnnounceConfig {
 
     const msgs = this.app.msgs;
     const values = this.values;
-    const notify = this.follow.notify;
+    const notify = this.notification;
 
     const modified =
-      values.enable != notify.enable ||
+      values.enable != !!notify ||
       (values.enable && values.hours.join(':') != notify.hours?.join(':'));
 
     const canSubmit = modified;

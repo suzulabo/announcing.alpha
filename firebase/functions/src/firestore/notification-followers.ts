@@ -93,9 +93,8 @@ const genUpdators = (
 
   const houlryMap = new Map<number, { [announceID: string]: [prevHour?: number] }>();
 
-  for (const follow of follower.follows) {
-    const announceID = follow.id;
-    const hours = follow.hours || [];
+  for (const [announceID, v] of Object.entries(follower.follows)) {
+    const hours = v.hours || [];
 
     if (hours.length == 0) {
       const prefix = `${announceID}-imm`;

@@ -56,7 +56,6 @@ export class AppAnnounce {
     try {
       const follow: Follow = {
         name: this.announceName,
-        notify: { enable: false, hours: [] },
         readTime: Date.now(),
       };
       await this.app.setFollow(this.announceID, follow);

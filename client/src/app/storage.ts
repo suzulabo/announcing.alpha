@@ -68,6 +68,7 @@ const objectMulti = <T>(prefix: string) => {
 
 export class AppStorage {
   readonly fcmToken = kvGetSet('fcmToken');
-  readonly signKeys = objectGetSet<{ deviceID: string; secKey: string; pubKey: string }>('signKey');
+  readonly signKey = kvGetSet('signKey');
   readonly follows = objectMulti<Follow>('follows.');
+  readonly notifications = objectMulti<{ hours?: number[] }>('notifications.');
 }

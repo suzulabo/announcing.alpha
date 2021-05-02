@@ -8,6 +8,10 @@ type Blob = {
 const languages = ['en', 'ja'] as const;
 export type Lang = typeof languages[number];
 
+export const isLang = (s: any): s is Lang => {
+  return languages.includes(s);
+};
+
 interface PostBase {
   title?: string;
   body?: string;
@@ -98,13 +102,11 @@ export interface DeletePostParams {
   postID?: string;
 }
 
-export const isLang = (s: any): s is Lang => {
-  return languages.includes(s);
-};
-
 export interface RegisterNotificationParams {
-  fcmToken?: string;
-  lang?: Lang;
-  tz?: string;
-  follows?: { id?: string; hours?: number[] }[];
+  fcmToken: string;
+  signKey: string;
+  sign: string;
+  lang: Lang;
+  tz: string;
+  follows: { [id: string]: { hours?: number[] } };
 }
