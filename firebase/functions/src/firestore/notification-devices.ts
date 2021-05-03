@@ -92,7 +92,7 @@ const genUpdators = (
   now: number,
 ) => {
   const result = [] as {
-    prefix: string;
+    key: string;
     update: () => void;
     remove: () => void;
   }[];
@@ -103,14 +103,14 @@ const genUpdators = (
     const hours = v.hours || [];
 
     if (hours.length == 0) {
-      const prefix = `imm-${announceID}`;
+      const key = `imm-${announceID}`;
       const update = () => {
         setImmediateNotification(firestore, batch, announceID, token, follower.lang);
       };
       const remove = () => {
         unsetImmediateNotification(firestore, batch, announceID, token);
       };
-      result.push({ prefix, update, remove });
+      result.push({ key, update, remove });
     } else {
       hours.forEach((hour, i) => {
         const zonedNow = toDate(now, { timeZone: follower.tz });
@@ -138,7 +138,7 @@ const genUpdators = (
 
   for (const [time, follows] of houlryMap.entries()) {
     result.push({
-      prefix: `hourly-${time}`,
+      key: `hourly-${time}`,
       update: () => {
         setHourlyNotification(firestore, batch, time, token, follower.lang, follows);
       },
@@ -166,14 +166,14 @@ const updateSchedule = async (
 
   const updators = current ? genUpdators(firestore, batch, token, current, now) : [];
   if (before) {
-    const prefixSet = new Set(
+    const keysSet = new Set(
       updators.map(v => {
-        return v.prefix;
+        return v.key;
       }),
     );
     const beforeUpdators = genUpdators(firestore, batch, token, before, now);
     for (const updator of beforeUpdators) {
-      if (!prefixSet.has(updator.prefix)) {
+      if (!keysSet.has(updator.key)) {
         updator.remove();
       }
     }
