@@ -12,7 +12,11 @@ export const firestoreDeleteAnnounce = async (
   const announceData = qds.data() as Announce;
 
   const posts = announceData.posts ? announceData.posts.map(v => `announces/${id}/posts/${v}`) : [];
-  const pathes = [...posts.reverse(), `announces/${id}/meta/${announceData.mid}`];
+  const pathes = [
+    ...posts.reverse(),
+    `announces/${id}/meta/${announceData.mid}`,
+    `notif-imm/${id}`,
+  ];
 
   const firestore = adminApp.firestore();
 

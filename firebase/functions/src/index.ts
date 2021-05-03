@@ -100,8 +100,8 @@ export const onFirestoreNotificationDevicesDelete = region.firestore
   .onDelete((qds, context) => {
     return firestoreNotificationDeviceDelete(qds, context, adminApp);
   });
-export const onFirestoreImmediateNotificationUpdate = region.firestore
-  .document('notif-imm/{time}')
+export const onFirestoreImmediateNotificationWrite = region.firestore
+  .document('notif-imm/{announceID}')
   .onWrite((change, context) => {
     return firestoreImmediateNotificationWrite(change, context, adminApp);
   });

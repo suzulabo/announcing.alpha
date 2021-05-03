@@ -95,20 +95,39 @@ const archiveImmediateNotification = async (
   });
 };
 
+const deleteArchives = async (
+  firestore: admin.firestore.Firestore,
+  announceID: string,
+  archives: string[],
+) => {
+  while (archives.length > 0) {
+    const ids = archives.splice(0, 500);
+    const batch = firestore.batch();
+    for (const id of ids) {
+      batch.delete(firestore.doc(`notif-imm/${announceID}/archives/${id}`));
+    }
+    await batch.commit();
+  }
+};
+
 export const firestoreImmediateNotificationWrite = async (
   change: Change<DocumentSnapshot>,
   context: EventContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
+  const firestore = adminApp.firestore();
   if (change.after) {
     // create, update
     const imm = change.after.data() as ImmediateNotification;
     if (!shouldArchiveImmediateNotification(imm)) {
       return;
     }
-    const firestore = adminApp.firestore();
     await archiveImmediateNotification(firestore, imm.announceID);
   } else {
-    // TODO delete
+    // delete
+    const imm = change.before.data() as ImmediateNotification;
+    if (imm.archives) {
+      await deleteArchives(firestore, imm.announceID, imm.archives);
+    }
   }
 };
