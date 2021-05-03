@@ -11,10 +11,10 @@ import { callPutPost } from './call/put-post';
 import { callRegisterNotification } from './call/register-notification';
 import { firestoreDeleteAnnounce } from './firestore/announce';
 import {
-  firestoreNotificationFollowerCreate,
-  firestoreNotificationFollowerDelete,
-  firestoreNotificationFollowerUpdate,
-} from './firestore/notification-followers';
+  firestoreNotificationDeviceCreate,
+  firestoreNotificationDeviceDelete,
+  firestoreNotificationDeviceUpdate,
+} from './firestore/notification-devices';
 import { firestoreCreatePost } from './firestore/post';
 import {
   httpsGetAnnounceMetaData,
@@ -84,20 +84,20 @@ export const onFirestoreCreatePost = region.firestore
     return firestoreCreatePost(qds, context, adminApp);
   });
 
-export const onFirestoreNotificationFollowersCreate = region.firestore
-  .document('notification-followers/{token}')
+export const onFirestoreNotificationDevicesCreate = region.firestore
+  .document('notif-devices/{token}')
   .onCreate((qds, context) => {
-    return firestoreNotificationFollowerCreate(qds, context, adminApp);
+    return firestoreNotificationDeviceCreate(qds, context, adminApp);
   });
-export const onFirestoreNotificationFollowersUpdate = region.firestore
-  .document('notification-followers/{token}')
+export const onFirestoreNotificationDevicesUpdate = region.firestore
+  .document('notif-devices/{token}')
   .onUpdate((change, context) => {
-    return firestoreNotificationFollowerUpdate(change, context, adminApp);
+    return firestoreNotificationDeviceUpdate(change, context, adminApp);
   });
-export const onFirestoreNotificationFollowersDelete = region.firestore
-  .document('notification-followers/{token}')
+export const onFirestoreNotificationDevicesDelete = region.firestore
+  .document('notif-devices/{token}')
   .onDelete((qds, context) => {
-    return firestoreNotificationFollowerDelete(qds, context, adminApp);
+    return firestoreNotificationDeviceDelete(qds, context, adminApp);
   });
 
 export const onPubsubSendNotification = region.pubsub

@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
 import { Lang } from '../shared';
 
-export interface NotificationFollower {
+export interface NotificationDevice {
   signKey: string;
   lang: Lang;
   tz: string;
@@ -21,7 +21,7 @@ export interface ImmediateNotificationArchive {
   followers: { [token: string]: [lang: Lang] };
 }
 
-export interface HourlyNotification {
+export interface TimedNotification {
   time: number;
   followers: {
     [token: string]: [lang: Lang, follows: { [announceID: string]: [hoursBefore?: number] }];
@@ -31,7 +31,7 @@ export interface HourlyNotification {
   uT: admin.firestore.Timestamp;
 }
 
-export interface HourlyNotificationArchive {
+export interface TimedNotificationArchive {
   followers: {
     [token: string]: [lang: Lang, follows: { [announceID: string]: [hoursBefore?: number] }];
   };

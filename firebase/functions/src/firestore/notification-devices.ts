@@ -3,7 +3,7 @@ import admin from 'firebase-admin';
 import { Change, EventContext } from 'firebase-functions';
 import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import { Lang } from '../shared';
-import { NotificationFollower } from '../utils/datatypes';
+import { NotificationDevice } from '../utils/datatypes';
 
 import Firestore = admin.firestore.Firestore;
 import Batch = admin.firestore.WriteBatch;
@@ -24,7 +24,7 @@ const setImmediateNotification = (
     unfollows: FieldValue.arrayRemove(token),
     uT: FieldValue.serverTimestamp(),
   };
-  batch.set(firestore.doc(`notification-immediate/${announceID}`), data, {
+  batch.set(firestore.doc(`notif-imm/${announceID}`), data, {
     merge: true,
   });
 };
@@ -40,7 +40,7 @@ const unsetImmediateNotification = (
     unfollows: FieldValue.arrayUnion(token),
     uT: FieldValue.serverTimestamp(),
   };
-  batch.set(firestore.doc(`notification-immediate/${announceID}`), data, {
+  batch.set(firestore.doc(`notif-imm/${announceID}`), data, {
     merge: true,
   });
 };
@@ -63,7 +63,7 @@ const setHourlyNotification = (
     unfollows: FieldValue.arrayRemove(token),
     uT: FieldValue.serverTimestamp(),
   };
-  batch.set(firestore.doc(`notification-hourly/${padNum(time, 4)}`), data, {
+  batch.set(firestore.doc(`notif-timed/${padNum(time, 4)}`), data, {
     merge: true,
   });
 };
@@ -79,7 +79,7 @@ const unsetHourlyNotification = (
     unfollows: FieldValue.arrayUnion(token),
     uT: FieldValue.serverTimestamp(),
   };
-  batch.set(firestore.doc(`notification-hourly/${padNum(time, 4)}`), data, {
+  batch.set(firestore.doc(`notif-timed/${padNum(time, 4)}`), data, {
     merge: true,
   });
 };
@@ -88,7 +88,7 @@ const genUpdators = (
   firestore: Firestore,
   batch: Batch,
   token: string,
-  follower: NotificationFollower,
+  follower: NotificationDevice,
   now: number,
 ) => {
   const result = [] as {
@@ -156,8 +156,8 @@ const genUpdators = (
 
 const updateSchedule = async (
   token: string,
-  before: NotificationFollower | null,
-  current: NotificationFollower | null,
+  before: NotificationDevice | null,
+  current: NotificationDevice | null,
   adminApp: admin.app.App,
 ) => {
   const firestore = adminApp.firestore();
@@ -186,31 +186,31 @@ const updateSchedule = async (
   await batch.commit();
 };
 
-export const firestoreNotificationFollowerCreate = (
+export const firestoreNotificationDeviceCreate = (
   qds: QueryDocumentSnapshot,
   context: EventContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
-  return updateSchedule(qds.id, null, qds.data() as NotificationFollower, adminApp);
+  return updateSchedule(qds.id, null, qds.data() as NotificationDevice, adminApp);
 };
 
-export const firestoreNotificationFollowerUpdate = (
+export const firestoreNotificationDeviceUpdate = (
   change: Change<QueryDocumentSnapshot>,
   context: EventContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
   return updateSchedule(
     change.after.id,
-    change.before.data() as NotificationFollower,
-    change.after.data() as NotificationFollower,
+    change.before.data() as NotificationDevice,
+    change.after.data() as NotificationDevice,
     adminApp,
   );
 };
 
-export const firestoreNotificationFollowerDelete = async (
+export const firestoreNotificationDeviceDelete = async (
   qds: QueryDocumentSnapshot,
   context: EventContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
-  return updateSchedule(qds.id, qds.data() as NotificationFollower, null, adminApp);
+  return updateSchedule(qds.id, qds.data() as NotificationDevice, null, adminApp);
 };

@@ -2,7 +2,7 @@ import { getTimezoneOffset } from 'date-fns-tz';
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { isLang, RegisterNotificationParams } from '../shared';
-import { NotificationFollower } from '../utils/datatypes';
+import { NotificationDevice } from '../utils/datatypes';
 import { logger } from '../utils/logger';
 import { checkSign } from '../utils/sign';
 
@@ -43,7 +43,7 @@ export const callRegisterNotification = async (
     throw new Error('missing follows');
   }
 
-  const follows = {} as NotificationFollower['follows'];
+  const follows = {} as NotificationDevice['follows'];
   for (const [id, v] of Object.entries(_follows)) {
     if (id.length != 12) {
       throw new Error(`invalid follow (${JSON.stringify(_follows)})`);
@@ -91,7 +91,7 @@ export const callRegisterNotification = async (
   const firestore = adminApp.firestore();
   const docRef = firestore.doc(`notification-followers/${fcmToken}`);
   {
-    const doc = (await docRef.get()).data() as NotificationFollower;
+    const doc = (await docRef.get()).data() as NotificationDevice;
     if (doc) {
       if (doc.signKey != signKey) {
         throw new Error('invalid signkey');
@@ -107,11 +107,11 @@ export const callRegisterNotification = async (
       follows,
       uT: admin.firestore.FieldValue.serverTimestamp(),
     };
-    await firestore.doc(`notification-followers/${fcmToken}`).set(data);
+    await firestore.doc(`notif-devices/${fcmToken}`).set(data);
 
     logger.info('SET NOTIFICATION:', { fcmToken, lang, follows });
   } else {
-    await firestore.doc(`notification-followers/${fcmToken}`).delete();
+    await firestore.doc(`notif-devices/${fcmToken}`).delete();
     logger.info('UNSET NOTIFICATION:', { fcmToken });
   }
 };
