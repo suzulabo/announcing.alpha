@@ -14,7 +14,7 @@ import {
   firestoreNotificationDeviceCreate,
   firestoreNotificationDeviceDelete,
   firestoreNotificationDeviceUpdate,
-} from './firestore/notification-devices';
+} from './firestore/notif-devices';
 import { firestoreCreatePost } from './firestore/post';
 import {
   httpsGetAnnounceMetaData,
