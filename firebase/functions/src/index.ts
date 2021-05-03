@@ -10,11 +10,7 @@ import { callEditAnnounce } from './call/edit-announce';
 import { callPutPost } from './call/put-post';
 import { callRegisterNotification } from './call/register-notification';
 import { firestoreDeleteAnnounce } from './firestore/announce';
-import {
-  firestoreNotificationDeviceCreate,
-  firestoreNotificationDeviceDelete,
-  firestoreNotificationDeviceUpdate,
-} from './firestore/notif-devices';
+import { firestoreNotificationDeviceWrite } from './firestore/notif-devices';
 import { firestoreImmediateNotificationWrite } from './firestore/notif-imm';
 import { firestoreCreatePost } from './firestore/post';
 import {
@@ -85,21 +81,12 @@ export const onFirestoreCreatePost = region.firestore
     return firestoreCreatePost(qds, context, adminApp);
   });
 
-export const onFirestoreNotificationDevicesCreate = region.firestore
-  .document('notif-devices/{token}')
-  .onCreate((qds, context) => {
-    return firestoreNotificationDeviceCreate(qds, context, adminApp);
-  });
-export const onFirestoreNotificationDevicesUpdate = region.firestore
+export const onFirestoreNotificationDeviceWrite = region.firestore
   .document('notif-devices/{token}')
   .onUpdate((change, context) => {
-    return firestoreNotificationDeviceUpdate(change, context, adminApp);
+    return firestoreNotificationDeviceWrite(change, context, adminApp);
   });
-export const onFirestoreNotificationDevicesDelete = region.firestore
-  .document('notif-devices/{token}')
-  .onDelete((qds, context) => {
-    return firestoreNotificationDeviceDelete(qds, context, adminApp);
-  });
+
 export const onFirestoreImmediateNotificationWrite = region.firestore
   .document('notif-imm/{announceID}')
   .onWrite((change, context) => {

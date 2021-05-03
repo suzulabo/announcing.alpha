@@ -186,31 +186,15 @@ const updateSchedule = async (
   await batch.commit();
 };
 
-export const firestoreNotificationDeviceCreate = (
-  qds: QueryDocumentSnapshot,
-  context: EventContext,
-  adminApp: admin.app.App,
-): Promise<void> => {
-  return updateSchedule(qds.id, null, qds.data() as NotificationDevice, adminApp);
-};
-
-export const firestoreNotificationDeviceUpdate = (
+export const firestoreNotificationDeviceWrite = (
   change: Change<QueryDocumentSnapshot>,
   context: EventContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
   return updateSchedule(
-    change.after.id,
+    context.params.token,
     change.before.data() as NotificationDevice,
     change.after.data() as NotificationDevice,
     adminApp,
   );
-};
-
-export const firestoreNotificationDeviceDelete = async (
-  qds: QueryDocumentSnapshot,
-  context: EventContext,
-  adminApp: admin.app.App,
-): Promise<void> => {
-  return updateSchedule(qds.id, qds.data() as NotificationDevice, null, adminApp);
 };
