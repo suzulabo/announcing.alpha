@@ -15,6 +15,7 @@ import {
   firestoreNotificationDeviceDelete,
   firestoreNotificationDeviceUpdate,
 } from './firestore/notif-devices';
+import { firestoreImmediateNotificationWrite } from './firestore/notif-imm';
 import { firestoreCreatePost } from './firestore/post';
 import {
   httpsGetAnnounceMetaData,
@@ -98,6 +99,11 @@ export const onFirestoreNotificationDevicesDelete = region.firestore
   .document('notif-devices/{token}')
   .onDelete((qds, context) => {
     return firestoreNotificationDeviceDelete(qds, context, adminApp);
+  });
+export const onFirestoreImmediateNotificationUpdate = region.firestore
+  .document('notif-imm/{time}')
+  .onWrite((change, context) => {
+    return firestoreImmediateNotificationWrite(change, context, adminApp);
   });
 
 export const onPubsubSendNotification = region.pubsub
