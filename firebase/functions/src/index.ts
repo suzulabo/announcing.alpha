@@ -83,7 +83,7 @@ export const onFirestoreCreatePost = region.firestore
 
 export const onFirestoreNotificationDeviceWrite = region.firestore
   .document('notif-devices/{token}')
-  .onUpdate((change, context) => {
+  .onWrite((change, context) => {
     return firestoreNotificationDeviceWrite(change, context, adminApp);
   });
 

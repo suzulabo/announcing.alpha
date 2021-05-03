@@ -1,7 +1,7 @@
 import { format, toDate, zonedTimeToUtc } from 'date-fns-tz';
 import admin from 'firebase-admin';
 import { Change, EventContext } from 'firebase-functions';
-import { QueryDocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
+import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
 import { Lang } from '../shared';
 import { NotificationDevice } from '../utils/datatypes';
 
@@ -187,7 +187,7 @@ const updateSchedule = async (
 };
 
 export const firestoreNotificationDeviceWrite = (
-  change: Change<QueryDocumentSnapshot>,
+  change: Change<DocumentSnapshot>,
   context: EventContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
