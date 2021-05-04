@@ -6,14 +6,14 @@ import { ImmediateNotification, ImmediateNotificationArchive } from '../utils/da
 import { incString } from '../utils/incstring';
 import { logger } from '../utils/logger';
 
-const SHULD_ARCHIVE_SIZE = 5000;
-const ARCHIVE_SIZE = 5000;
+const SHOULD_ARCHIVE_COUNT = 5000;
+const ARCHIVE_COUNT = 5000;
 
-const shouldArchiveImmediateNotification = (data: ImmediateNotification) => {
+const shouldArchive = (data: ImmediateNotification) => {
   return (
     (data.followers ? Object.keys(data.followers).length : 0) +
       (data.unfollows ? data.unfollows.length : 0) >=
-    SHULD_ARCHIVE_SIZE
+    SHOULD_ARCHIVE_COUNT
   );
 };
 
@@ -30,7 +30,7 @@ const archiveImmediateNotification = async (
     const followers = immediate.followers || {};
     const unfollows = immediate.unfollows || [];
     const archives = immediate.archives || [];
-    if (!shouldArchiveImmediateNotification(immediate)) {
+    if (!shouldArchive(immediate)) {
       return;
     }
 
@@ -66,7 +66,7 @@ const archiveImmediateNotification = async (
       let aID = incString.next(incString.max(newArchives));
       while (archiveFollowers.length > 0) {
         const data: ImmediateNotificationArchive = {
-          followers: Object.fromEntries(archiveFollowers.splice(0, ARCHIVE_SIZE)),
+          followers: Object.fromEntries(archiveFollowers.splice(0, ARCHIVE_COUNT)),
         };
         if (deletions.length > 0) {
           const id = deletions.shift()!;
@@ -119,7 +119,7 @@ export const firestoreImmediateNotificationWrite = async (
   if (change.after) {
     // create, update
     const imm = change.after.data() as ImmediateNotification;
-    if (!shouldArchiveImmediateNotification(imm)) {
+    if (!shouldArchive(imm)) {
       return;
     }
     await archiveImmediateNotification(firestore, imm.announceID);
