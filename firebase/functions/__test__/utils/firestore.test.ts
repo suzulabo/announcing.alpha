@@ -1,5 +1,5 @@
-import { AnnounceMeta } from '../../src/shared';
-import { announceMetaHash, _serialize } from '../../src/utils/firestore';
+import { AnnounceMeta } from 'src/shared';
+import { announceMetaHash, _serialize } from 'src/utils/firestore';
 
 describe('firestore', () => {
   it('_serialize', () => {

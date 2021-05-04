@@ -1,4 +1,4 @@
-import { millisToBase62, postIDtoMillis } from '../../src/utils/util';
+import { millisToBase62, postIDtoMillis } from 'src/utils/util';
 
 describe('util', () => {
   it('postIDtoMillis', () => {
