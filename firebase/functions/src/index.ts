@@ -12,6 +12,7 @@ import { callRegisterNotification } from './call/register-notification';
 import { firestoreDeleteAnnounce } from './firestore/announce';
 import { firestoreNotificationDeviceWrite } from './firestore/notif-devices';
 import { firestoreImmediateNotificationWrite } from './firestore/notif-imm';
+import { firestoreTimedNotificationWrite } from './firestore/notif-timed';
 import { firestoreCreatePost } from './firestore/post';
 import {
   httpsGetAnnounceMetaData,
@@ -91,6 +92,11 @@ export const onFirestoreImmediateNotificationWrite = region.firestore
   .document('notif-imm/{announceID}')
   .onWrite((change, context) => {
     return firestoreImmediateNotificationWrite(change, context, adminApp);
+  });
+export const onFirestoreTimedNotificationWrite = region.firestore
+  .document('notif-timed/{time}')
+  .onWrite((change, context) => {
+    return firestoreTimedNotificationWrite(change, context, adminApp);
   });
 
 export const onPubsubSendNotification = region.pubsub
