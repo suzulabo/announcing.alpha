@@ -117,12 +117,14 @@ class DocRef {
 class DocSnapshot {
   readonly exists: boolean;
   readonly id: string;
+  private _data: DocData | undefined;
   constructor(private firestore: FakeFirestore, public ref: DocRef) {
     this.id = ref.id;
-    this.exists = !!this.data();
+    this._data = this.captureData();
+    this.exists = !!this._data;
   }
 
-  data() {
+  private captureData() {
     const tree = getPathTree(this.ref);
 
     let d = this.firestore.data;
@@ -136,6 +138,10 @@ class DocSnapshot {
     const dst = {};
     copyData(d, dst);
     return dst;
+  }
+
+  data() {
+    return this._data;
   }
 }
 
