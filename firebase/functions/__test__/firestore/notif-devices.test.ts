@@ -114,4 +114,51 @@ describe('firestoreNotificationDeviceWrite', () => {
       });
     }
   });
+
+  it('unfollows', async () => {
+    const token1 = 'token1-' + 'x'.repeat(160);
+
+    const data = {
+      'notif-devices': {
+        [token1]: {
+          lang: 'ja',
+          tz: 'Asia/Tokyo',
+          follows: {
+            ['111111111111']: {},
+            ['111111111112']: { hours: [12] },
+          },
+        },
+      },
+    };
+    const firestore = new FakeFirestore(data);
+
+    const doc1 = firestore.doc(`notif-devices/${token1}`).get();
+    await firestoreNotificationDeviceWrite(
+      { before: { data: () => {} }, after: doc1 } as any,
+      { params: { token: token1 } } as any,
+      firestore.adminApp(),
+    );
+
+    data['notif-devices'][token1]['follows'] = {} as any;
+
+    const doc2 = firestore.doc(`notif-devices/${token1}`).get();
+    await firestoreNotificationDeviceWrite(
+      { before: doc1, after: doc2 } as any,
+      { params: { token: token1 } } as any,
+      firestore.adminApp(),
+    );
+
+    expect(firestore.data['notif-imm']['111111111111']).toEqual({
+      announceID: '111111111111',
+      followers: {},
+      unfollows: [token1],
+      uT: expect.any(Date),
+    });
+    expect(firestore.data['notif-timed']['0300']).toEqual({
+      time: 300,
+      followers: {},
+      unfollows: [token1],
+      uT: expect.any(Date),
+    });
+  });
 });
