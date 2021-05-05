@@ -41,6 +41,9 @@ const copyData = (src: DocData, dst: DocData) => {
             dst[k] = [];
           }
           return;
+        case 'DeleteTransform':
+          delete dst[k];
+          return;
       }
 
       if (!dst[k]) {

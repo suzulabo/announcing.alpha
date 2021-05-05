@@ -67,4 +67,18 @@ describe('fake-firestore', () => {
     f.doc('users/aaa').update({ cities: FieldValue.arrayRemove('tokyo') });
     expect(f.data.users.aaa).toEqual({ cities: ['hiroshima'] });
   });
+
+  it('FieldValue delete', () => {
+    const f = new FakeFirestore({
+      users: {
+        aaa: {
+          follows: { A: { name: 'a' }, B: { name: 'b' }, C: { name: 'c' } },
+        },
+      },
+    });
+    f.doc('users/aaa').update({ follows: { B: FieldValue.delete() } });
+    expect(Object.keys(f.data.users.aaa.follows).sort()).toEqual(['A', 'C']);
+    f.doc('users/aaa').update({ follows: { X: FieldValue.delete() } });
+    expect(Object.keys(f.data.users.aaa.follows).sort()).toEqual(['A', 'C']);
+  });
 });
