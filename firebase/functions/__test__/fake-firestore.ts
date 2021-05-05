@@ -37,6 +37,8 @@ const copyData = (src: DocData, dst: DocData) => {
             dst[k] = x.filter(a => {
               return !v.elements.includes(a);
             });
+          } else {
+            dst[k] = [];
           }
           return;
       }
