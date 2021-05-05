@@ -19,7 +19,7 @@ const copyData = (src: DocData, dst: DocData) => {
   Object.entries(src).forEach(([k, v]) => {
     if (typeof v == 'object') {
       if (Array.isArray(v)) {
-        dst[k] = [...src[k]]; // should care object in array?
+        dst[k] = [...v]; // should care object in array?
         return;
       }
 
@@ -132,7 +132,10 @@ class DocSnapshot {
         return;
       }
     }
-    return d;
+
+    const dst = {};
+    copyData(d, dst);
+    return dst;
   }
 }
 
