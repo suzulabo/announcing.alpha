@@ -14,6 +14,7 @@ describe('fake-firestore', () => {
     expect(f.doc('users/aaa').get().data()).toEqual({ name: 'test' });
     expect(f.doc('users/bbb').get().data()).toBeUndefined();
   });
+
   it('doc.get().data() subcollection', () => {
     const f = new FakeFirestore({
       users: {
@@ -32,6 +33,22 @@ describe('fake-firestore', () => {
 
     expect(f.doc('users/aaa/followers/AAA').get().data()).toEqual({ name: 'TEST' });
     expect(f.doc('users/bbb/followers/BBB').get().data()).toBeUndefined();
+  });
+
+  it('collection().doc().set()', () => {
+    const f = new FakeFirestore({
+      users: {
+        aaa: {
+          name: 'test',
+        },
+      },
+    });
+
+    const doc = f.doc('users/aaa');
+    const c = doc.collection('items');
+    c.doc('A').set({ name: 'A' });
+    expect(f.doc('users/aaa/items/A').get().data()).toEqual({ name: 'A' });
+    expect(f.doc('users/aaa').get().data()).toEqual({ name: 'test' });
   });
 
   it('doc.create', () => {

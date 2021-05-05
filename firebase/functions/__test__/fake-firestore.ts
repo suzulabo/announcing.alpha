@@ -22,6 +22,10 @@ const copyData = (src: DocData, dst: DocData) => {
         dst[k] = [...v]; // should care object in array?
         return;
       }
+      if (v instanceof Date) {
+        dst[k] = new Date(v);
+        return;
+      }
 
       switch (v.constructor?.name) {
         case 'ServerTimestampTransform':
@@ -57,10 +61,23 @@ const copyData = (src: DocData, dst: DocData) => {
 };
 
 class CollectionRef {
-  constructor(firestore: FakeFirestore, public parent: DocRef | undefined, public id: string) {}
+  constructor(
+    private firestore: FakeFirestore,
+    public parent: DocRef | undefined,
+    public id: string,
+  ) {}
+
+  doc(id: string) {
+    return new DocRef(this.firestore, this, id);
+  }
 }
+
 class DocRef {
   constructor(private firestore: FakeFirestore, public parent: CollectionRef, public id: string) {}
+
+  collection(id: string) {
+    return new CollectionRef(this.firestore, this, id);
+  }
 
   get() {
     return new DocSnapshot(this.firestore, this);
@@ -82,7 +99,9 @@ class DocRef {
     }
 
     const cur = d[this.id] || {};
-    const dst = options?.merge ? { ...cur } : {};
+    const dst = options?.merge
+      ? { ...cur }
+      : { ...(cur['_collections'] && { _collections: cur['_collections'] }) };
     copyData(data, dst);
     d[this.id] = dst;
   }
@@ -135,8 +154,9 @@ class DocSnapshot {
       }
     }
 
-    const dst = {};
+    const dst = {} as DocData;
     copyData(d, dst);
+    delete dst['_collections'];
     return dst;
   }
 
@@ -147,7 +167,7 @@ class DocSnapshot {
 
 class Batch {
   private updators = [] as (() => void)[];
-  constructor(firestore: FakeFirestore) {}
+  constructor() {}
 
   set(ref: DocRef, data: DocData, options?: SetOptions) {
     this.updators.push(() => {
@@ -180,6 +200,12 @@ class Batch {
   }
 }
 
+class Transaction extends Batch {
+  get(ref: DocRef) {
+    return ref.get();
+  }
+}
+
 export class FakeFirestore {
   constructor(public data: DocData = {}) {}
 
@@ -208,6 +234,12 @@ export class FakeFirestore {
   }
 
   batch() {
-    return new Batch(this);
+    return new Batch();
+  }
+
+  async runTransaction(f: (t: Transaction) => Promise<void>) {
+    const t = new Transaction();
+    await f(t);
+    t.commit();
   }
 }
