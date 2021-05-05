@@ -31,6 +31,12 @@ describe('fake-firestore', () => {
     expect(f.doc('users/bbb/followers/BBB').get().data()).toBeUndefined();
   });
 
+  it('doc.create', () => {
+    const f = new FakeFirestore();
+    f.doc('users/aaa').create({ name: 'test' });
+    expect(f.data.users.aaa).toStrictEqual({ name: 'test' });
+  });
+
   it('doc.delete', () => {
     const f = new FakeFirestore({
       users: {

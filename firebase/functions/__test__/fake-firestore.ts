@@ -1,3 +1,7 @@
+interface SetOptions {
+  merge: boolean;
+}
+
 const getPathTree = (ref: DocRef) => {
   const tree = [ref.id, ref.parent.id];
   while (ref.parent.parent) {
@@ -18,7 +22,27 @@ class DocRef {
     return new DocSnapshot(this.firestore, this);
   }
 
-  set(data: any, options?: { merge: boolean }) {}
+  set(data: any, options?: { merge: boolean }) {
+    const tree = getPathTree(this);
+    tree.pop();
+    let d = this.firestore.data;
+    for (const p of tree) {
+      if (!d[p]) {
+        d[p] = {};
+      }
+      d = d[p];
+    }
+    if (options?.merge) {
+      const cur = d[this.id];
+      if (cur) {
+        d[this.id] = { ...cur, data };
+      } else {
+        d[this.id] = { ...data };
+      }
+    } else {
+      d[this.id] = { ...data };
+    }
+  }
 
   create(data: any) {
     if (this.get().exists) {
@@ -27,9 +51,9 @@ class DocRef {
     this.set(data);
   }
 
-  update(data: any, options?: { merge: boolean }) {
+  update(data: any) {
     if (this.get().exists) {
-      this.set(data, options);
+      this.set(data, { merge: true });
     }
   }
 
@@ -72,6 +96,24 @@ class DocSnapshot {
 class Batch {
   private updators = [] as (() => void)[];
   constructor(firestore: FakeFirestore) {}
+
+  set(ref: DocRef, data: any, options?: SetOptions) {
+    this.updators.push(() => {
+      ref.set(data, options);
+    });
+  }
+
+  create(ref: DocRef, data: any) {
+    this.updators.push(() => {
+      ref.create(data);
+    });
+  }
+
+  update(ref: DocRef, data: any) {
+    this.updators.push(() => {
+      ref.update(data);
+    });
+  }
 
   delete(ref: DocRef) {
     this.updators.push(() => {
