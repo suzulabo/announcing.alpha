@@ -13,8 +13,8 @@
     "build": "npm run copy-shared && tsc -p tsconfig.build.json",
     "tsc.watch": "tsc -w -p tsconfig.build.json",
     "build.watch": "run-p copy-shared.watch tsc.watch",
-    "test": "jest",
-    "test.watch": "jest --watch",
+    "test": "FIREBASE_CONFIG={} jest",
+    "test.watch": "FIREBASE_CONFIG={} jest --watch",
     "copy-shared": "node copy-shared.js",
     "copy-shared.watch": "npm-watch copy-shared",
     "logs": "firebase functions:log"
