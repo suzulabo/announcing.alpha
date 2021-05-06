@@ -5,7 +5,6 @@ import { TimedNotification, TimedNotificationArchive } from '../utils/datatypes'
 import { incString } from '../utils/incstring';
 import { logger } from '../utils/logger';
 
-const SHOULD_ARCHIVE_COUNT = 5000;
 const SHOULD_ARCHIVE_SIZE = 1024 * 1024 * 0.8;
 
 const getFollowsSize = (data: TimedNotification['followers'][string]) => {
@@ -25,12 +24,18 @@ const getFollowersSize = (data: TimedNotification['followers']) => {
 };
 
 const shouldArchive = (data: TimedNotification) => {
-  const followersCount = data.followers ? Object.keys(data.followers).length : 0;
-  const unfollowersCount = data.unfollows ? data.unfollows.length : 0;
-  return (
-    followersCount + unfollowersCount > SHOULD_ARCHIVE_COUNT ||
-    getFollowersSize(data.followers) + unfollowersCount * 170 > SHOULD_ARCHIVE_SIZE
-  );
+  const followersSize = getFollowersSize(data.followers);
+  const unfollowersSize = data.unfollows
+    ? data.unfollows.reduce((a, v) => {
+        return a + v.length;
+      }, 0)
+    : 0;
+  if (followersSize + unfollowersSize > SHOULD_ARCHIVE_SIZE) {
+    logger.debug('shouldArchive', { followersSize, unfollowersSize });
+    return true;
+  }
+
+  return false;
 };
 
 const archiveTimedNotification = async (firestore: admin.firestore.Firestore, time: number) => {
@@ -83,10 +88,7 @@ const archiveTimedNotification = async (firestore: admin.firestore.Firestore, ti
         const [token, v] = archiveFollowers.shift()!;
         dataFollowers.push([token, v]);
         dataSize += token.length + 1 + getFollowsSize(v);
-        const doArchive =
-          dataFollowers.length > SHOULD_ARCHIVE_COUNT ||
-          dataSize > SHOULD_ARCHIVE_SIZE ||
-          archiveFollowers.length == 0;
+        const doArchive = dataSize > SHOULD_ARCHIVE_SIZE || archiveFollowers.length == 0;
         if (!doArchive) {
           continue;
         }
