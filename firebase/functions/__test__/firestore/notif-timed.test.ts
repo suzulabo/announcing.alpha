@@ -57,5 +57,30 @@ describe('firestoreTimedNotificationWrite', () => {
     const archives2 = firestore.doc('notif-timed/0000/archives/2').get().data()!;
     const archivesFollowers = { ...archives1.followers, ...archives2.followers };
     expect(archivesFollowers).toEqual(followers);
+
+    // test unfollow
+    const followers2 = Object.fromEntries(
+      [...Array(3000)].map((_, i) => {
+        return [`token${5000 + i}-${tokenSuffix}`, ['ja', { '111111111112': [] }]];
+      }),
+    );
+    const unfollows = Object.keys(followers);
+    firestore.doc('notif-timed/0000').update({ followers: followers2, unfollows });
+
+    await firestoreTimedNotificationWrite(
+      { after: firestore.doc('notif-timed/0000').get() } as any,
+      {} as any,
+      firestore.adminApp(),
+    );
+
+    expect(firestore.doc('notif-timed/0000').get().data()).toEqual({
+      time: 0,
+      archives: ['1'],
+      uT: expect.any(Date),
+    });
+    expect(firestore.doc('notif-timed/0000/archives/1').get().data()).toEqual({
+      followers: followers2,
+    });
+    expect(firestore.doc('notif-timed/0000/archives/2').get().exists).toEqual(false);
   });
 });
