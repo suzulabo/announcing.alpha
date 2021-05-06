@@ -57,8 +57,8 @@ describe('firestoreImmediateNotificationWrite', () => {
       uT: expect.any(Date),
     });
 
-    const archives1 = firestore.doc('notif-imm/111111111111/archives/1').get().data();
-    expect(Object.keys(archives1!.followers)).toEqual(Object.keys(followers));
+    const archives1 = firestore.doc('notif-imm/111111111111/archives/1').get().data()!;
+    expect(archives1.followers).toEqual(followers);
   });
 
   it('unfollows', async () => {
