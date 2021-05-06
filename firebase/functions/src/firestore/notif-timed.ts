@@ -1,13 +1,16 @@
 import admin from 'firebase-admin';
 import { Change, EventContext } from 'firebase-functions';
 import { DocumentSnapshot } from 'firebase-functions/lib/providers/firestore';
+import { Lang } from 'src/shared';
 import { TimedNotification, TimedNotificationArchive } from '../utils/datatypes';
 import { incString } from '../utils/incstring';
 import { logger } from '../utils/logger';
 
 const SHOULD_ARCHIVE_SIZE = 1024 * 1024 * 0.8;
 
-const getFollowsSize = (data: TimedNotification['followers'][string]) => {
+const getFollowsSize = (
+  data: [lang: Lang, follows: { [announceID: string]: [hoursBefore?: number] }],
+) => {
   const [, follows] = data;
   if (!follows) {
     return 3;
@@ -17,6 +20,9 @@ const getFollowsSize = (data: TimedNotification['followers'][string]) => {
 };
 
 const getFollowersSize = (data: TimedNotification['followers']) => {
+  if (!data) {
+    return 0;
+  }
   return Object.entries(data).reduce((n, a) => {
     const [token, v] = a;
     return n + token.length + 1 + getFollowsSize(v);

@@ -23,7 +23,7 @@ export interface ImmediateNotificationArchive {
 
 export interface TimedNotification {
   time: number;
-  followers: {
+  followers?: {
     [token: string]: [lang: Lang, follows: { [announceID: string]: [hoursBefore?: number] }];
   };
   unfollows?: string[];
