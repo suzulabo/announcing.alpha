@@ -10,6 +10,7 @@
     }
   },
   "scripts": {
+    "clean": "rm -rf lib && rm -rf src/shared*",
     "build": "npm run copy-shared && tsc -p tsconfig.build.json",
     "tsc.watch": "tsc -w -p tsconfig.build.json",
     "build.watch": "run-p copy-shared.watch tsc.watch",
