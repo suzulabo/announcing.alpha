@@ -2,10 +2,13 @@
   "name": "announcing-firebase",
   "private": true,
   "scripts": {
-    "func.build": "npm --prefix ./functions run build",
-    "func.build.watch": "npm --prefix ./functions run build.watch",
+    "build:func": "npm --prefix ./functions run build",
+    "build:func:watch": "npm --prefix ./functions run build:watch",
+    "build:console": "rm -rf console && npm --prefix ../console run build && cp -a ../console/www console",
+    "build:client": "rm -rf client && npm --prefix ../client run build && cp -a ../client/www client",
+    "build": "run-s build:*",
     "serve": "firebase emulators:start --import=./emu-data --export-on-exit",
-    "start": "run-p func.build.watch serve",
+    "start": "run-p build:func:watch serve",
     "deploy": "firebase deploy"
   },
   "devDependencies": {

@@ -8,7 +8,6 @@ export interface AppEnvironment {
     readonly storageBucket: string;
     readonly messagingSenderId: string;
     readonly appId: string;
-    readonly measurementId: string;
   };
   readonly functionsRegion: string;
   readonly vapidKey: string;
