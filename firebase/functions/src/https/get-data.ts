@@ -5,7 +5,7 @@ import { AnnounceMeta, Post } from '../shared';
 const cacheControl = 'public, max-age=31556952, s-maxage=86400, immutable';
 const announceMetaPattern = new RegExp('^/announce/([a-zA-Z0-9]{12})/meta/([a-zA-Z0-9]{8})$');
 const announcePostPattern = new RegExp('^/announce/([a-zA-Z0-9]{12})/post/([-a-zA-Z0-9]{10,20})$');
-const imagePattern = new RegExp('^/image/([a-zA-Z0-9]{20,25})$');
+const imagePattern = new RegExp('^/image/([a-zA-Z0-9]{15,25})$');
 
 export const httpsGetAnnounceMetaData = async (
   req: Request,
