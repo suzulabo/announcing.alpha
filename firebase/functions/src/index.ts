@@ -20,7 +20,6 @@ import {
   httpsGetImageData,
 } from './https/get-data';
 import { pubsubSendNotification } from './pubsub/send-notification';
-//import { pubsubHourly } from './notification/send-hourly';
 import { AppEnv } from './shared';
 import { logger } from './utils/logger';
 
@@ -105,10 +104,6 @@ export const onPubsubSendNotification = region.pubsub
     await pubsubSendNotification(msg, context, adminApp);
     return 0;
   });
-
-export const onPubsubHourly = region.pubsub.schedule(`0 0 0 * *`).onRun(async context => {
-  //  await pubsubHourly(new Date().getUTCHours(), context, adminApp);
-});
 
 /*
 // for functions:shell
