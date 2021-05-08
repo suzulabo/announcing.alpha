@@ -10,7 +10,7 @@ const getImmediateNotificationFollowers = async (
   firestore: admin.firestore.Firestore,
   announceID: string,
 ) => {
-  const immediateRef = firestore.doc(`notification-immediate/${announceID}`);
+  const immediateRef = firestore.doc(`notif-imm/${announceID}`);
   const immediate = (await immediateRef.get()).data() as ImmediateNotification;
   if (!immediate) {
     return;
