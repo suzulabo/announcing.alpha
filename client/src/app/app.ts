@@ -1,5 +1,5 @@
 import { Build } from '@stencil/core';
-import { Announce, AnnounceMetaJSON, PostJSON } from 'src/shared';
+import { Announce, AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
 import { AnnounceState, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
@@ -19,6 +19,7 @@ export class App {
   private apiSite: string;
 
   constructor(
+    appEnv: AppEnv,
     private appMsg: AppMsg,
     private appFirebase: AppFirebase,
     private appState: AppState,
@@ -27,7 +28,7 @@ export class App {
     if (Build.isDev) {
       this.apiSite = `http://${location.hostname}:5000`;
     } else {
-      this.apiSite = location.origin.replace('client', 'api');
+      this.apiSite = appEnv.env.sites.api;
     }
   }
 

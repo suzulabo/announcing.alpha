@@ -1,7 +1,7 @@
 import _cors from 'cors';
 import { initializeApp } from 'firebase-admin';
 import * as functions from 'firebase-functions';
-import { config, Request, Response } from 'firebase-functions';
+import { Request, Response } from 'firebase-functions';
 import 'firebase-functions/lib/logger/compat';
 import { callCreateAnnounce } from './call/create-announce';
 import { callDeleteAnnounce } from './call/delete-announce';
@@ -23,9 +23,11 @@ import { pubsubSendNotification } from './pubsub/send-notification';
 import { AppEnv } from './shared';
 import { logger } from './utils/logger';
 
+const isEmu = process.env.FUNCTIONS_EMULATOR != null;
+
 const adminApp = initializeApp();
 const appEnv = new AppEnv().env;
-const cors = _cors({ origin: config().cors.origin });
+const cors = _cors({ origin: isEmu ? '*' : appEnv.sites.client });
 
 const region = functions.region(appEnv.functionsRegion);
 

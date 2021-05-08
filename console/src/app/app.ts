@@ -1,5 +1,5 @@
 import { Build } from '@stencil/core';
-import { Announce } from 'src/shared';
+import { Announce, AppEnv } from 'src/shared';
 import { AnnounceState } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
@@ -16,6 +16,7 @@ export class App {
   readonly clientSite: string;
 
   constructor(
+    appEnv: AppEnv,
     private appMsg: AppMsg,
     private appFirebase: AppFirebase,
     private appState: AppState,
@@ -23,7 +24,7 @@ export class App {
     if (Build.isDev) {
       this.clientSite = `http://${location.hostname}:3371`;
     } else {
-      this.clientSite = location.origin.replace('console', 'client');
+      this.clientSite = appEnv.env.sites.client;
     }
   }
 

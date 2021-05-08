@@ -12,6 +12,11 @@ export interface AppEnvironment {
   readonly functionsRegion: string;
   readonly vapidKey: string;
   readonly contact: string;
+  sites: {
+    console: string;
+    client: string;
+    api: string;
+  };
 }
 
 export class AppEnv {
