@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "build:func": "npm --prefix ./functions run build",
-    "build:func:watch": "npm --prefix ./functions run build:watch",
+    "build:func:watch": "npm --prefix ./functions run build.watch",
     "build:console": "rm -rf console && npm --prefix ../console run build && cp -a ../console/www console",
     "build:client": "rm -rf client && npm --prefix ../client run build && cp -a ../client/www client",
     "build": "run-s build:*",
