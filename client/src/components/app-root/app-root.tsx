@@ -33,9 +33,6 @@ export class AppRoot {
     }
 
     const p = location.pathname;
-    if (this.path && this.path != p) {
-      this.app.storeBeforeRoute(this.path);
-    }
     this.path = p;
   }
 

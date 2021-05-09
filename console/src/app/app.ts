@@ -36,11 +36,6 @@ export class App {
     document.title = v;
   }
 
-  storeBeforeRoute(p: string) {
-    const state = history.state || {};
-    history.replaceState({ ...state, beforeRoute: p }, null);
-  }
-
   href(p: string, back?: boolean) {
     return {
       href: p,
@@ -73,7 +68,7 @@ export class App {
     if (back && history.state?.beforeRoute == url.pathname) {
       history.back();
     } else {
-      history.pushState(null, null, url.pathname);
+      history.pushState({ beforeRoute: location.pathname }, null, url.pathname);
       window.dispatchEvent(new PopStateEvent('popstate'));
     }
   }
