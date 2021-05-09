@@ -36,17 +36,43 @@ export const pubsubSendNotification = async (
   context: EventContext,
   adminApp: admin.app.App,
 ) => {
-  logger.debug('pubsubSendNotification', msg.json);
+  const handleResponse = async (bs: admin.messaging.BatchResponse, tokens: string[]) => {
+    if (bs.failureCount == 0) {
+      return;
+    }
+
+    const firestore = adminApp.firestore();
+    const batch = firestore.batch();
+    let update = false;
+    bs.responses.forEach((res, i) => {
+      if (res.success) {
+        return;
+      }
+
+      const token = tokens[i];
+      const err = res.error!;
+      logger.warn('send error', { ...err, token });
+      if (err.code == 'messaging/registration-token-not-registered') {
+        batch.delete(firestore.doc(`notif-devices/${token}`));
+        update = true;
+      }
+    });
+    if (update) {
+      try {
+        await batch.commit();
+      } catch (err) {
+        logger.error('update error', err);
+      }
+    }
+  };
+
   const messaging = adminApp.messaging();
   {
     const mmsg = msg.json.mmsg as admin.messaging.MulticastMessage;
     if (mmsg) {
       logger.debug('sendMulticast', mmsg);
-      const result = await messaging.sendMulticast(mmsg);
-      if (result.failureCount > 0) {
-        logger.warn('send error', result);
-        // TODO
-      }
+      const res = await messaging.sendMulticast(mmsg);
+      await handleResponse(res, mmsg.tokens);
       return;
     }
   }
@@ -54,13 +80,15 @@ export const pubsubSendNotification = async (
     const tmsgs = msg.json.tmsgs as admin.messaging.TokenMessage[];
     if (tmsgs) {
       logger.debug('sendAll', tmsgs);
-      const result = await messaging.sendAll(tmsgs);
-      if (result.failureCount > 0) {
-        logger.warn('send error', result);
-        // TODO
-      }
+      const res = await messaging.sendAll(tmsgs);
+      await handleResponse(
+        res,
+        tmsgs.map(v => {
+          return v.token;
+        }),
+      );
       return;
     }
   }
-  logger.warn('no msgs');
+  logger.warn('no msgs', msg.json);
 };
