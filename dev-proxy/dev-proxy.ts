@@ -1,6 +1,7 @@
 import * as http from 'http';
 import { createProxyServer } from 'http-proxy';
-import Server = require('http-proxy');
+
+type ProxyServer = ReturnType<typeof createProxyServer>;
 
 const logging = (s: string, all?: boolean) => {
   const now = new Date();
@@ -16,7 +17,7 @@ interface ProxyConfig {
   proxy: number | ((req: http.IncomingMessage, res: http.ServerResponse) => void);
 }
 
-const proxyServerMap = new Map<number, Server>();
+const proxyServerMap = new Map<number, ProxyServer>();
 
 const getProxyServer = (port: number) => {
   if (proxyServerMap.has(port)) {
