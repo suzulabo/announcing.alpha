@@ -8,28 +8,6 @@
   },
   "hosting": [
     {
-      "target": "console",
-      "public": "console",
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "rewrites": [
-        {
-          "source": "**",
-          "destination": "/index.html"
-        }
-      ],
-      "headers": [
-        {
-          "source": "/build/p-*",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "max-age=31556952, s-maxage=31556952, immutable"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "target": "client",
       "public": "client",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
@@ -62,23 +40,41 @@
           ]
         }
       ]
+    },
+    {
+      "target": "console",
+      "public": "console",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "/build/p-*",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31556952, s-maxage=31556952, immutable"
+            }
+          ]
+        }
+      ]
     }
   ],
   "emulators": {
     "auth": {
-      "host": "0.0.0.0",
       "port": 9099
     },
     "functions": {
-      "host": "0.0.0.0",
       "port": 5001
     },
     "firestore": {
-      "host": "0.0.0.0",
       "port": 8080
     },
     "hosting": {
-      "host": "0.0.0.0",
       "port": 5000
     },
     "pubsub": {

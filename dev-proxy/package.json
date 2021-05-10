@@ -1,0 +1,13 @@
+{
+  "name": "dev-proxy",
+  "private": true,
+  "scripts": {
+    "start": "ts-node dev-proxy.ts"
+  },
+  "devDependencies": {
+    "@types/http-proxy": "^1.17.4",
+    "http-proxy": "^1.18.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.3"
+  }
+}

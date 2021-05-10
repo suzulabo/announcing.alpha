@@ -25,7 +25,7 @@ export class App {
     private appStorage: AppStorage,
   ) {
     if (Build.isDev) {
-      this.dataURLPrefix = `http://${location.hostname}:5005/data`;
+      this.dataURLPrefix = `${location.origin}/data`;
     } else {
       this.dataURLPrefix = '/data';
     }

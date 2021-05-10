@@ -31,8 +31,8 @@ export class AppFirebase {
       return;
     }
     console.log('useEmulator');
-    this.functions.useEmulator(location.hostname, 5001);
-    this.firestore.settings({ ssl: false, host: `${location.hostname}:8080` });
+    this.functions.useEmulator(location.hostname, parseInt(location.port));
+    this.firestore.settings({ ssl: false, host: `${location.host}` });
   }
 
   async init() {
