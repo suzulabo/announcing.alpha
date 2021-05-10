@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import { Request, Response } from 'firebase-functions';
 import { AnnounceMeta, Post } from '../shared';
+import { Cache } from '../utils/cache';
 
 const cacheControl = 'public, max-age=31556952, s-maxage=86400, immutable';
 const announceMetaPattern = new RegExp('^/data/announces/([a-zA-Z0-9]{12})/meta/([a-zA-Z0-9]{8})$');
@@ -8,6 +9,22 @@ const announcePostPattern = new RegExp(
   '^/data/announces/([a-zA-Z0-9]{12})/posts/([-a-zA-Z0-9]{10,20})$',
 );
 const imagePattern = new RegExp('^/data/images/([a-zA-Z0-9]{15,25})$');
+
+const cache = new Cache();
+
+const getCacheFirst = async <T extends Object>(docRef: admin.firestore.DocumentReference) => {
+  const v = cache.get(docRef.path)!;
+  if (v) {
+    return v as T;
+  }
+
+  const data = (await docRef.get()).data();
+  if (!data) {
+    return;
+  }
+  cache.set(docRef.path, data);
+  return data as T;
+};
 
 export const httpsGetAnnounceMetaData = async (
   req: Request,
@@ -23,7 +40,7 @@ export const httpsGetAnnounceMetaData = async (
 
   const firestore = admin.firestore();
   const docRef = firestore.doc(`announces/${id}/meta/${metaID}`);
-  const data = (await docRef.get()).data() as AnnounceMeta;
+  const data = await getCacheFirst<AnnounceMeta>(docRef);
   if (!data) {
     res.sendStatus(404);
     return;
@@ -47,7 +64,7 @@ export const httpsGetAnnouncePostData = async (
 
   const firestore = admin.firestore();
   const docRef = firestore.doc(`announces/${id}/posts/${postID}`);
-  const data = (await docRef.get()).data() as Post;
+  const data = await getCacheFirst<Post>(docRef);
   if (!data) {
     res.sendStatus(404);
     return;
@@ -68,7 +85,7 @@ export const httpsGetImageData = async (req: Request, res: Response, adminApp: a
 
   const firestore = admin.firestore();
   const docRef = firestore.doc(`images/${id}`);
-  const data = (await docRef.get()).data() as { data: Buffer };
+  const data = await getCacheFirst<{ data: Buffer }>(docRef);
   if (!data) {
     res.sendStatus(404);
     return;

@@ -1,5 +1,6 @@
-type Miss = {};
-export const MISS: Miss = {};
+export class Miss {
+  constructor(readonly created: number = Date.now()) {}
+}
 
 export class Cache<T extends object> {
   constructor(private m = new Map<string, WeakRef<T | Miss>>()) {}
