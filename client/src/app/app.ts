@@ -1,5 +1,5 @@
 import { Build } from '@stencil/core';
-import { Announce, AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
+import { Announce, AnnounceMetaJSON, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
 import { AnnounceState, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
@@ -16,19 +16,18 @@ const BUILD_INFO = {
 export class App {
   readonly buildInfo = BUILD_INFO;
 
-  private apiSite: string;
+  private dataURLPrefix: string;
 
   constructor(
-    appEnv: AppEnv,
     private appMsg: AppMsg,
     private appFirebase: AppFirebase,
     private appState: AppState,
     private appStorage: AppStorage,
   ) {
     if (Build.isDev) {
-      this.apiSite = `http://${location.hostname}:5000`;
+      this.dataURLPrefix = `http://${location.hostname}:5005/data`;
     } else {
-      this.apiSite = appEnv.env.sites.api;
+      this.dataURLPrefix = '/data';
     }
   }
 
@@ -115,21 +114,21 @@ export class App {
     return this.appState.state.announces.get(id);
   }
 
-  private async fetchApi<T>(p: string) {
-    const res = await fetch(`${this.apiSite}/${p}`);
+  private async fetchData<T>(p: string) {
+    const res = await fetch(`${this.dataURLPrefix}/${p}`);
     return (await res.json()) as T;
   }
 
   fetchAnnounceMeta(id: string, metaID: string) {
-    return this.fetchApi<AnnounceMetaJSON>(`announce/${id}/meta/${metaID}`);
+    return this.fetchData<AnnounceMetaJSON>(`announces/${id}/meta/${metaID}`);
   }
 
   fetchPost(id: string, postID: string) {
-    return this.fetchApi<PostJSON>(`announce/${id}/post/${postID}`);
+    return this.fetchData<PostJSON>(`announces/${id}/posts/${postID}`);
   }
 
   getImageURI(id: string) {
-    return `${this.apiSite}/image/${id}`;
+    return `${this.dataURLPrefix}/images/${id}`;
   }
 
   getFollows() {

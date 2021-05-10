@@ -8,24 +8,6 @@
   },
   "hosting": [
     {
-      "target": "api",
-      "public": "api",
-      "rewrites": [
-        {
-          "regex": "^/announce/[a-zA-Z0-9]{12}/meta/[a-zA-Z0-9]{8}$",
-          "function": "getAnnounceMetaData"
-        },
-        {
-          "regex": "^/announce/[a-zA-Z0-9]{12}/post/[-a-zA-Z0-9]{10,20}$",
-          "function": "getAnnouncePostData"
-        },
-        {
-          "regex": "^/image/[a-zA-Z0-9]{15,25}$",
-          "function": "getImageData"
-        }
-      ]
-    },
-    {
       "target": "console",
       "public": "console",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
@@ -33,6 +15,17 @@
         {
           "source": "**",
           "destination": "/index.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "/build/p-*",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31556952, s-maxage=31556952, immutable"
+            }
+          ]
         }
       ]
     },
@@ -42,8 +35,31 @@
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
+          "regex": "^/data/announces/[a-zA-Z0-9]{12}/meta/[a-zA-Z0-9]{8}$",
+          "function": "getAnnounceMetaData"
+        },
+        {
+          "regex": "^/data/announces/[a-zA-Z0-9]{12}/posts/[-a-zA-Z0-9]{10,20}$",
+          "function": "getAnnouncePostData"
+        },
+        {
+          "regex": "^/data/images/[a-zA-Z0-9]{15,25}$",
+          "function": "getImageData"
+        },
+        {
           "source": "**",
           "destination": "/index.html"
+        }
+      ],
+      "headers": [
+        {
+          "source": "/build/p-*",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "max-age=31556952, s-maxage=31556952, immutable"
+            }
+          ]
         }
       ]
     }

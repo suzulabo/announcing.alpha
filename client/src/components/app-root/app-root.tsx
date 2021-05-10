@@ -48,7 +48,7 @@ export class AppRoot {
       const appFirebase = new AppFirebase(appEnv);
       const appState = new AppState();
       const appStorage = new AppStorage();
-      this.app = new App(appEnv, appMsg, appFirebase, appState, appStorage);
+      this.app = new App(appMsg, appFirebase, appState, appStorage);
       await this.app.init();
       this.handlePopState();
     } finally {
