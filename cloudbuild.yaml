@@ -6,7 +6,7 @@ steps:
       - -c
       - >-
         gcloud secrets versions access latest
-        --secret=app-env-ts > shared/src/global/app.env.ts
+        --secret=app-env-ts > shared/src/appenv.env.ts
 
   - id: 'write .firebaserc'
     name: gcr.io/cloud-builders/gcloud
