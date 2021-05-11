@@ -14,7 +14,7 @@ steps:
     args:
       - -c
       - >-
-        echo `${_FIREBASERC}` > firebase/.firebaserc
+        echo ${_FIREBASERC} > firebase/.firebaserc
 
   - name: bash
     args: ['cat', 'firebase/.firebaserc', 'shared/src/appenv.env.ts']
