@@ -1,11 +1,11 @@
 steps:
   - id: 'write appenv'
     name: bash
-    args: ['-c', "echo '''${_APPENV_TS}''' > shared/src/appenv.env.ts"]
+    args: ['-c', 'echo "${_APPENV_TS}" > shared/src/appenv.env.ts']
 
   - id: 'write firebaserc'
     name: bash
-    args: ['-c', "echo '''${_FIREBASERC}''' > firebase/.firebaserc"]
+    args: ['-c', "echo '${_FIREBASERC}' > firebase/.firebaserc"]
 
   - id: 'check output'
     name: bash
