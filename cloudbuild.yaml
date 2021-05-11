@@ -8,6 +8,17 @@ steps:
         gcloud secrets versions access latest
         --secret=app-env-ts > shared/src/appenv.env.ts
 
+  - id: 'write firebaserc'
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: 'bash'
+    args:
+      - -c
+      - >-
+        echo `${_FIREBASERC}` > firebase/.firebaserc
+
+  - name: bash
+    args: ['cat', 'firebase/.firebaserc', 'shared/src/appenv.env.ts']
+
   - id: 'install firebase packages'
     name: node:14
     entrypoint: npm
@@ -45,4 +56,4 @@ steps:
     name: node:14
     entrypoint: npm
     dir: firebase
-    args: ['run', 'deploy', '--', '--project=$PROJECT_ID']
+    args: ['run', 'deploy']
