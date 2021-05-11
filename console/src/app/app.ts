@@ -22,7 +22,7 @@ export class App {
     private appState: AppState,
   ) {
     if (Build.isDev) {
-      this.clientSite = `http://${location.hostname}:3371`;
+      this.clientSite = `http://${location.hostname}:${parseInt(location.port) + 1}`;
     } else {
       this.clientSite = appEnv.env.sites.client;
     }
