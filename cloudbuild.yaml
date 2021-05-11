@@ -1,22 +1,14 @@
 steps:
-  - id: 'load app env'
-    name: gcr.io/cloud-builders/gcloud
-    entrypoint: 'bash'
-    args:
-      - -c
-      - >-
-        gcloud secrets versions access latest
-        --secret=app-env-ts > shared/src/appenv.env.ts
+  - id: 'write appenv'
+    name: bash
+    args: ['-c', "echo '''${_APPENV_TS}''' > shared/src/appenv.env.ts"]
 
   - id: 'write firebaserc'
-    name: gcr.io/cloud-builders/gcloud
-    entrypoint: 'bash'
-    args:
-      - -c
-      - >-
-        echo '${_FIREBASERC}' > firebase/.firebaserc
+    name: bash
+    args: ['-c', "echo '''${_FIREBASERC}''' > firebase/.firebaserc"]
 
-  - name: bash
+  - id: 'check output'
+    name: bash
     args: ['cat', 'firebase/.firebaserc', 'shared/src/appenv.env.ts']
 
   - id: 'install firebase packages'
