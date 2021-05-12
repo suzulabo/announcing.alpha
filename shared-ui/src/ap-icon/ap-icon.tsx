@@ -6,10 +6,12 @@ import google from 'bootstrap-icons/icons/google.svg';
 import image from 'bootstrap-icons/icons/image.svg';
 import square from 'bootstrap-icons/icons/square.svg';
 import trash from 'bootstrap-icons/icons/trash.svg';
+import twitter from 'bootstrap-icons/icons/twitter.svg';
 
 const svgMap = {
   github,
   google,
+  twitter,
   image,
   trash,
   dizzy,
@@ -23,7 +25,7 @@ const svgMap = {
 })
 export class ApIcon {
   @Prop()
-  icon: 'github' | 'google' | 'image' | 'trash' | 'dizzy' | 'square' | 'squareChecked';
+  icon: 'github' | 'google' | 'twitter' | 'image' | 'trash' | 'dizzy' | 'square' | 'squareChecked';
 
   render() {
     return <img src={svgMap[this.icon]} />;

@@ -29,6 +29,7 @@ export const msgs = {
   signIn: {
     pageTitle: `ログイン - ${titleSuffix}`,
     googleBtn: 'Googleでログイン',
+    twitterBtn: 'Twitterでログイン',
     keepSignedIn: 'ログイン状態を保存',
   },
   home: {

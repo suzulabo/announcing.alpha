@@ -16,6 +16,10 @@ export class AppSignIn {
     return this.app.signInGoogle(this.keepSignedIn);
   };
 
+  private handleTwitterClick = () => {
+    return this.app.signInTwitter(this.keepSignedIn);
+  };
+
   private handleKeepSignedIn = () => {
     this.keepSignedIn = !this.keepSignedIn;
   };
@@ -28,6 +32,10 @@ export class AppSignIn {
         <button onClick={this.handleGoogleClick}>
           <ap-icon icon="google"></ap-icon>
           {msgs.signIn.googleBtn}
+        </button>
+        <button onClick={this.handleTwitterClick}>
+          <ap-icon icon="twitter"></ap-icon>
+          {msgs.signIn.twitterBtn}
         </button>
         <ap-checkbox
           label={msgs.signIn.keepSignedIn}

@@ -106,6 +106,17 @@ export class AppFirebase {
     await this.auth.signInWithRedirect(provider);
   }
 
+  async signInTwitter(keep: boolean) {
+    await this.auth.setPersistence(keep ? 'local' : 'session');
+
+    const provider = new firebase.auth.TwitterAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account',
+    });
+
+    await this.auth.signInWithRedirect(provider);
+  }
+
   async signOut() {
     await this.auth.signOut();
   }

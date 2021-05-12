@@ -97,6 +97,10 @@ export class App {
     return this.appFirebase.signInGoogle(keep);
   }
 
+  signInTwitter(keep: boolean) {
+    return this.appFirebase.signInTwitter(keep);
+  }
+
   createAnnounce(name: string, desc: string) {
     return this.appFirebase.callCreateAnnounce({ name, desc });
   }
