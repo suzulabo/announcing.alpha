@@ -24,7 +24,11 @@ export class ApTextView {
 
     return (
       <Host>
-        {this.post.imgData && <img src={post.imgData} />}
+        {this.post.imgData && (
+          <a href={post.imgData}>
+            <img src={post.imgData} />
+          </a>
+        )}
         <span class="date">{this.msgs.datetime(post.pT)}</span>
         {post.title && <span class="title">{post.title}</span>}
         {post.body && <ap-textview class="body" text={post.body} />}
