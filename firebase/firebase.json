@@ -31,11 +31,29 @@
       ],
       "headers": [
         {
+          "source": "**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=600"
+            }
+          ]
+        },
+        {
+          "source": "/build/@(app.esm.js|app.js)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=30"
+            }
+          ]
+        },
+        {
           "source": "/build/p-*",
           "headers": [
             {
               "key": "Cache-Control",
-              "value": "max-age=31556952, s-maxage=31556952, immutable"
+              "value": "public, max-age=31556952, immutable"
             }
           ]
         }
@@ -53,11 +71,29 @@
       ],
       "headers": [
         {
+          "source": "**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=600"
+            }
+          ]
+        },
+        {
+          "source": "/build/@(app.esm.js|app.js)",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=30"
+            }
+          ]
+        },
+        {
           "source": "/build/p-*",
           "headers": [
             {
               "key": "Cache-Control",
-              "value": "max-age=31556952, s-maxage=31556952, immutable"
+              "value": "public, max-age=31556952, immutable"
             }
           ]
         }
