@@ -120,20 +120,36 @@ export class AppFirebase {
     return token;
   }
 
-  async checkNotifyPermission() {
+  async checkNotifyPermission(ask: boolean) {
     if (!this.messaging) {
       return 'unsupported';
     }
+
+    if (Notification == null || Notification.permission == null) {
+      return 'unsupported';
+    }
+
+    const permission = Notification.permission;
+    switch (permission) {
+      case 'granted':
+      case 'denied':
+        return permission;
+      case 'default':
+        if (!ask) {
+          return permission;
+        }
+    }
+
     try {
       const token = await this.messageToken();
       if (token) {
-        return 'allow';
+        return 'granted';
       } else {
-        return 'deny';
+        return 'denied';
       }
     } catch (err) {
       if (err.code == 'messaging/permission-blocked') {
-        return 'deny';
+        return 'denied';
       }
       throw err;
     }

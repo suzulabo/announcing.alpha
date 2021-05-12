@@ -47,7 +47,7 @@ export class AppAnnounceConfig {
 
       this.values = { enable: !!this.notification, hours: this.notification?.hours || [] };
 
-      this.permission = await this.app.checkNotifyPermission();
+      this.permission = await this.app.checkNotifyPermission(true);
     } finally {
       this.app.loading = false;
     }
@@ -165,7 +165,7 @@ export class AppAnnounceConfig {
       if (this.permission == 'unsupported') {
         return this.renderUnsupported();
       }
-      if (this.permission == 'deny') {
+      if (this.permission != 'granted') {
         return this.renderDenied();
       }
 

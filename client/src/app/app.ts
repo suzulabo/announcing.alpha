@@ -33,6 +33,16 @@ export class App {
 
   async init() {
     await this.appFirebase.init();
+
+    // Check permission of notification
+    // if not granted, clear local settings. Server settings will delete automatically.
+    const permission = await this.appFirebase.checkNotifyPermission(false);
+    if (permission != 'granted') {
+      const ids = await this.appStorage.notifications.keys();
+      for (const id of ids) {
+        await this.appStorage.notifications.remove(id);
+      }
+    }
   }
 
   setTitle(v: string) {
@@ -154,9 +164,7 @@ export class App {
   }
 
   async deleteFollow(id: string) {
-    if ((await this.appFirebase.checkNotifyPermission()) == 'allow') {
-      await this.setNotify(id, false);
-    }
+    await this.setNotify(id, false);
     await this.appStorage.follows.remove(id);
   }
 
@@ -164,11 +172,19 @@ export class App {
     return this.appStorage.notifications.get(id);
   }
 
-  async checkNotifyPermission() {
-    return this.appFirebase.checkNotifyPermission();
+  async checkNotifyPermission(ask: boolean) {
+    return this.appFirebase.checkNotifyPermission(ask);
   }
 
   async setNotify(announceID: string, enable: boolean, hours?: number[]) {
+    if (!enable) {
+      const permission = await this.appFirebase.checkNotifyPermission(false);
+      if (permission != 'granted') {
+        await this.appStorage.notifications.remove(announceID);
+        return;
+      }
+    }
+
     const follows = {} as { [id: string]: { hours?: number[] } };
 
     const notifications = await this.appStorage.notifications.entries();
