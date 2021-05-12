@@ -12,7 +12,6 @@ const getCache = async <T>(docRef: firebase.firestore.DocumentReference): Promis
     try {
       const doc = await docRef.get({ source: 'cache' });
       if (doc.exists) {
-        console.debug('hit cache:', docRef.path);
         return doc.data() as T;
       }
     } catch {}

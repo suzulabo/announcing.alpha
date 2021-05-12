@@ -27,7 +27,6 @@ const getCacheFirst = async <T>(
     try {
       const doc = await docRef.get({ source: 'cache' });
       if (doc.exists) {
-        console.debug('hit cache:', docRef.path);
         return doc.data() as T;
       }
     } catch {}
@@ -226,7 +225,6 @@ export class AppFirebase {
     const docRef = this.firestore.doc(`images/${id}`);
     const doc = await getCacheFirst<Image>(docRef);
     if (doc) {
-      console.log(doc);
       return `data:image/jpeg;base64,${doc.data.toBase64()}`;
     }
   }
