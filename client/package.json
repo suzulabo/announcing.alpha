@@ -20,7 +20,9 @@
     "start": "run-p copy-shared.watch serve"
   },
   "devDependencies": {
-    "@capacitor/core": "^2.4.7",
+    "@capacitor/cli": "^3.0.0-rc.3",
+    "@capacitor/core": "^3.0.0-rc.3",
+    "@capacitor/storage": "^0.3.10",
     "@rollup/plugin-replace": "^2.4.2",
     "@stencil/core": "^2.5.2",
     "@stencil/sass": "^1.4.1",

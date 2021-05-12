@@ -1,7 +1,5 @@
-import { Plugins } from '@capacitor/core';
+import { Storage } from '@capacitor/storage';
 import { Follow } from './datatypes';
-
-const { Storage } = Plugins;
 
 const kvGetSet = (key: string) => {
   return {
