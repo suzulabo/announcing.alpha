@@ -1,6 +1,9 @@
 import { format } from 'date-fns';
+import { Msgs } from './msgs';
 
-export const msgs = {
+const titleSuffix = 'Announcing♪';
+
+export const msgs: Msgs = {
   common: {
     back: '戻る',
     next: '次へ',
@@ -31,6 +34,7 @@ export const msgs = {
     title: 'Announcing♪ Client',
   },
   home: {
+    pageTitle: titleSuffix,
     newBadge: '新着',
     deleted: (name: string) => {
       return `「${name}」は削除されました`;
@@ -38,6 +42,9 @@ export const msgs = {
     unfollowBtn: 'フォローを解除する',
   },
   announce: {
+    pageTitle: (s: string) => {
+      return `${s} - ${titleSuffix}`;
+    },
     noPosts: 'お知らせはまだありません',
     followBtn: 'フォローする',
     configBtn: '設定',

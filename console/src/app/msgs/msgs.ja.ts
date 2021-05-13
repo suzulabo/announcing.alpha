@@ -1,8 +1,9 @@
 import { format } from 'date-fns';
+import { Msgs } from './msgs';
 
 const titleSuffix = 'Announcing♪ Console';
 
-export const msgs = {
+export const msgs: Msgs = {
   common: {
     back: '戻る',
     cancel: 'キャンセル',

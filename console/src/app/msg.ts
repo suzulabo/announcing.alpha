@@ -1,8 +1,9 @@
-import { msgs as jaMsgs } from './msgs/msg.ja';
+import { Msgs } from './msgs/msgs';
+import { msgs as jaMsgs } from './msgs/msgs.ja';
 
 const lang = 'ja';
 
-const msgsMap = {
+const msgsMap: { [k: string]: Msgs } = {
   ja: jaMsgs,
 };
 
