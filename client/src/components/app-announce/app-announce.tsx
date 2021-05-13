@@ -49,6 +49,8 @@ export class AppAnnounce {
     } finally {
       this.app.loading = false;
     }
+
+    this.app.setTitle(this.app.msgs.announce.pageTitle(this.announceName));
   }
 
   private handleFollowClick = async () => {

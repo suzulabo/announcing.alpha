@@ -25,17 +25,21 @@ export interface Msgs {
     unfollowBtn: string;
   };
   announce: {
-    pageTitle: (s: string) => string;
+    pageTitle: (announceName: string) => string;
     noPosts: string;
     followBtn: string;
     configBtn: string;
   };
   announceConfig: {
+    pageTitle: (announceName: string) => string;
     unfollowBtn: string;
     unfollowConfirm: string;
     enable: string;
     hours: (hours: number[]) => string;
     hoursBtn: string;
     submitBtn: string;
+  };
+  post: {
+    pageTitle: (announceName: string, postTitle: string) => string;
   };
 }

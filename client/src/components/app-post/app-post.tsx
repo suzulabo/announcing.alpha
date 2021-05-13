@@ -22,6 +22,8 @@ export class AppPost {
   async componentWillLoad() {
     this.app.loading = true;
     try {
+      await this.app.loadAnnounce(this.announceID);
+
       this.post = await this.app.fetchPost(this.announceID, this.postID);
       if (this.post?.img) {
         this.post.imgData = this.app.getImageURI(this.post.img);
@@ -29,6 +31,11 @@ export class AppPost {
     } finally {
       this.app.loading = false;
     }
+
+    const a = this.app.getAnnounceState(this.announceID);
+    this.app.setTitle(
+      this.app.msgs.post.pageTitle(a.name, this.post.title || this.post.body.substr(0, 20)),
+    );
   }
 
   render() {

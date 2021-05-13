@@ -15,6 +15,8 @@ export class AppHome {
   follows: [string, Follow][];
 
   async componentWillLoad() {
+    this.app.setTitle(this.app.msgs.home.pageTitle);
+
     const follows = await this.app.getFollows();
 
     for (const [id, follow] of follows) {

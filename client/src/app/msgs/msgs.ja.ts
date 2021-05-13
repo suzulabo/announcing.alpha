@@ -42,14 +42,17 @@ export const msgs: Msgs = {
     unfollowBtn: 'フォローを解除する',
   },
   announce: {
-    pageTitle: (s: string) => {
-      return `${s} - ${titleSuffix}`;
+    pageTitle: (announceName: string) => {
+      return `${announceName} - ${titleSuffix}`;
     },
     noPosts: 'お知らせはまだありません',
     followBtn: 'フォローする',
     configBtn: '設定',
   },
   announceConfig: {
+    pageTitle: (announceName: string) => {
+      return `${announceName} - 設定 - ${titleSuffix}`;
+    },
     unfollowBtn: 'フォローを解除',
     unfollowConfirm: 'フォローを解除します。よろしいですか？',
     enable: '通知を有効にする',
@@ -58,5 +61,10 @@ export const msgs: Msgs = {
     },
     hoursBtn: '通知時刻を設定',
     submitBtn: '登録',
+  },
+  post: {
+    pageTitle: (announceName: string, postTitle: string) => {
+      return `${postTitle} - ${announceName} - ${titleSuffix}`;
+    },
   },
 };

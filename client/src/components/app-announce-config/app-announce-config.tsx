@@ -51,6 +51,8 @@ export class AppAnnounceConfig {
     } finally {
       this.app.loading = false;
     }
+
+    this.app.setTitle(this.app.msgs.announceConfig.pageTitle(this.follow.name));
   }
 
   private unfollow = {
