@@ -155,12 +155,12 @@ export class App {
     }
   }
 
-  async setReadTime(id: string) {
+  async setReadTime(id: string, pT: number) {
     const follow = await this.getFollow(id);
-    if (follow) {
-      follow.readTime = Date.now();
+    if (follow && follow.readTime < pT) {
+      follow.readTime = pT;
+      return this.appStorage.follows.set(id, follow);
     }
-    return this.appStorage.follows.set(id, follow);
   }
 
   async deleteFollow(id: string) {

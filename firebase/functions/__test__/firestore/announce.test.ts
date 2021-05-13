@@ -7,7 +7,7 @@ describe('firestoreDeleteAnnounce', () => {
       announces: {
         '111111111111': {
           mid: '1',
-          posts: ['1', '2', '3'],
+          posts: { '1': {}, '2': {}, '3': {} },
           _collections: {
             meta: {
               '1': {

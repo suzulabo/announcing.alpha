@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { AnnounceMeta, User } from '../shared';
+import { AnnounceMeta, Post, User } from '../shared';
 import { logger } from '../utils/logger';
 import { toMD5Base62 } from './util';
 
@@ -12,6 +12,13 @@ const serialize = (...args: (string | undefined)[]) => {
 
 export const announceMetaHash = (v: AnnounceMeta) => {
   return toMD5Base62(serialize(v.name, v.desc, v.link, v.icon)).substr(0, 8);
+};
+
+export const postHash = (v: Post) => {
+  return toMD5Base62(serialize(v.pT.toMillis().toString(), v.title, v.body, v.link, v.img)).substr(
+    0,
+    8,
+  );
 };
 
 export const checkOwner = async (firestore: admin.firestore.Firestore, uid: string, id: string) => {

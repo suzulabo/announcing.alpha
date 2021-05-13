@@ -115,6 +115,8 @@ class DocRef {
 
   update(data: DocData) {
     if (this.get().exists) {
+      // TODO: It's worng!!
+      // https://firebase.google.com/docs/firestore/manage-data/add-data#update_fields_in_nested_objects
       this.set(data, { merge: true });
     }
   }

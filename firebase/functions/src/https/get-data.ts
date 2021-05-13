@@ -6,7 +6,7 @@ import { Cache } from '../utils/cache';
 const cacheControl = 'public, max-age=31556952, s-maxage=86400, immutable';
 const announceMetaPattern = new RegExp('^/data/announces/([a-zA-Z0-9]{12})/meta/([a-zA-Z0-9]{8})$');
 const announcePostPattern = new RegExp(
-  '^/data/announces/([a-zA-Z0-9]{12})/posts/([-a-zA-Z0-9]{10,20})$',
+  '^/data/announces/([a-zA-Z0-9]{12})/posts/([a-zA-Z0-9]{8})$',
 );
 const imagePattern = new RegExp('^/data/images/([a-zA-Z0-9]{15,25})$');
 

@@ -38,7 +38,7 @@ export const callDeletePost = async (
       logger.debug('no data', id);
       return;
     }
-    if (!announceData.posts || announceData.posts.indexOf(postID) < 0) {
+    if (!(postID in announceData.posts)) {
       logger.debug('no post data', { id, postID });
       return;
     }
@@ -46,7 +46,7 @@ export const callDeletePost = async (
     t.delete(announceRef.collection('posts').doc(postID));
     {
       const updateData = {
-        posts: admin.firestore.FieldValue.arrayRemove(postID),
+        [`posts.${postID}`]: admin.firestore.FieldValue.delete(),
         uT: admin.firestore.FieldValue.serverTimestamp(),
       };
       t.update(announceRef, updateData);

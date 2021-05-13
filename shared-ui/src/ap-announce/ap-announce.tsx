@@ -26,7 +26,13 @@ export class ApAnnounce {
     desc?: string;
     iconData?: string;
     link?: string;
-    posts?: string[];
+    posts: {
+      [postID: string]: {
+        pT: {
+          toMillis: () => number;
+        };
+      };
+    };
   };
 
   @Prop()
@@ -123,9 +129,11 @@ export class ApAnnounce {
   }
 
   private renderPosts() {
-    const posts = [...(this.announce.posts || [])].reverse();
-    return posts.map(v => {
-      return this.loadedPosts.has(v) ? this.loadedPosts.get(v) : this.renderSkeletonPost(v);
+    const posts = Object.entries(this.announce.posts).sort(([_k1, v1], [_k2, v2]) => {
+      return v2.pT.toMillis() - v1.pT.toMillis();
+    });
+    return posts.map(([id]) => {
+      return this.loadedPosts.has(id) ? this.loadedPosts.get(id) : this.renderSkeletonPost(id);
     });
   }
 
@@ -134,7 +142,7 @@ export class ApAnnounce {
     if (!announce) {
       return;
     }
-    const noPosts = !announce.posts || announce.posts.length == 0;
+    const noPosts = Object.keys(announce.posts).length == 0;
 
     return (
       <Host>

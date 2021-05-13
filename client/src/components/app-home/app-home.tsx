@@ -1,7 +1,6 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
-import { postIDtoMillis } from 'src/app/utils';
 
 @Component({
   tag: 'app-home',
@@ -54,9 +53,8 @@ export class AppHome {
         );
       }
 
-      const hasNew = a.posts?.find(postID => {
-        const pT = postIDtoMillis(postID);
-        return pT > follow.readTime;
+      const hasNew = Object.values(a.posts).find(v => {
+        return v.pT.toMillis() > follow.readTime;
       });
 
       return (

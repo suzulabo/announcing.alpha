@@ -12,6 +12,12 @@ export const isLang = (s: any): s is Lang => {
   return languages.includes(s);
 };
 
+export interface Announce {
+  mid: string; // meta id
+  posts: { [postID: string]: { pT: Timestamp } };
+  uT: Timestamp; // updated time
+}
+
 interface PostBase {
   title?: string;
   body?: string;
@@ -31,13 +37,6 @@ export const PostRule = {
   body: { length: 500 },
   link: { length: 500 },
 };
-
-export interface Announce {
-  mid: string; // meta id
-  posts?: string[];
-  pid?: string; // (current) post id
-  uT: Timestamp; // updated time
-}
 
 export interface AnnounceMetaBase {
   name: string;

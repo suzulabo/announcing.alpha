@@ -1,10 +1,8 @@
 import * as admin from 'firebase-admin';
 import { CallableContext } from 'firebase-functions/lib/providers/https';
 import { Announce, ImageRule, Post, PostRule, PutPostParams } from '../shared';
-import { checkOwner, storeImage } from '../utils/firestore';
-import { incString } from '../utils/incstring';
+import { checkOwner, postHash, storeImage } from '../utils/firestore';
 import { logger } from '../utils/logger';
-import { millisToBase62 } from '../utils/util';
 
 export const callPutPost = async (
   params: PutPostParams,
@@ -49,6 +47,7 @@ const putPost = async (
   {
     const isOwner = await checkOwner(firestore, uid, id);
     if (!isOwner) {
+      logger.warn('not owner', { params });
       return;
     }
   }
@@ -68,7 +67,7 @@ const putPost = async (
     if (!data) {
       throw new Error(`missing edit data: ${id}/${editID}`);
     }
-    postData.pT = data.pT as any;
+    postData.pT = data.pT;
   }
 
   await firestore.runTransaction<void>(async t => {
@@ -79,24 +78,6 @@ const putPost = async (
       return;
     }
 
-    const postID = (() => {
-      const id = millisToBase62((postData.pT as admin.firestore.Timestamp).toMillis());
-      if (!editID) {
-        return id;
-      }
-
-      let c = editID.split('-')[1];
-      const posts = announceData.posts || [];
-      while (true) {
-        c = incString.next(c);
-        const v = `${id}-${c}`;
-        if (!posts.includes(v)) {
-          return v;
-        }
-      }
-    })();
-    const posts = announceData.posts || [];
-
     if (imgData) {
       const imgID = await storeImage(firestore, imgData);
       if (imgID) {
@@ -104,20 +85,24 @@ const putPost = async (
       }
     }
 
+    const postID = postHash(postData);
+    if (postID in announceData.posts) {
+      logger.warn('duplicate postID', { postID, params });
+    }
+
     t.create(announceRef.collection('posts').doc(postID), postData);
 
     if (editID) {
-      const idx = posts.indexOf(editID);
-      posts[idx] = postID;
+      const updateData = {
+        [`posts.${postID}`]: { pT: postData.pT },
+        [`posts.${editID}`]: admin.firestore.FieldValue.delete(),
+        uT: admin.firestore.FieldValue.serverTimestamp(),
+      };
+      t.update(announceRef, updateData);
       t.delete(announceRef.collection('posts').doc(editID));
     } else {
-      posts.push(postID);
-    }
-
-    {
       const updateData = {
-        pid: postID,
-        posts,
+        [`posts.${postID}`]: { pT: postData.pT },
         uT: admin.firestore.FieldValue.serverTimestamp(),
       };
       t.update(announceRef, updateData);

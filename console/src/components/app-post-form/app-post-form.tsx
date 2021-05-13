@@ -43,7 +43,7 @@ export class AppPostForm {
       return;
     }
 
-    if (!as.posts?.includes(this.postID)) {
+    if (!(this.postID in as.posts)) {
       this.app.pushRoute(this.backPath, true);
       return;
     }

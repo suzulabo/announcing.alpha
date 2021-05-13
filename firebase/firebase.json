@@ -17,7 +17,7 @@
           "function": "getAnnounceMetaData"
         },
         {
-          "regex": "^/data/announces/[a-zA-Z0-9]{12}/posts/[-a-zA-Z0-9]{10,20}$",
+          "regex": "^/data/announces/[a-zA-Z0-9]{12}/posts/[a-zA-Z0-9]{8}$",
           "function": "getAnnouncePostData"
         },
         {

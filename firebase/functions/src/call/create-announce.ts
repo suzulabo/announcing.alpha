@@ -36,6 +36,7 @@ export const callCreateAnnounce = async (
 
   const announceData = {
     mid,
+    posts: {},
     uT: admin.firestore.FieldValue.serverTimestamp(),
   };
   const userData = {
