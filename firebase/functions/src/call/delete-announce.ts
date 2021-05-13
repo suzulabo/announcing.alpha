@@ -4,7 +4,7 @@ import { DeleteAnnounceParams } from '../shared';
 import { logger } from '../utils/logger';
 
 export const callDeleteAnnounce = async (
-  params: DeleteAnnounceParams,
+  params: Partial<DeleteAnnounceParams>,
   context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {

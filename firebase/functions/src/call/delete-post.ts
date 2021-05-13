@@ -5,7 +5,7 @@ import { checkOwner } from '../utils/firestore';
 import { logger } from '../utils/logger';
 
 export const callDeletePost = async (
-  params: DeletePostParams,
+  params: Partial<DeletePostParams>,
   context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {

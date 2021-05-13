@@ -5,19 +5,12 @@ import { checkOwner, postHash, storeImage } from '../utils/firestore';
 import { logger } from '../utils/logger';
 
 export const callPutPost = async (
-  params: PutPostParams,
+  params: Partial<PutPostParams>,
   context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
   const uid = context.auth?.uid;
-  return putPost(params, uid, adminApp);
-};
 
-const putPost = async (
-  params: PutPostParams,
-  uid: string | undefined,
-  adminApp: admin.app.App,
-): Promise<void> => {
   if (!uid) {
     throw new Error('missing uid');
   }

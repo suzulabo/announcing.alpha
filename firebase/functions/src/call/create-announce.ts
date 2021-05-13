@@ -6,7 +6,7 @@ import { logger } from '../utils/logger';
 import { autoID } from '../utils/util';
 
 export const callCreateAnnounce = async (
-  params: CreateAnnounceParams,
+  params: Partial<CreateAnnounceParams>,
   context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {

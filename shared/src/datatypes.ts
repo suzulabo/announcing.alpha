@@ -70,13 +70,13 @@ export const ImageRule = {
 };
 
 export interface CreateAnnounceParams {
-  name?: string;
+  name: string;
   desc?: string;
 }
 
 export interface EditAnnounceParams {
-  id?: string;
-  name?: string;
+  id: string;
+  name: string;
   desc?: string;
   link?: string;
   icon?: string;
@@ -84,11 +84,11 @@ export interface EditAnnounceParams {
 }
 
 export interface DeleteAnnounceParams {
-  id?: string;
+  id: string;
 }
 
 export interface PutPostParams {
-  id?: string;
+  id: string;
   title?: string;
   body?: string;
   link?: string;
@@ -97,8 +97,8 @@ export interface PutPostParams {
 }
 
 export interface DeletePostParams {
-  id?: string;
-  postID?: string;
+  id: string;
+  postID: string;
 }
 
 export interface RegisterNotificationParams {

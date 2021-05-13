@@ -5,7 +5,7 @@ import { announceMetaHash, checkOwner, storeImage } from '../utils/firestore';
 import { logger } from '../utils/logger';
 
 export const callEditAnnounce = async (
-  params: EditAnnounceParams,
+  params: Partial<EditAnnounceParams>,
   context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
