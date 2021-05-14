@@ -9,7 +9,8 @@
     "build": "run-s build:*",
     "serve": "firebase emulators:start --import=./emu-data --export-on-exit",
     "start": "run-p build:func:watch serve",
-    "deploy": "firebase deploy"
+    "deploy": "firebase deploy",
+    "firestore-indexes": "node firestore-indexes-gen.js > firestore.indexes.json"
   },
   "devDependencies": {
     "firebase-tools": "^9.10.1",

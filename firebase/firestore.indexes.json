@@ -1,3 +1,155 @@
 {
-  "indexes": []
+  "indexes": [],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "announces",
+      "fieldPath": "mid",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "announces",
+      "fieldPath": "posts",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "announces",
+      "fieldPath": "uT",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "meta",
+      "fieldPath": "name",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "meta",
+      "fieldPath": "desc",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "meta",
+      "fieldPath": "link",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "meta",
+      "fieldPath": "icon",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "meta",
+      "fieldPath": "cT",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "title",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "body",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "link",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "img",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "pT",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "images",
+      "fieldPath": "data",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-devices",
+      "fieldPath": "signKey",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-devices",
+      "fieldPath": "lang",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-devices",
+      "fieldPath": "tz",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-devices",
+      "fieldPath": "follows",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-devices",
+      "fieldPath": "uT",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-imm",
+      "fieldPath": "announceID",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-imm",
+      "fieldPath": "followers",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-imm",
+      "fieldPath": "unfollows",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-imm",
+      "fieldPath": "archives",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-imm",
+      "fieldPath": "uT",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-timed",
+      "fieldPath": "time",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-timed",
+      "fieldPath": "followers",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-timed",
+      "fieldPath": "unfollows",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-timed",
+      "fieldPath": "archives",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "notif-timed",
+      "fieldPath": "uT",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "archives",
+      "fieldPath": "followers",
+      "indexes": []
+    }
+  ]
 }
