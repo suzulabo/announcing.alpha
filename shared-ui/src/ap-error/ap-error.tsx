@@ -11,6 +11,13 @@ export class ApError {
     close: string;
     showErrors: string;
     datetime: (d: number) => string;
+  } = {
+    main: 'Woops!\nPlease try again later',
+    close: 'Close',
+    showErrors: 'Show errors',
+    datetime: (d: number) => {
+      return new Date(d).toLocaleString();
+    },
   };
 
   @State()

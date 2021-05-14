@@ -42,8 +42,10 @@ export class AppRoot {
   private async init() {
     this.initialized = false;
     try {
-      const appEnv = new AppEnv();
       const appMsg = new AppMsg();
+      document.querySelector('ap-error').msgs = appMsg.msgs.error;
+
+      const appEnv = new AppEnv();
       const appState = new AppState();
       const appFirebase = new AppFirebase(appEnv, appState, appMsg);
       this.app = new App(appEnv, appMsg, appFirebase, appState);
@@ -127,7 +129,11 @@ export class AppRoot {
 
   render() {
     if (!this.initialized) {
-      return;
+      return (
+        <Host>
+          <ap-loading class={{ show: true }} />
+        </Host>
+      );
     }
 
     const m = this.getRoute();
@@ -148,7 +154,6 @@ export class AppRoot {
           </div>
         </footer>
         <ap-loading class={{ show: this.app.loading }} />
-        <ap-error msgs={{ ...this.app.msgs.error, close: this.app.msgs.common.close }}></ap-error>
       </Host>
     );
   }

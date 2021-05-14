@@ -13,6 +13,7 @@ export interface Msgs {
   error: {
     main: string;
     showErrors: string;
+    close: string;
     datetime: (d: number) => string;
   };
   footer: {

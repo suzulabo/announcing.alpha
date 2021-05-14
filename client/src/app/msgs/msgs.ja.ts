@@ -24,6 +24,7 @@ export const msgs: Msgs = {
   error: {
     main: 'ご迷惑をおかけします。\nしばらくしてから再度お試しください。',
     showErrors: 'エラー内容を表示',
+    close: '閉じる',
     datetime: (d: number) => {
       if (d > 0) {
         return format(d, 'yyyy/MM/dd H:mm:ss');
