@@ -1,7 +1,14 @@
+import * as fs from 'fs';
 import * as http from 'http';
+import * as https from 'https';
 import { createProxyServer } from 'http-proxy';
 
 type ProxyServer = ReturnType<typeof createProxyServer>;
+
+const httpsOptions = {
+  key: fs.readFileSync('./localhttps_key.pem'),
+  cert: fs.readFileSync('./localhttps_cert.pem'),
+};
 
 const logging = (s: string, all?: boolean) => {
   const now = new Date();
@@ -26,6 +33,7 @@ const getProxyServer = (port: number) => {
 
   const sv = createProxyServer({
     target: { host: '127.0.0.1', port },
+    secure: false,
   });
   sv.on('error', err => {
     logging(`${err.stack}`, true);
@@ -34,7 +42,7 @@ const getProxyServer = (port: number) => {
   return sv;
 };
 
-const createDevProxy = (port: number, patterns: ProxyConfig[]) => {
+const createDevProxy = (port: number, httpsPort: number, patterns: ProxyConfig[]) => {
   const match = (url: string, pattern: string | RegExp) => {
     if (!pattern) {
       return true;
@@ -60,7 +68,7 @@ const createDevProxy = (port: number, patterns: ProxyConfig[]) => {
     }
   });
 
-  const httpServer = http.createServer((req, res) => {
+  const reqListener = (req: http.IncomingMessage, res: http.ServerResponse) => {
     const url = req.url;
     logging(url);
     for (const sv of proxyServers) {
@@ -73,8 +81,8 @@ const createDevProxy = (port: number, patterns: ProxyConfig[]) => {
         return;
       }
     }
-  });
-  httpServer.on('upgrade', (req, socket, head) => {
+  };
+  const handleUpgrade = (req: http.IncomingMessage, socket: any, head: any) => {
     const url = req.url as string;
     logging(`ws:${url}`);
     for (const sv of proxyServers) {
@@ -87,16 +95,27 @@ const createDevProxy = (port: number, patterns: ProxyConfig[]) => {
         return;
       }
     }
-  });
+  };
 
-  httpServer.on('error', err => {
-    logging(`${err.stack}`, true);
-  });
-
-  httpServer.listen(port);
+  {
+    const httpServer = http.createServer(reqListener);
+    httpServer.on('upgrade', handleUpgrade);
+    httpServer.on('error', err => {
+      logging(`${err.stack}`, true);
+    });
+    httpServer.listen(port);
+  }
+  {
+    const httpsServer = https.createServer(httpsOptions, reqListener);
+    httpsServer.on('upgrade', handleUpgrade);
+    httpsServer.on('error', err => {
+      logging(`${err.stack}`, true);
+    });
+    httpsServer.listen(httpsPort);
+  }
 };
 
-createDevProxy(9292, [
+createDevProxy(9292, 9392, [
   {
     pattern: '/www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig',
     proxy: (req, res) => {
@@ -116,8 +135,9 @@ createDevProxy(9292, [
   { proxy: 3370, pattern: '' }, // stencil
 ]);
 console.log('Console: http://localhost:9292/');
+console.log('Console: https://localhost:9392/');
 
-createDevProxy(9293, [
+createDevProxy(9293, 9393, [
   { proxy: 8080, pattern: '/v1/' }, // firestore REST
   { proxy: 8080, pattern: '/google.firestore.v1.Firestore/' }, // firestore RPC
   { proxy: 5001, pattern: new RegExp('.+/us-central1/.+') }, // functions
@@ -125,3 +145,4 @@ createDevProxy(9293, [
   { proxy: 3371, pattern: '' }, // stencil
 ]);
 console.log('Client: http://localhost:9293/');
+console.log('Client: https://localhost:9393/');
