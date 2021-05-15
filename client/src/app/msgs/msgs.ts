@@ -21,6 +21,7 @@ export interface Msgs {
   };
   home: {
     pageTitle: string;
+    noFollows: string;
     newBadge: string;
     deleted: (name: string) => string;
     unfollowBtn: string;

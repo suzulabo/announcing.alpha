@@ -36,6 +36,7 @@ export const msgs: Msgs = {
   },
   home: {
     pageTitle: titleSuffix,
+    noFollows: 'フォローしているアナウンスはありません',
     newBadge: '新着',
     deleted: (name: string) => {
       return `「${name}」は削除されました`;

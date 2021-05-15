@@ -73,6 +73,10 @@ export class AppHome {
   }
 
   render() {
+    if (this.follows.length == 0) {
+      return <Host>{this.app.msgs.home.noFollows}</Host>;
+    }
+
     return (
       <Host>
         <div class="announces-grid">{this.renderAnnounces()}</div>
