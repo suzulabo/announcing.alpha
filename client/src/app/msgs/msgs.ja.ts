@@ -67,5 +67,6 @@ export const msgs: Msgs = {
     pageTitle: (announceName: string, postTitle: string) => {
       return `${postTitle} - ${announceName} - ${titleSuffix}`;
     },
+    share: 'シェアする',
   },
 };

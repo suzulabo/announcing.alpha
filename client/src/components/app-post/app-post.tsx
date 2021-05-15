@@ -38,10 +38,18 @@ export class AppPost {
     );
   }
 
+  private shareClick = async () => {
+    try {
+      await this.app.share(location.href);
+    } catch {}
+  };
+
   render() {
     if (!this.post) {
       return;
     }
+
+    console.log('this.app.checkShareSupport()', navigator.share, this.app.checkShareSupport());
 
     return (
       <Host>
@@ -49,6 +57,11 @@ export class AppPost {
         <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
           {this.app.msgs.common.back}
         </a>
+        {this.app.checkShareSupport() && (
+          <button class="anchor share" onClick={this.shareClick}>
+            {this.app.msgs.post.share}
+          </button>
+        )}
       </Host>
     );
   }

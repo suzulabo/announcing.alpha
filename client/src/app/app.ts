@@ -1,3 +1,5 @@
+import { Device, DeviceInfo } from '@capacitor/device';
+import { Share } from '@capacitor/share';
 import { Build } from '@stencil/core';
 import { Announce, AnnounceMetaJSON, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
@@ -17,6 +19,7 @@ export class App {
   readonly buildInfo = BUILD_INFO;
 
   private dataURLPrefix: string;
+  private deviceInfo: DeviceInfo;
 
   constructor(
     private appMsg: AppMsg,
@@ -32,6 +35,8 @@ export class App {
   }
 
   async init() {
+    this.deviceInfo = await Device.getInfo();
+
     await this.appFirebase.init();
 
     // Check permission of notification
@@ -95,6 +100,21 @@ export class App {
 
   get msgs() {
     return this.appMsg.msgs;
+  }
+
+  checkShareSupport() {
+    if (this.deviceInfo.platform != 'web') {
+      return true;
+    }
+    if (navigator.share) {
+      return true;
+    }
+
+    return false;
+  }
+
+  share(url: string) {
+    return Share.share({ url });
   }
 
   private async toAnnounceState(id: string, a: Announce): Promise<AnnounceState> {

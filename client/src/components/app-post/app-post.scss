@@ -7,6 +7,13 @@ app-post {
   flex-direction: column;
   justify-content: center;
 
+  .share {
+    margin-top: 50px;
+    align-self: flex-end;
+    font-size: 0.9em;
+    color: var(--light-color);
+  }
+
   .back {
     margin-top: 50px;
     align-self: center;

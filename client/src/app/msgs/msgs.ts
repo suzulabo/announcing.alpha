@@ -42,5 +42,6 @@ export interface Msgs {
   };
   post: {
     pageTitle: (announceName: string, postTitle: string) => string;
+    share: string;
   };
 }
