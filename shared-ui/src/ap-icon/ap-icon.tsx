@@ -1,6 +1,7 @@
 import { Component, h, Prop } from '@stencil/core';
 import squareChecked from 'bootstrap-icons/icons/check2-square.svg';
 import dizzy from 'bootstrap-icons/icons/emoji-dizzy.svg';
+import frown from 'bootstrap-icons/icons/emoji-frown.svg';
 import github from 'bootstrap-icons/icons/github.svg';
 import google from 'bootstrap-icons/icons/google.svg';
 import image from 'bootstrap-icons/icons/image.svg';
@@ -15,6 +16,7 @@ const svgMap = {
   image,
   trash,
   dizzy,
+  frown,
   square,
   squareChecked,
 };
@@ -25,7 +27,16 @@ const svgMap = {
 })
 export class ApIcon {
   @Prop()
-  icon: 'github' | 'google' | 'twitter' | 'image' | 'trash' | 'dizzy' | 'square' | 'squareChecked';
+  icon:
+    | 'github'
+    | 'google'
+    | 'twitter'
+    | 'image'
+    | 'trash'
+    | 'dizzy'
+    | 'frown'
+    | 'square'
+    | 'squareChecked';
 
   render() {
     return <img src={svgMap[this.icon]} />;

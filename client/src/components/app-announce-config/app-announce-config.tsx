@@ -133,18 +133,20 @@ export class AppAnnounceConfig {
   private renderUnsupported() {
     // TODO
     return (
-      <Fragment>
-        <span>Unsupported Brwoser</span>
-      </Fragment>
+      <div class="notif-warn">
+        <ap-icon icon="frown" />
+        <div>{this.app.msgs.announceConfig.unsupported}</div>
+      </div>
     );
   }
 
   private renderDenied() {
     // TODO
     return (
-      <Fragment>
-        <span>Not permitted</span>
-      </Fragment>
+      <div class="notif-warn">
+        <ap-icon icon="dizzy" />
+        <div>{this.app.msgs.announceConfig.notPermitted}</div>
+      </div>
     );
   }
 

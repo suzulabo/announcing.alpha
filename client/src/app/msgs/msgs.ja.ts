@@ -64,6 +64,8 @@ export const msgs: Msgs = {
     },
     hoursBtn: '通知時刻を設定',
     submitBtn: '登録',
+    unsupported: 'このブラウザで通知はご利用になれません',
+    notPermitted: '通知が許可されていません\nブラウザの設定をご確認ください',
   },
   post: {
     pageTitle: (announceName: string, postTitle: string) => {

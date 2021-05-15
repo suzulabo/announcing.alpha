@@ -41,6 +41,8 @@ export interface Msgs {
     hours: (hours: number[]) => string;
     hoursBtn: string;
     submitBtn: string;
+    unsupported: string;
+    notPermitted: string;
   };
   post: {
     pageTitle: (announceName: string, postTitle: string) => string;

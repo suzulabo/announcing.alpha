@@ -57,4 +57,15 @@ app-announce-config {
       align-self: center;
     }
   }
+
+  .notif-warn {
+    text-align: center;
+    ap-icon {
+      font-size: 20px;
+    }
+    div {
+      white-space: pre-line;
+      margin-top: 30px;
+    }
+  }
 }
