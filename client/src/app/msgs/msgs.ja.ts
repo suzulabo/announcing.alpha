@@ -46,6 +46,7 @@ export const msgs: Msgs = {
     pageTitle: (announceName: string) => {
       return `${announceName} - ${titleSuffix}`;
     },
+    deleted: 'このアナウンスは削除されました',
     noPosts: 'お知らせはまだありません',
     followBtn: 'フォローする',
     configBtn: '設定',
@@ -67,6 +68,7 @@ export const msgs: Msgs = {
     pageTitle: (announceName: string, postTitle: string) => {
       return `${postTitle} - ${announceName} - ${titleSuffix}`;
     },
+    deleted: 'このお知らせは削除されました',
     share: 'シェアする',
   },
 };

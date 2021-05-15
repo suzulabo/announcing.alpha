@@ -25,17 +25,20 @@ export class AppPost {
       await this.app.loadAnnounce(this.announceID);
 
       this.post = await this.app.fetchPost(this.announceID, this.postID);
-      if (this.post?.img) {
+      if (!this.post) {
+        return;
+      }
+      if (this.post.img) {
         this.post.imgData = this.app.getImageURI(this.post.img);
       }
+
+      const a = this.app.getAnnounceState(this.announceID);
+      this.app.setTitle(
+        this.app.msgs.post.pageTitle(a.name, this.post.title || this.post.body.substr(0, 20)),
+      );
     } finally {
       this.app.loading = false;
     }
-
-    const a = this.app.getAnnounceState(this.announceID);
-    this.app.setTitle(
-      this.app.msgs.post.pageTitle(a.name, this.post.title || this.post.body.substr(0, 20)),
-    );
   }
 
   private shareClick = async () => {
@@ -46,10 +49,15 @@ export class AppPost {
 
   render() {
     if (!this.post) {
-      return;
+      return (
+        <Host>
+          <div class="deleted">{this.app.msgs.post.deleted}</div>
+          <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
+            {this.app.msgs.common.back}
+          </a>
+        </Host>
+      );
     }
-
-    console.log('this.app.checkShareSupport()', navigator.share, this.app.checkShareSupport());
 
     return (
       <Host>

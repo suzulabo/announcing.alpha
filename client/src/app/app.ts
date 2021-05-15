@@ -146,7 +146,9 @@ export class App {
 
   private async fetchData<T>(p: string) {
     const res = await fetch(`${this.dataURLPrefix}/${p}`);
-    return (await res.json()) as T;
+    if (res.ok) {
+      return (await res.json()) as T;
+    }
   }
 
   fetchAnnounceMeta(id: string, metaID: string) {

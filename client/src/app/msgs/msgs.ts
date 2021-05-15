@@ -27,6 +27,7 @@ export interface Msgs {
   };
   announce: {
     pageTitle: (announceName: string) => string;
+    deleted: string;
     noPosts: string;
     followBtn: string;
     configBtn: string;
@@ -42,6 +43,7 @@ export interface Msgs {
   };
   post: {
     pageTitle: (announceName: string, postTitle: string) => string;
+    deleted: string;
     share: string;
   };
 }

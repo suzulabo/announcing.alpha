@@ -24,6 +24,9 @@ export class AppAnnounce {
       await this.app.loadAnnounce(this.announceID);
 
       const a = this.app.getAnnounceState(this.announceID);
+      if (!a) {
+        return;
+      }
       this.announceName = a.name;
 
       const follow = await this.app.getFollow(this.announceID);
@@ -35,11 +38,11 @@ export class AppAnnounce {
           await this.app.setFollow(this.announceID, follow);
         }
       }
+
+      this.app.setTitle(this.app.msgs.announce.pageTitle(this.announceName));
     } finally {
       this.app.loading = false;
     }
-
-    this.app.setTitle(this.app.msgs.announce.pageTitle(this.announceName));
   }
 
   private handleFollowClick = async () => {
@@ -68,14 +71,20 @@ export class AppAnnounce {
   };
 
   render() {
+    const msgs = this.app.msgs;
+
     const announce = this.app.getAnnounceState(this.announceID);
 
     if (!announce) {
-      return;
+      return (
+        <Host>
+          <div class="deleted">{msgs.announce.deleted}</div>
+          <a {...this.app.href('/', true)}>{msgs.common.back}</a>
+        </Host>
+      );
     }
 
     const follow = this.follow;
-    const msgs = this.app.msgs;
 
     return (
       <Host>
