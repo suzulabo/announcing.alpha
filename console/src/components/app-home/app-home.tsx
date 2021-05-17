@@ -10,8 +10,9 @@ export class AppHome {
   app: App;
 
   async componentWillLoad() {
-    await this.app.loadUser();
-    this.app.setTitle(this.app.msgs.home.pageTitle);
+    await this.app.processLoading(async () => {
+      await this.app.loadUser();
+    });
   }
 
   private handleSignOutClick = async () => {

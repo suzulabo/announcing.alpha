@@ -18,9 +18,6 @@ export class AppRoot {
   private app: App;
 
   @State()
-  initialized = false;
-
-  @State()
   path: string;
 
   @Listen('popstate', { target: 'window' })
@@ -35,25 +32,18 @@ export class AppRoot {
     this.path = p;
   }
 
-  componentWillLoad() {
-    void this.init();
-  }
+  async componentWillLoad() {
+    const appMsg = new AppMsg();
+    document.querySelector('ap-error').msgs = appMsg.msgs.error;
 
-  private async init() {
-    this.initialized = false;
-    try {
-      const appMsg = new AppMsg();
-      document.querySelector('ap-error').msgs = appMsg.msgs.error;
-
-      const appEnv = new AppEnv();
-      const appState = new AppState();
-      const appFirebase = new AppFirebase(appEnv, appState, appMsg);
-      this.app = new App(appEnv, appMsg, appFirebase, appState);
-      await this.app.init();
-      this.handlePopState();
-    } finally {
-      this.initialized = true;
-    }
+    const appEnv = new AppEnv();
+    const appState = new AppState();
+    const appFirebase = new AppFirebase(appEnv, appState, appMsg);
+    this.app = new App(appEnv, appMsg, appFirebase, appState);
+    await this.app.processLoading(() => {
+      return this.app.init();
+    });
+    this.handlePopState();
   }
 
   private checkRedirect() {
@@ -128,14 +118,6 @@ export class AppRoot {
   }
 
   render() {
-    if (!this.initialized) {
-      return (
-        <Host>
-          <ap-loading class={{ show: true }} />
-        </Host>
-      );
-    }
-
     const m = this.getRoute();
 
     return (
@@ -153,7 +135,6 @@ export class AppRoot {
             </a>
           </div>
         </footer>
-        <ap-loading class={{ show: this.app.loading }} />
       </Host>
     );
   }

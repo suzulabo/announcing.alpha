@@ -1,4 +1,4 @@
-import { Build } from '@stencil/core';
+import { Build, readTask } from '@stencil/core';
 import { Announce, AppEnv } from 'src/shared';
 import { AnnounceState } from './datatypes';
 import { AppFirebase } from './firebase';
@@ -73,11 +73,30 @@ export class App {
     }
   }
 
+  private _loading = false;
   set loading(v: boolean) {
-    this.appState.state.loading = v;
+    this._loading = v;
+    this.setLoadingClass();
   }
-  get loading() {
-    return this.appState.state.loading;
+
+  private setLoadingClass = () => {
+    readTask(() => {
+      const apLoading = document.querySelector('ap-loading');
+      if (this._loading) {
+        apLoading.classList.add('show');
+      } else {
+        apLoading.classList.remove('show');
+      }
+    });
+  };
+
+  async processLoading(f: () => Promise<void>) {
+    this.loading = true;
+    try {
+      await f();
+    } finally {
+      this.loading = false;
+    }
   }
 
   get msgs() {

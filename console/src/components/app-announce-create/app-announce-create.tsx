@@ -27,13 +27,10 @@ export class AppAnnounceCreate {
   }
 
   private handleSubmitClick = async () => {
-    this.app.loading = true;
-    try {
+    await this.app.processLoading(async () => {
       await this.app.createAnnounce(this.values.name, this.values.desc);
       this.app.pushRoute('/');
-    } finally {
-      this.app.loading = false;
-    }
+    });
   };
 
   render() {

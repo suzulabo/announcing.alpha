@@ -27,41 +27,43 @@ export class AppPostForm {
   private backPath: string;
 
   async componentWillLoad() {
-    this.backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
+    await this.app.processLoading(async () => {
+      this.backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
 
-    await this.app.loadAnnounce(this.announceID);
-    const as = this.app.getAnnounceState(this.announceID);
-    if (!as) {
-      this.app.pushRoute(this.backPath, true);
-      return;
-    }
+      await this.app.loadAnnounce(this.announceID);
+      const as = this.app.getAnnounceState(this.announceID);
+      if (!as) {
+        this.app.pushRoute(this.backPath, true);
+        return;
+      }
 
-    this.announce = as;
+      this.announce = as;
 
-    if (!this.postID) {
-      this.values = {};
-      return;
-    }
+      if (!this.postID) {
+        this.values = {};
+        return;
+      }
 
-    if (!(this.postID in as.posts)) {
-      this.app.pushRoute(this.backPath, true);
-      return;
-    }
+      if (!(this.postID in as.posts)) {
+        this.app.pushRoute(this.backPath, true);
+        return;
+      }
 
-    const post = await this.app.getPost(this.announceID, this.postID);
-    if (!post) {
-      this.app.pushRoute(this.backPath, true);
-      return;
-    }
-    this.post = post;
-    this.values = { ...post };
+      const post = await this.app.getPost(this.announceID, this.postID);
+      if (!post) {
+        this.app.pushRoute(this.backPath, true);
+        return;
+      }
+      this.post = post;
+      this.values = { ...post };
 
-    if (post.img) {
-      this.values.imgData = await this.app.getImage(post.img);
-      this.post.imgData = this.values.imgData;
-    }
+      if (post.img) {
+        this.values.imgData = await this.app.getImage(post.img);
+        this.post.imgData = this.values.imgData;
+      }
 
-    this.app.setTitle(this.app.msgs.postForm.pageTitle(as.name));
+      this.app.setTitle(this.app.msgs.postForm.pageTitle(as.name));
+    });
   }
 
   private handleInput = {

@@ -22,27 +22,29 @@ export class AppAnnounce {
   private qrCode: QRCodeStyling;
 
   async componentWillLoad() {
-    await this.app.loadAnnounce(this.announceID);
+    await this.app.processLoading(async () => {
+      await this.app.loadAnnounce(this.announceID);
 
-    const as = this.app.getAnnounceState(this.announceID);
-    if (!as) {
-      this.app.pushRoute('/');
-      return;
-    }
+      const as = this.app.getAnnounceState(this.announceID);
+      if (!as) {
+        this.app.pushRoute('/');
+        return;
+      }
 
-    this.app.setTitle(this.app.msgs.announce.pageTitle(as.name));
+      this.app.setTitle(this.app.msgs.announce.pageTitle(as.name));
 
-    this.qrCode = new QRCodeStyling({
-      width: 200,
-      height: 200,
-      dotsOptions: {
-        color: '#333333',
-        type: 'extra-rounded',
-      },
-      cornersSquareOptions: {
-        type: 'extra-rounded',
-      },
-      data: this.clientURL,
+      this.qrCode = new QRCodeStyling({
+        width: 200,
+        height: 200,
+        dotsOptions: {
+          color: '#333333',
+          type: 'extra-rounded',
+        },
+        cornersSquareOptions: {
+          type: 'extra-rounded',
+        },
+        data: this.clientURL,
+      });
     });
   }
 

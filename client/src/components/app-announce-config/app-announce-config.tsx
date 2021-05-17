@@ -29,8 +29,7 @@ export class AppAnnounceConfig {
   private notification: { hours?: number[] };
 
   async componentWillLoad() {
-    this.app.loading.show();
-    try {
+    await this.app.processLoading(async () => {
       const id = this.announceID;
       await this.app.loadAnnounce(id);
       if (!this.app.getAnnounceState(id)) {
@@ -48,9 +47,7 @@ export class AppAnnounceConfig {
       this.values = { enable: !!this.notification, hours: this.notification?.hours || [] };
 
       this.permission = await this.app.checkNotifyPermission(true);
-    } finally {
-      this.app.loading.hide();
-    }
+    });
 
     this.app.setTitle(this.app.msgs.announceConfig.pageTitle(this.follow.name));
   }
@@ -65,13 +62,10 @@ export class AppAnnounceConfig {
       },
       unfollow: async () => {
         this.showUnfollowConfirm = false;
-        this.app.loading.show();
-        try {
+        await this.app.processLoading(async () => {
           await this.app.deleteFollow(this.announceID);
           this.app.pushRoute(`/${this.announceID}`);
-        } finally {
-          this.app.loading.hide();
-        }
+        });
       },
     },
   };
@@ -120,14 +114,11 @@ export class AppAnnounceConfig {
   };
 
   private handleSubmitClick = async () => {
-    this.app.loading.show();
-    try {
+    await this.app.processLoading(async () => {
       const hours = this.values.enable ? this.values.hours : [];
       await this.app.setNotify(this.announceID, this.values.enable, hours);
       this.app.pushRoute(`/${this.announceID}`);
-    } finally {
-      this.app.loading.hide();
-    }
+    });
   };
 
   private renderUnsupported() {

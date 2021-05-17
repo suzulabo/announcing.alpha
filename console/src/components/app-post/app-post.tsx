@@ -24,29 +24,31 @@ export class AppPost {
   private post: PostJSON & { imgData?: string };
 
   async componentWillLoad() {
-    await this.app.loadAnnounce(this.announceID);
+    await this.app.processLoading(async () => {
+      await this.app.loadAnnounce(this.announceID);
 
-    const as = this.app.getAnnounceState(this.announceID);
-    if (!as) {
-      this.app.pushRoute(`/${this.announceID}`, true);
-      return;
-    }
-    this.announce = as;
+      const as = this.app.getAnnounceState(this.announceID);
+      if (!as) {
+        this.app.pushRoute(`/${this.announceID}`, true);
+        return;
+      }
+      this.announce = as;
 
-    const post = await this.app.getPost(this.announceID, this.postID);
-    if (!post) {
-      this.app.pushRoute(`/${this.announceID}`, true);
-      return;
-    }
-    this.post = { ...post, pT: post.pT.toMillis() };
+      const post = await this.app.getPost(this.announceID, this.postID);
+      if (!post) {
+        this.app.pushRoute(`/${this.announceID}`, true);
+        return;
+      }
+      this.post = { ...post, pT: post.pT.toMillis() };
 
-    if (this.post.img) {
-      this.post.imgData = await this.app.getImage(this.post.img);
-    }
+      if (this.post.img) {
+        this.post.imgData = await this.app.getImage(this.post.img);
+      }
 
-    this.app.setTitle(
-      this.app.msgs.post.pageTitle(this.post.title || this.post.body.substr(0, 20)),
-    );
+      this.app.setTitle(
+        this.app.msgs.post.pageTitle(this.post.title || this.post.body.substr(0, 20)),
+      );
+    });
   }
 
   private handleDelete = (ev: Event) => {

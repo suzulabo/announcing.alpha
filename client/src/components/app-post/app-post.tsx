@@ -20,8 +20,7 @@ export class AppPost {
   post: PostJSON & { imgData?: string };
 
   async componentWillLoad() {
-    this.app.loading.show();
-    try {
+    await this.app.processLoading(async () => {
       await this.app.loadAnnounce(this.announceID);
 
       this.post = await this.app.fetchPost(this.announceID, this.postID);
@@ -36,9 +35,7 @@ export class AppPost {
       this.app.setTitle(
         this.app.msgs.post.pageTitle(a.name, this.post.title || this.post.body.substr(0, 20)),
       );
-    } finally {
-      this.app.loading.hide();
-    }
+    });
   }
 
   private shareClick = async () => {

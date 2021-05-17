@@ -14,8 +14,7 @@ export class AppHome {
   follows: [string, Follow][];
 
   async componentWillLoad() {
-    this.app.loading.show();
-    try {
+    await this.app.processLoading(async () => {
       this.app.setTitle(this.app.msgs.home.pageTitle);
 
       const follows = await this.app.getFollows();
@@ -30,9 +29,7 @@ export class AppHome {
       }
 
       this.follows = follows;
-    } finally {
-      this.app.loading.hide();
-    }
+    });
   }
 
   private handleUnfollowClick = async (event: Event) => {

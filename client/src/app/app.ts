@@ -91,18 +91,31 @@ export class App {
     }
   }
 
-  loading = {
-    show: () => {
-      readTask(() => {
-        document.querySelector('ap-loading').classList.add('show');
-      });
-    },
-    hide: () => {
-      readTask(() => {
-        document.querySelector('ap-loading').classList.remove('show');
-      });
-    },
+  private _loading = false;
+  set loading(v: boolean) {
+    this._loading = v;
+    this.setLoadingClass();
+  }
+
+  private setLoadingClass = () => {
+    readTask(() => {
+      const apLoading = document.querySelector('ap-loading');
+      if (this._loading) {
+        apLoading.classList.add('show');
+      } else {
+        apLoading.classList.remove('show');
+      }
+    });
   };
+
+  async processLoading(f: () => Promise<void>) {
+    this.loading = true;
+    try {
+      await f();
+    } finally {
+      this.loading = false;
+    }
+  }
 
   get msgs() {
     return this.appMsg.msgs;

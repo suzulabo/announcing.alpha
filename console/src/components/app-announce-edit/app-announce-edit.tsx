@@ -87,23 +87,25 @@ export class AppAnnounceEdit {
   };
 
   async componentWillLoad() {
-    await this.app.loadAnnounce(this.announceID);
-    const as = this.app.getAnnounceState(this.announceID);
-    if (!as) {
-      this.app.pushRoute('/');
-      return;
-    }
+    await this.app.processLoading(async () => {
+      await this.app.loadAnnounce(this.announceID);
+      const as = this.app.getAnnounceState(this.announceID);
+      if (!as) {
+        this.app.pushRoute('/');
+        return;
+      }
 
-    this.app.setTitle(this.app.msgs.announceEdit.pageTitle(as.name));
+      this.app.setTitle(this.app.msgs.announceEdit.pageTitle(as.name));
 
-    this.announce = as;
-    this.values = {
-      name: as.name,
-      desc: as.desc,
-      link: as.link,
-      icon: as.icon,
-      iconData: as.iconData,
-    };
+      this.announce = as;
+      this.values = {
+        name: as.name,
+        desc: as.desc,
+        link: as.link,
+        icon: as.icon,
+        iconData: as.iconData,
+      };
+    });
   }
 
   render() {
