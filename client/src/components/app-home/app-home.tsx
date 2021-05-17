@@ -14,20 +14,25 @@ export class AppHome {
   follows: [string, Follow][];
 
   async componentWillLoad() {
-    this.app.setTitle(this.app.msgs.home.pageTitle);
+    this.app.loading.show();
+    try {
+      this.app.setTitle(this.app.msgs.home.pageTitle);
 
-    const follows = await this.app.getFollows();
+      const follows = await this.app.getFollows();
 
-    for (const [id, follow] of follows) {
-      await this.app.loadAnnounce(id);
-      const a = this.app.getAnnounceState(id);
-      if (a && a.name != follow.name) {
-        follow.name = a.name;
-        await this.app.setFollow(id, follow);
+      for (const [id, follow] of follows) {
+        await this.app.loadAnnounce(id);
+        const a = this.app.getAnnounceState(id);
+        if (a && a.name != follow.name) {
+          follow.name = a.name;
+          await this.app.setFollow(id, follow);
+        }
       }
-    }
 
-    this.follows = follows;
+      this.follows = follows;
+    } finally {
+      this.app.loading.hide();
+    }
   }
 
   private handleUnfollowClick = async (event: Event) => {

@@ -20,7 +20,7 @@ export class AppPost {
   post: PostJSON & { imgData?: string };
 
   async componentWillLoad() {
-    this.app.loading = true;
+    this.app.loading.show();
     try {
       await this.app.loadAnnounce(this.announceID);
 
@@ -37,7 +37,7 @@ export class AppPost {
         this.app.msgs.post.pageTitle(a.name, this.post.title || this.post.body.substr(0, 20)),
       );
     } finally {
-      this.app.loading = false;
+      this.app.loading.hide();
     }
   }
 

@@ -19,7 +19,7 @@ export class AppAnnounce {
   private announceName: string;
 
   async componentWillLoad() {
-    this.app.loading = true;
+    this.app.loading.show();
     try {
       await this.app.loadAnnounce(this.announceID);
 
@@ -41,12 +41,12 @@ export class AppAnnounce {
 
       this.app.setTitle(this.app.msgs.announce.pageTitle(this.announceName));
     } finally {
-      this.app.loading = false;
+      this.app.loading.hide();
     }
   }
 
   private handleFollowClick = async () => {
-    this.app.loading = true;
+    this.app.loading.show();
     try {
       const follow: Follow = {
         name: this.announceName,
@@ -55,7 +55,7 @@ export class AppAnnounce {
       await this.app.setFollow(this.announceID, follow);
       this.follow = await this.app.getFollow(this.announceID);
     } finally {
-      this.app.loading = false;
+      this.app.loading.hide();
     }
   };
 

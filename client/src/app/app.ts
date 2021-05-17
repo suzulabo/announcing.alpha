@@ -1,6 +1,6 @@
 import { Device, DeviceInfo } from '@capacitor/device';
 import { Share } from '@capacitor/share';
-import { Build } from '@stencil/core';
+import { Build, readTask } from '@stencil/core';
 import { Announce, AnnounceMetaJSON, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
 import { AnnounceState, Follow } from './datatypes';
@@ -91,12 +91,18 @@ export class App {
     }
   }
 
-  set loading(v: boolean) {
-    this.appState.state.loading = v;
-  }
-  get loading() {
-    return this.appState.state.loading;
-  }
+  loading = {
+    show: () => {
+      readTask(() => {
+        document.querySelector('ap-loading').classList.add('show');
+      });
+    },
+    hide: () => {
+      readTask(() => {
+        document.querySelector('ap-loading').classList.remove('show');
+      });
+    },
+  };
 
   get msgs() {
     return this.appMsg.msgs;
