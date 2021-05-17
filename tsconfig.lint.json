@@ -1,4 +1,4 @@
 {
   "compilerOptions": { "strict": true },
-  "include": [".eslintrc.js", "**/stencil.config.ts"]
+  "include": [".eslintrc.js", "**/stencil.config.ts", "**/capacitor.config.ts"]
 }
