@@ -1,3 +1,4 @@
+import { App as CapApp } from '@capacitor/app';
 import { Device, DeviceInfo } from '@capacitor/device';
 import { Share } from '@capacitor/share';
 import { Build, readTask } from '@stencil/core';
@@ -48,6 +49,11 @@ export class App {
         await this.appStorage.notifications.remove(id);
       }
     }
+
+    await CapApp.addListener('appUrlOpen', data => {
+      console.log('App opened with URL:', data);
+      alert(data.url);
+    });
   }
 
   setTitle(v: string) {
