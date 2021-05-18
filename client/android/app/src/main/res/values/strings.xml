@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Announcing♪</string>
+    <string name="title_activity_main">Announcing♪</string>
+    <string name="package_name">app.announcing.client</string>
+    <string name="custom_url_scheme">app.announcing.client</string>
+</resources>
