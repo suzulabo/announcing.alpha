@@ -1,3 +1,5 @@
+import { Capacitor, PluginListenerHandle } from '@capacitor/core';
+import { PushNotifications } from '@capacitor/push-notifications';
 import { Build } from '@stencil/core';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
@@ -6,6 +8,73 @@ import 'firebase/messaging';
 import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 import nacl from 'tweetnacl';
 import { bs62 } from './utils';
+
+class CapNotification {
+  private token: string;
+
+  constructor() {
+    void PushNotifications.addListener('pushNotificationReceived', notif => {
+      console.log('pushNotificationReceived', JSON.stringify(notif, null, 2));
+    });
+    void PushNotifications.addListener('pushNotificationActionPerformed', notification => {
+      console.log('pushNotificationActionPerformed', JSON.stringify(notification, null, 2));
+    });
+  }
+
+  async checkNotifyPermission(ask: boolean) {
+    {
+      const result = await PushNotifications.checkPermissions();
+
+      switch (result.receive) {
+        case 'denied':
+        case 'granted':
+          return result.receive;
+        default:
+          if (!ask) {
+            return 'default';
+          }
+      }
+    }
+
+    {
+      const result = await PushNotifications.requestPermissions();
+      switch (result.receive) {
+        case 'denied':
+        case 'granted':
+          return result.receive;
+        default:
+          return 'default';
+      }
+    }
+  }
+
+  async messageToken() {
+    if (this.token) {
+      return this.token;
+    }
+
+    const handlers = [] as PluginListenerHandle[];
+    try {
+      this.token = await new Promise<string>(async (resolve, reject) => {
+        handlers.push(
+          await PushNotifications.addListener('registration', token => {
+            resolve(token.value);
+          }),
+          await PushNotifications.addListener('registrationError', reason => {
+            reject(reason);
+          }),
+        );
+
+        PushNotifications.register().catch(reason => {
+          reject(reason);
+        });
+      });
+      return this.token;
+    } finally {
+      handlers.forEach(v => v.remove());
+    }
+  }
+}
 
 const getCache = async <T>(docRef: firebase.firestore.DocumentReference): Promise<T> => {
   {
@@ -21,9 +90,15 @@ const getCache = async <T>(docRef: firebase.firestore.DocumentReference): Promis
 export class AppFirebase {
   private functions: firebase.functions.Functions;
   private firestore: firebase.firestore.Firestore;
-  private messaging: firebase.messaging.Messaging;
 
-  constructor(private appEnv: AppEnv, private _firebaseApp?: firebase.app.App) {}
+  private messaging?: firebase.messaging.Messaging;
+  private capNotification?: CapNotification;
+
+  constructor(private appEnv: AppEnv, private _firebaseApp?: firebase.app.App) {
+    if (Capacitor.getPlatform() != 'web') {
+      this.capNotification = new CapNotification();
+    }
+  }
 
   private devonly_setEmulator() {
     if (!Build.isDev) {
@@ -42,10 +117,13 @@ export class AppFirebase {
     this._firebaseApp = firebase.initializeApp(this.appEnv.env.firebaseConfig);
     this.functions = this._firebaseApp.functions(this.appEnv.env.functionsRegion);
     this.firestore = this._firebaseApp.firestore();
-    try {
-      this.messaging = this._firebaseApp.messaging();
-    } catch (err) {
-      console.warn('create messaging', err);
+
+    if (!this.capNotification) {
+      try {
+        this.messaging = this._firebaseApp.messaging();
+      } catch (err) {
+        console.warn('create messaging', err);
+      }
     }
     this.devonly_setEmulator();
 
@@ -112,6 +190,10 @@ export class AppFirebase {
   }
 
   private async messageToken() {
+    if (this.capNotification) {
+      return this.capNotification.messageToken();
+    }
+
     const serviceWorkerRegistration = await navigator.serviceWorker.getRegistration();
     const token = await this.messaging.getToken({
       vapidKey: this.appEnv.env.vapidKey,
@@ -121,6 +203,10 @@ export class AppFirebase {
   }
 
   async checkNotifyPermission(ask: boolean) {
+    if (this.capNotification) {
+      return this.capNotification.checkNotifyPermission(ask);
+    }
+
     if (!this.messaging) {
       return 'unsupported';
     }
