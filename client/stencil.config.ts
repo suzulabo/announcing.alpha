@@ -1,5 +1,6 @@
 import replace from '@rollup/plugin-replace';
 import { Config } from '@stencil/core';
+import { OutputTargetWww } from '@stencil/core/internal';
 import { sass } from '@stencil/sass';
 import nodePolyfills from 'rollup-plugin-node-polyfills';
 
@@ -21,19 +22,26 @@ const buildSrc = () => {
   return 'local build';
 };
 
-export const config: Config = {
-  globalScript: 'src/global/app.ts',
-  taskQueue: 'async',
-  outputTargets: [
-    {
+const isCapacitor = process.env['CAP_BUILD'] != null;
+if (isCapacitor) {
+  console.log('Capacitor Build');
+}
+
+const outputTargetWww: OutputTargetWww = isCapacitor
+  ? { type: 'www', dir: 'cap', serviceWorker: null }
+  : {
       type: 'www',
       serviceWorker: {
         swSrc: 'src/sw.js',
         globPatterns: process.argv.includes('--dev') ? ['index.html'] : ['**/*.{js,html}'],
       },
       copy: [{ src: '../assetlinks.json', dest: '.well-known/assetlinks.json' }],
-    },
-  ],
+    };
+
+export const config: Config = {
+  globalScript: 'src/global/app.ts',
+  taskQueue: 'async',
+  outputTargets: [outputTargetWww],
   plugins: [
     sass({}),
     replace({
