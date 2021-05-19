@@ -1,8 +1,9 @@
+import { Http } from '@capacitor-community/http';
 import { App as CapApp } from '@capacitor/app';
 import { Device, DeviceInfo } from '@capacitor/device';
 import { Share } from '@capacitor/share';
 import { Build, readTask } from '@stencil/core';
-import { Announce, AnnounceMetaJSON, PostJSON } from 'src/shared';
+import { Announce, AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
 import { AnnounceState, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
@@ -23,20 +24,21 @@ export class App {
   private deviceInfo: DeviceInfo;
 
   constructor(
+    private appEnv: AppEnv,
     private appMsg: AppMsg,
     private appFirebase: AppFirebase,
     private appState: AppState,
     private appStorage: AppStorage,
-  ) {
-    if (Build.isDev) {
-      this.dataURLPrefix = `${location.origin}/data`;
-    } else {
-      this.dataURLPrefix = '/data';
-    }
-  }
+  ) {}
 
   async init() {
     this.deviceInfo = await Device.getInfo();
+
+    if (Build.isDev || this.deviceInfo.platform == 'web') {
+      this.dataURLPrefix = '/data';
+    } else {
+      this.dataURLPrefix = `${this.appEnv.env.sites.client}/data`;
+    }
 
     await this.appFirebase.init();
 
@@ -52,7 +54,8 @@ export class App {
 
     await CapApp.addListener('appUrlOpen', data => {
       console.log('App opened with URL:', data);
-      alert(data.url);
+      const url = new URL(data.url);
+      this.pushRoute(url.pathname);
     });
   }
 
@@ -170,9 +173,9 @@ export class App {
   }
 
   private async fetchData<T>(p: string) {
-    const res = await fetch(`${this.dataURLPrefix}/${p}`);
-    if (res.ok) {
-      return (await res.json()) as T;
+    const res = await Http.request({ method: 'GET', url: `${this.dataURLPrefix}/${p}` });
+    if (res.status == 200) {
+      return res.data as T;
     }
   }
 

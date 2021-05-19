@@ -31,6 +31,7 @@ export const config: Config = {
         swSrc: 'src/sw.js',
         globPatterns: process.argv.includes('--dev') ? ['index.html'] : ['**/*.{js,html}'],
       },
+      copy: [{ src: '../assetlinks.json', dest: '.well-known/assetlinks.json' }],
     },
   ],
   plugins: [
