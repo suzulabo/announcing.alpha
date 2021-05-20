@@ -174,9 +174,14 @@ export class App {
 
   private async fetchData<T>(p: string) {
     const res = await Http.request({ method: 'GET', url: `${this.dataURLPrefix}/${p}` });
-    if (res.status == 200) {
+    if (res.status == 200 && typeof res.data == 'object') {
       return res.data as T;
     }
+    if (res.status == 404) {
+      return;
+    }
+
+    throw new Error(`Fetch Error (${res.status})`);
   }
 
   fetchAnnounceMeta(id: string, metaID: string) {
