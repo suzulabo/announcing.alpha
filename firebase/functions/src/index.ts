@@ -1,4 +1,3 @@
-import _cors from 'cors';
 import { initializeApp } from 'firebase-admin';
 import * as functions from 'firebase-functions';
 import { Request, Response } from 'firebase-functions';
@@ -21,13 +20,9 @@ import {
 } from './https/get-data';
 import { pubsubSendNotification } from './pubsub/send-notification';
 import { AppEnv } from './shared';
-import { logger } from './utils/logger';
-
-const isEmu = process.env.FUNCTIONS_EMULATOR != null;
 
 const adminApp = initializeApp();
 const appEnv = new AppEnv().env;
-const cors = _cors({ origin: isEmu ? '*' : appEnv.sites.client });
 
 const region = functions.region(appEnv.functionsRegion);
 
@@ -57,13 +52,7 @@ type httpsHandler = (
 ) => Promise<void>;
 const onHttpsRequest = (handler: httpsHandler) => {
   return region.https.onRequest(async (req, res) => {
-    try {
-      cors(req, res, () => {});
-      await handler(req, res, adminApp);
-    } catch (err) {
-      logger.error(err);
-      res.sendStatus(500);
-    }
+    await handler(req, res, adminApp);
   });
 };
 
