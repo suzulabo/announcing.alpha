@@ -7,18 +7,40 @@ import 'firebase/functions';
 import 'firebase/messaging';
 import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 import nacl from 'tweetnacl';
+import { NotifyAnnounceEvent } from './datatypes';
 import { bs62 } from './utils';
 
 class CapNotification {
   private token: string;
 
   constructor() {
-    void PushNotifications.addListener('pushNotificationReceived', notif => {
-      console.log('pushNotificationReceived', JSON.stringify(notif, null, 2));
+    void PushNotifications.addListener('pushNotificationReceived', notification => {
+      console.debug('pushNotificationReceived', JSON.stringify(notification, null, 2));
+
+      const announceID = notification.data?.announceID;
+      if (!announceID || typeof announceID != 'string') {
+        return;
+      }
+
+      this.dispatchNotifyAnnounce(announceID);
     });
     void PushNotifications.addListener('pushNotificationActionPerformed', notification => {
-      console.log('pushNotificationActionPerformed', JSON.stringify(notification, null, 2));
+      console.debug('pushNotificationActionPerformed', JSON.stringify(notification, null, 2));
+
+      const announceID = notification.notification.data?.announceID;
+      if (!announceID || typeof announceID != 'string') {
+        return;
+      }
+
+      this.dispatchNotifyAnnounce(announceID);
     });
+  }
+
+  private dispatchNotifyAnnounce(announceID: string) {
+    const event = new NotifyAnnounceEvent('notifyAnnounce', {
+      detail: { announceID },
+    });
+    dispatchEvent(event);
   }
 
   async checkNotifyPermission(ask: boolean) {

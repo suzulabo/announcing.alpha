@@ -1,5 +1,6 @@
 import { Component, h, Host, Listen, State } from '@stencil/core';
 import { App } from 'src/app/app';
+import { NotifyAnnounceEvent } from 'src/app/datatypes';
 import { AppFirebase } from 'src/app/firebase';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
@@ -33,6 +34,17 @@ export class AppRoot {
     this.path = p;
   }
 
+  @Listen('notifyAnnounce', { target: 'window' })
+  handleNotifyAnnounce(event: NotifyAnnounceEvent) {
+    console.debug('notifyAnnounce', event.detail.announceID);
+    const p = `/${event.detail.announceID}`;
+    if (this.app) {
+      this.app.pushRoute(p);
+    } else {
+      location.href = p;
+    }
+  }
+
   async componentWillLoad() {
     const appMsg = new AppMsg();
     document.querySelector('ap-error').msgs = appMsg.msgs.error;
@@ -41,8 +53,9 @@ export class AppRoot {
     const appFirebase = new AppFirebase(appEnv);
     const appState = new AppState();
     const appStorage = new AppStorage();
-    this.app = new App(appEnv, appMsg, appFirebase, appState, appStorage);
-    await this.app.init();
+    const app = new App(appEnv, appMsg, appFirebase, appState, appStorage);
+    await app.init();
+    this.app = app;
     this.handlePopState();
   }
 

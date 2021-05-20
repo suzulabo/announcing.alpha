@@ -9,3 +9,5 @@ export interface AnnounceState extends Announce, AnnounceMetaJSON {
   id: string;
   iconData?: string;
 }
+
+export class NotifyAnnounceEvent extends CustomEvent<{ announceID: string }> {}
