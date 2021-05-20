@@ -26,7 +26,6 @@
     "@capacitor/app": "^0.3.10",
     "@capacitor/cli": "^3.0.0-rc.3",
     "@capacitor/core": "^3.0.0-rc.3",
-    "@capacitor/device": "^0.6.2",
     "@capacitor/push-notifications": "^0.3.10",
     "@capacitor/share": "^0.5.7",
     "@capacitor/storage": "^0.3.10",

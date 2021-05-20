@@ -1,6 +1,6 @@
 import { Http } from '@capacitor-community/http';
 import { App as CapApp } from '@capacitor/app';
-import { Device, DeviceInfo } from '@capacitor/device';
+import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Build, readTask } from '@stencil/core';
 import { Announce, AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
@@ -21,7 +21,6 @@ export class App {
   readonly buildInfo = BUILD_INFO;
 
   private dataURLPrefix: string;
-  private deviceInfo: DeviceInfo;
 
   constructor(
     private appEnv: AppEnv,
@@ -32,9 +31,7 @@ export class App {
   ) {}
 
   async init() {
-    this.deviceInfo = await Device.getInfo();
-
-    if (Build.isDev || this.deviceInfo.platform == 'web') {
+    if (Build.isDev || Capacitor.getPlatform() == 'web') {
       this.dataURLPrefix = '/data';
     } else {
       this.dataURLPrefix = `${this.appEnv.env.sites.client}/data`;
@@ -131,7 +128,7 @@ export class App {
   }
 
   checkShareSupport() {
-    if (this.deviceInfo.platform != 'web') {
+    if (Capacitor.getPlatform() != 'web') {
       return true;
     }
     if (navigator.share) {
