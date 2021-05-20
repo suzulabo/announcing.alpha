@@ -173,11 +173,19 @@ export class AppFirebase {
         const unsubscribe = this.firestore.doc(p).onSnapshot(
           async () => {
             if (cb) {
-              await cb();
+              try {
+                await cb();
+              } catch (err) {
+                unsubscribe();
+                listenMap.delete(p);
+                reject(err);
+                return;
+              }
             }
             resolve();
           },
           err => {
+            console.warn('onSnapshot error', p, err);
             unsubscribe();
             listenMap.delete(p);
             reject(err);
