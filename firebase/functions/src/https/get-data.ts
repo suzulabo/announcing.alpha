@@ -38,7 +38,7 @@ export const httpsGetAnnounceMetaData = async (
   }
   const [, id, metaID] = m;
 
-  const firestore = admin.firestore();
+  const firestore = adminApp.firestore();
   const docRef = firestore.doc(`announces/${id}/meta/${metaID}`);
   const data = await getCacheFirst<AnnounceMeta>(docRef);
   if (!data) {
@@ -62,7 +62,7 @@ export const httpsGetAnnouncePostData = async (
   }
   const [, id, postID] = m;
 
-  const firestore = admin.firestore();
+  const firestore = adminApp.firestore();
   const docRef = firestore.doc(`announces/${id}/posts/${postID}`);
   const data = await getCacheFirst<Post>(docRef);
   if (!data) {
@@ -83,7 +83,7 @@ export const httpsGetImageData = async (req: Request, res: Response, adminApp: a
 
   const [, id] = m;
 
-  const firestore = admin.firestore();
+  const firestore = adminApp.firestore();
   const docRef = firestore.doc(`images/${id}`);
   const data = await getCacheFirst<{ data: Buffer }>(docRef);
   if (!data) {

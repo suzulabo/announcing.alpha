@@ -112,7 +112,7 @@ const deleteArchives = async (
 
 export const firestoreImmediateNotificationWrite = async (
   change: Change<DocumentSnapshot>,
-  context: EventContext,
+  _context: EventContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
   const firestore = adminApp.firestore();

@@ -15,7 +15,7 @@ const sortNum = (a: number[]) => {
 
 export const callRegisterNotification = async (
   params: Partial<RegisterNotificationParams>,
-  context: CallableContext,
+  _context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
   logger.debug('params:', params);

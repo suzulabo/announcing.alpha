@@ -33,7 +33,7 @@ export const pubTokenMessages = async (msgs: admin.messaging.TokenMessage[]) => 
 
 export const pubsubSendNotification = async (
   msg: Message,
-  context: EventContext,
+  _context: EventContext,
   adminApp: admin.app.App,
 ) => {
   const handleResponse = async (bs: admin.messaging.BatchResponse, tokens: string[]) => {
