@@ -1,6 +1,6 @@
 import { Component, h, Host, Listen, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { NotifyAnnounceEvent } from 'src/app/datatypes';
+import { NotifyPostEvent } from 'src/app/datatypes';
 import { AppFirebase } from 'src/app/firebase';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
@@ -34,10 +34,10 @@ export class AppRoot {
     this.path = p;
   }
 
-  @Listen('notifyAnnounce', { target: 'window' })
-  handleNotifyAnnounce(event: NotifyAnnounceEvent) {
-    console.debug('notifyAnnounce', event.detail.announceID);
-    const p = `/${event.detail.announceID}`;
+  @Listen('notifyPost', { target: 'window' })
+  handleNotifyPost(event: NotifyPostEvent) {
+    console.debug('notifyPost', event.detail.announceID, event.detail.postID);
+    const p = `/${event.detail.announceID}/${event.detail.postID}`;
     if (this.app) {
       this.app.pushRoute(p);
     } else {

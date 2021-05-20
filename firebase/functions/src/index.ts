@@ -80,7 +80,7 @@ export const onFirestoreDeleteAnnounce = region.firestore
 export const onFirestoreCreatePost = region.firestore
   .document('announces/{announceID}/posts/{postID}')
   .onCreate((qds, context) => {
-    return firestoreCreatePost(qds, context, adminApp);
+    return firestoreCreatePost(qds, context, adminApp, appEnv.sites.client);
   });
 
 export const onFirestoreNotificationDeviceWrite = region.firestore

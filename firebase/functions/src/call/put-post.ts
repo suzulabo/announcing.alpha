@@ -60,6 +60,7 @@ export const callPutPost = async (
     if (!data) {
       throw new Error(`missing edit data: ${id}/${editID}`);
     }
+    postData.edited = editID;
     postData.pT = data.pT;
   }
 

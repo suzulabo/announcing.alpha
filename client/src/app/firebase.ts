@@ -7,7 +7,7 @@ import 'firebase/functions';
 import 'firebase/messaging';
 import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 import nacl from 'tweetnacl';
-import { NotifyAnnounceEvent } from './datatypes';
+import { NotifyPostEvent } from './datatypes';
 import { bs62 } from './utils';
 
 class CapNotification {
@@ -17,28 +17,27 @@ class CapNotification {
     void PushNotifications.addListener('pushNotificationReceived', notification => {
       console.debug('pushNotificationReceived', JSON.stringify(notification, null, 2));
 
-      const announceID = notification.data?.announceID;
-      if (!announceID || typeof announceID != 'string') {
-        return;
-      }
-
-      this.dispatchNotifyAnnounce(announceID);
+      this.dispatchNotifyPost(notification.data);
     });
     void PushNotifications.addListener('pushNotificationActionPerformed', notification => {
       console.debug('pushNotificationActionPerformed', JSON.stringify(notification, null, 2));
 
-      const announceID = notification.notification.data?.announceID;
-      if (!announceID || typeof announceID != 'string') {
-        return;
-      }
-
-      this.dispatchNotifyAnnounce(announceID);
+      this.dispatchNotifyPost(notification.notification.data);
     });
   }
 
-  private dispatchNotifyAnnounce(announceID: string) {
-    const event = new NotifyAnnounceEvent('notifyAnnounce', {
-      detail: { announceID },
+  private dispatchNotifyPost(data?: any) {
+    const announceID = data?.announceID;
+    if (!announceID || typeof announceID != 'string') {
+      return;
+    }
+    const postID = data?.postID;
+    if (!postID || typeof postID != 'string') {
+      return;
+    }
+
+    const event = new NotifyPostEvent('notifyPost', {
+      detail: { announceID, postID },
     });
     dispatchEvent(event);
   }

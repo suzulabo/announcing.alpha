@@ -23,6 +23,7 @@ interface PostBase {
   body?: string;
   link?: string;
   img?: string;
+  edited?: string;
 }
 
 export interface Post extends PostBase {

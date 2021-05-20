@@ -47,14 +47,16 @@ export const firestoreCreatePost = async (
   qds: QueryDocumentSnapshot,
   context: EventContext,
   adminApp: admin.app.App,
+  clientSite: string,
 ): Promise<void> => {
-  // check edited post
-  if (qds.id.includes('-')) {
-    logger.debug('edited post');
+  const postData = qds.data() as Post;
+
+  if (postData.edited) {
     return;
   }
 
   const announceID = context.params.announceID;
+  const postID = qds.id;
 
   const firestore = adminApp.firestore();
   const followers = await getImmediateNotificationFollowers(firestore, announceID);
@@ -80,10 +82,13 @@ export const firestoreCreatePost = async (
     return;
   }
 
-  const postData = qds.data() as Post;
   const msgs = [] as admin.messaging.MulticastMessage[];
-  const notification = { title: announceMeta.name, body: postData.title || postData.body };
-  const data = { announceID, ...(announceMeta.icon && { icon: announceMeta.icon }) };
+  const notification: admin.messaging.Notification = {
+    title: announceMeta.name,
+    body: postData.title || postData.body,
+    ...(announceMeta.icon && { imageUrl: `${clientSite}/data/images/${announceMeta.icon}` }),
+  };
+  const data = { announceID, postID, ...(announceMeta.icon && { icon: announceMeta.icon }) };
 
   let tokens = [...tokensSet] as string[];
   while (tokens.length > 0) {
