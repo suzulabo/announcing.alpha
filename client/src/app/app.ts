@@ -3,9 +3,9 @@ import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Build, readTask } from '@stencil/core';
-import { Announce, AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
+import { AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
-import { AnnounceState, Follow } from './datatypes';
+import { FetchError, FETCH_ERROR, Follow, NOT_FOUND } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
@@ -142,34 +142,46 @@ export class App {
     return Share.share({ url });
   }
 
-  private async toAnnounceState(id: string, a: Announce): Promise<AnnounceState> {
-    const meta = await this.fetchAnnounceMeta(id, a.mid);
-    if (!meta) {
-      return;
-    }
-
-    return { id, ...a, ...meta, ...(!!meta.icon && { iconData: this.getImageURI(meta.icon) }) };
-  }
-
-  async loadAnnounce(id: string) {
-    await this.appFirebase.listenAnnounce(id, async () => {
+  loadAnnounce(id: string) {
+    const cb = async () => {
       const a = await this.appFirebase.getAnnounce(id);
-      const m = new Map(this.appState.state.announces);
-      if (!a) {
-        m.delete(id);
-      } else {
-        const as = await this.toAnnounceState(id, a);
-        m.set(id, as);
+      const m = this.appState.state.announces;
+      try {
+        if (!a) {
+          m.delete(id);
+          return;
+        }
+        if (a == NOT_FOUND) {
+          m.set(id, a);
+          return;
+        }
+
+        const meta = await this.fetchAnnounceMeta(id, a.mid);
+        if (!meta || meta == FETCH_ERROR) {
+          m.set(id, FETCH_ERROR);
+          return;
+        }
+        m.set(id, {
+          id,
+          ...a,
+          ...meta,
+          ...(!!meta.icon && { iconData: this.getImageURI(meta.icon) }),
+        });
+      } finally {
+        this.appState.state.announces = new Map(m);
       }
-      this.appState.state.announces = m;
-    });
+    };
+
+    this.appFirebase.listenAnnounce(id, cb);
+
+    void cb();
   }
 
   getAnnounceState(id: string) {
     return this.appState.state.announces.get(id);
   }
 
-  private async fetchData<T>(p: string) {
+  private async fetchData<T>(p: string): Promise<T | FetchError> {
     const res = await Http.request({ method: 'GET', url: `${this.dataURLPrefix}/${p}` });
     if (res.status == 200 && typeof res.data == 'object') {
       return res.data as T;
@@ -177,8 +189,8 @@ export class App {
     if (res.status == 404) {
       return;
     }
-
-    throw new Error(`Fetch Error (${res.status})`);
+    console.error(`Fetch Error (${res.status})`);
+    return FETCH_ERROR;
   }
 
   fetchAnnounceMeta(id: string, metaID: string) {

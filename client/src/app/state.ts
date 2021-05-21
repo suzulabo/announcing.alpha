@@ -1,8 +1,8 @@
 import { createStore } from '@stencil/store';
-import { AnnounceState, Follow } from './datatypes';
+import { AnnounceState, FetchError, Follow, NotFound } from './datatypes';
 
 interface State {
-  announces: Map<string, AnnounceState>;
+  announces: Map<string, AnnounceState | NotFound | FetchError>;
   follows: Follow[];
 }
 

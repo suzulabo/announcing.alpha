@@ -1,5 +1,6 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
+import { FETCH_ERROR, NOT_FOUND } from 'src/app/datatypes';
 import { PostJSON } from 'src/shared';
 
 @Component({
@@ -20,21 +21,17 @@ export class AppPost {
   post: PostJSON & { imgData?: string };
 
   async componentWillLoad() {
+    this.app.setTitle('');
+    this.app.loadAnnounce(this.announceID);
     await this.app.processLoading(async () => {
-      await this.app.loadAnnounce(this.announceID);
-
-      this.post = await this.app.fetchPost(this.announceID, this.postID);
-      if (!this.post) {
+      const post = await this.app.fetchPost(this.announceID, this.postID);
+      if (!post || post == FETCH_ERROR) {
         return;
       }
+      this.post = post;
       if (this.post.img) {
         this.post.imgData = this.app.getImageURI(this.post.img);
       }
-
-      const a = this.app.getAnnounceState(this.announceID);
-      this.app.setTitle(
-        this.app.msgs.post.pageTitle(a.name, this.post.title || this.post.body.substr(0, 20)),
-      );
     });
   }
 
@@ -47,6 +44,22 @@ export class AppPost {
   };
 
   render() {
+    const a = this.app.getAnnounceState(this.announceID);
+
+    if (!a) {
+      return;
+    }
+    if (a == NOT_FOUND) {
+      return;
+    }
+    if (a == FETCH_ERROR) {
+      return;
+    }
+
+    this.app.setTitle(
+      this.app.msgs.post.pageTitle(a.name, this.post.title || this.post.body.substr(0, 20)),
+    );
+
     if (!this.post) {
       return (
         <Host>

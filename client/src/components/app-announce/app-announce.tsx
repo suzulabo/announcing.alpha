@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { Follow } from 'src/app/datatypes';
+import { FETCH_ERROR, Follow, NOT_FOUND } from 'src/app/datatypes';
+import { AnnounceMetaJSON } from 'src/shared';
 
 @Component({
   tag: 'app-announce',
@@ -16,30 +17,15 @@ export class AppAnnounce {
   @State()
   follow: Follow;
 
+  @State()
+  meta: AnnounceMetaJSON;
+
   private announceName: string;
 
   async componentWillLoad() {
-    await this.app.processLoading(async () => {
-      await this.app.loadAnnounce(this.announceID);
-
-      const a = this.app.getAnnounceState(this.announceID);
-      if (!a) {
-        return;
-      }
-      this.announceName = a.name;
-
-      const follow = await this.app.getFollow(this.announceID);
-      if (follow) {
-        this.follow = follow;
-
-        if (follow.name != a.name) {
-          follow.name = a.name;
-          await this.app.setFollow(this.announceID, follow);
-        }
-      }
-
-      this.app.setTitle(this.app.msgs.announce.pageTitle(this.announceName));
-    });
+    this.app.loadAnnounce(this.announceID);
+    this.follow = await this.app.getFollow(this.announceID);
+    this.app.setTitle('');
   }
 
   private handleFollowClick = async () => {
@@ -55,7 +41,7 @@ export class AppAnnounce {
 
   private postLoader = async (postID: string) => {
     const post = await this.app.fetchPost(this.announceID, postID);
-    if (!post) {
+    if (!post || post == FETCH_ERROR) {
       return;
     }
 
@@ -70,6 +56,10 @@ export class AppAnnounce {
     const announce = this.app.getAnnounceState(this.announceID);
 
     if (!announce) {
+      return;
+    }
+
+    if (announce == NOT_FOUND) {
       return (
         <Host>
           <div class="deleted">{msgs.announce.deleted}</div>
@@ -78,7 +68,18 @@ export class AppAnnounce {
       );
     }
 
+    if (announce == FETCH_ERROR) {
+      return (
+        <Host>
+          <div class="fetch-error">{msgs.announce.fetchError}</div>
+          <a {...this.app.href('/', true)}>{msgs.common.back}</a>
+        </Host>
+      );
+    }
+
     const follow = this.follow;
+
+    this.app.setTitle(this.app.msgs.announce.pageTitle(announce.name));
 
     return (
       <Host>

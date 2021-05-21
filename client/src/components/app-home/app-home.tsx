@@ -1,6 +1,6 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { Follow } from 'src/app/datatypes';
+import { FETCH_ERROR, Follow, NOT_FOUND } from 'src/app/datatypes';
 
 @Component({
   tag: 'app-home',
@@ -19,13 +19,8 @@ export class AppHome {
 
       const follows = await this.app.getFollows();
 
-      for (const [id, follow] of follows) {
-        await this.app.loadAnnounce(id);
-        const a = this.app.getAnnounceState(id);
-        if (a && a.name != follow.name) {
-          follow.name = a.name;
-          await this.app.setFollow(id, follow);
-        }
+      for (const [id] of follows) {
+        this.app.loadAnnounce(id);
       }
 
       this.follows = follows;
@@ -45,6 +40,26 @@ export class AppHome {
       const a = this.app.getAnnounceState(id);
 
       if (!a) {
+        return <div class="announce-box"></div>;
+      }
+
+      if (a == FETCH_ERROR) {
+        return (
+          <div class="announce-box">
+            <div class="head">
+              <div class="name-box">
+                <span class="name">{follow.name}</span>
+              </div>
+            </div>
+            <span>{msgs.home.fetchError}</span>
+            <button class="small unfollow" data-announce-id={id} onClick={this.handleUnfollowClick}>
+              {msgs.home.unfollowBtn}
+            </button>
+          </div>
+        );
+      }
+
+      if (a == NOT_FOUND) {
         return (
           <div class="announce-box">
             <span>{msgs.home.deleted(follow.name)}</span>

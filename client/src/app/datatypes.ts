@@ -5,6 +5,12 @@ export interface Follow {
   readTime: number;
 }
 
+export const NOT_FOUND = 'NOT_FOUND';
+export type NotFound = typeof NOT_FOUND;
+
+export const FETCH_ERROR = 'FETCH_ERROR';
+export type FetchError = typeof FETCH_ERROR;
+
 export interface AnnounceState extends Announce, AnnounceMetaJSON {
   id: string;
   iconData?: string;

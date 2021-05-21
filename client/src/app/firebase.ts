@@ -7,7 +7,7 @@ import 'firebase/functions';
 import 'firebase/messaging';
 import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 import nacl from 'tweetnacl';
-import { NotifyPostEvent } from './datatypes';
+import { NotFound, NotifyPostEvent, NOT_FOUND } from './datatypes';
 import { bs62 } from './utils';
 
 class CapNotification {
@@ -164,37 +164,32 @@ export class AppFirebase {
   }
 
   private listeners = (() => {
+    const notFounds = new Set<string>();
     const listenMap = new Map<string, () => void>();
 
-    const add = async (p: string, cb: () => Promise<void>) => {
+    const add = (p: string, cb: () => void) => {
       if (listenMap.has(p)) {
         return;
       }
 
-      return new Promise<void>((resolve, reject) => {
-        const unsubscribe = this.firestore.doc(p).onSnapshot(
-          async () => {
-            if (cb) {
-              try {
-                await cb();
-              } catch (err) {
-                unsubscribe();
-                listenMap.delete(p);
-                reject(err);
-                return;
-              }
-            }
-            resolve();
-          },
-          err => {
-            console.warn('onSnapshot error', p, err);
-            unsubscribe();
-            listenMap.delete(p);
-            reject(err);
-          },
-        );
-        listenMap.set(p, unsubscribe);
-      });
+      const unsubscribe = this.firestore.doc(p).onSnapshot(
+        ds => {
+          if (ds.exists) {
+            notFounds.delete(p);
+          } else {
+            notFounds.add(p);
+          }
+          if (cb) {
+            cb();
+          }
+        },
+        err => {
+          console.error('onSnapshot error', p, err);
+          unsubscribe();
+          listenMap.delete(p);
+        },
+      );
+      listenMap.set(p, unsubscribe);
     };
 
     const release = () => {
@@ -204,7 +199,7 @@ export class AppFirebase {
       listenMap.clear();
     };
 
-    return { add, release };
+    return { add, release, notFounds } as const;
   })();
 
   releaseListeners() {
@@ -215,8 +210,12 @@ export class AppFirebase {
     return this.listeners.add(`announces/${id}`, cb);
   }
 
-  async getAnnounce(id: string) {
-    const docRef = this.firestore.doc(`announces/${id}`);
+  getAnnounce(id: string): Promise<Announce | NotFound> {
+    const p = `announces/${id}`;
+    if (this.listeners.notFounds.has(p)) {
+      return Promise.resolve(NOT_FOUND);
+    }
+    const docRef = this.firestore.doc(p);
     return getCache<Announce>(docRef);
   }
 
