@@ -57,6 +57,7 @@ describe('firestoreImmediateNotificationWrite', () => {
       uT: expect.any(Date),
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const archives1 = firestore.doc('notif-imm/111111111111/archives/1').get().data()!;
     expect(archives1.followers).toEqual(followers);
   });

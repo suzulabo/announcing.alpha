@@ -1,3 +1,5 @@
 import 'intersection-observer';
 
-export default () => {};
+export default () => {
+  return;
+};

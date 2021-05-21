@@ -6,7 +6,7 @@ import nodePolyfills from 'rollup-plugin-node-polyfills';
 
 // https://stenciljs.com/docs/config
 
-declare var process: {
+declare const process: {
   env: {
     [key: string]: string;
   };

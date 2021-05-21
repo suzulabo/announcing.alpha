@@ -129,7 +129,7 @@ export class ApAnnounce {
   }
 
   private renderPosts() {
-    const posts = Object.entries(this.announce.posts).sort(([_k1, v1], [_k2, v2]) => {
+    const posts = Object.entries(this.announce.posts).sort(([, v1], [, v2]) => {
       return v2.pT.toMillis() - v1.pT.toMillis();
     });
     return posts.map(([id]) => {

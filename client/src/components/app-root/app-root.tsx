@@ -91,7 +91,7 @@ export class AppRoot {
         break b;
       }
 
-      if (!!postID) {
+      if (postID) {
         if (postID == 'config_') {
           return { tag: 'app-announce-config', params: { announceID } };
         } else if (this.postIDPattern.test(postID)) {

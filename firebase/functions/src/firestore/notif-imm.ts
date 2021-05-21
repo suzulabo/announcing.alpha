@@ -68,8 +68,8 @@ const archiveImmediateNotification = async (
         const data: ImmediateNotificationArchive = {
           followers: Object.fromEntries(archiveFollowers.splice(0, ARCHIVE_COUNT)),
         };
-        if (deletions.length > 0) {
-          const id = deletions.shift()!;
+        const id = deletions.shift();
+        if (id) {
           t.set(archivesRef.doc(id), data);
           newArchives.push(id);
         } else {

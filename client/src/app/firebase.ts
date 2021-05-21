@@ -1,4 +1,4 @@
-import { Capacitor, PluginListenerHandle } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Build } from '@stencil/core';
 import firebase from 'firebase/app';
@@ -74,22 +74,28 @@ class CapNotification {
       return this.token;
     }
 
-    const handlers = [] as PluginListenerHandle[];
-    try {
-      this.token = await new Promise<string>(async (resolve, reject) => {
-        handlers.push(
-          await PushNotifications.addListener('registration', token => {
-            resolve(token.value);
-          }),
-          await PushNotifications.addListener('registrationError', reason => {
-            reject(reason);
-          }),
-        );
-
-        PushNotifications.register().catch(reason => {
-          reject(reason);
-        });
+    const p = (() => {
+      let resolve: (v: string) => void;
+      let reject: (r: any) => void;
+      const promise = new Promise<string>((_resolve, _reject) => {
+        resolve = _resolve;
+        reject = _reject;
       });
+      return { promise, resolve, reject };
+    })();
+
+    const handlers = [
+      await PushNotifications.addListener('registration', v => {
+        p.resolve(v.value);
+      }),
+      await PushNotifications.addListener('registrationError', reason => {
+        p.reject(reason);
+      }),
+    ];
+
+    try {
+      await PushNotifications.register();
+      this.token = await p.promise;
       return this.token;
     } finally {
       handlers.forEach(v => v.remove());
@@ -98,13 +104,9 @@ class CapNotification {
 }
 
 const getCache = async <T>(docRef: firebase.firestore.DocumentReference): Promise<T> => {
-  {
-    try {
-      const doc = await docRef.get({ source: 'cache' });
-      if (doc.exists) {
-        return doc.data() as T;
-      }
-    } catch {}
+  const doc = await docRef.get({ source: 'cache' });
+  if (doc.exists) {
+    return doc.data() as T;
   }
 };
 

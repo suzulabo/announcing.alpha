@@ -16,7 +16,14 @@ describe('firestoreNotificationDeviceWrite', () => {
     });
 
     await firestoreNotificationDeviceWrite(
-      { before: { data: () => {} }, after: firestore.doc(`notif-devices/${token1}`).get() } as any,
+      {
+        before: {
+          data: () => {
+            return;
+          },
+        },
+        after: firestore.doc(`notif-devices/${token1}`).get(),
+      } as any,
       { params: { token: token1 } } as any,
       firestore.adminApp(),
     );
@@ -41,7 +48,14 @@ describe('firestoreNotificationDeviceWrite', () => {
     });
 
     await firestoreNotificationDeviceWrite(
-      { before: { data: () => {} }, after: firestore.doc(`notif-devices/${token1}`).get() } as any,
+      {
+        before: {
+          data: () => {
+            return;
+          },
+        },
+        after: firestore.doc(`notif-devices/${token1}`).get(),
+      } as any,
       { params: { token: token1 } } as any,
       firestore.adminApp(),
     );
@@ -85,7 +99,14 @@ describe('firestoreNotificationDeviceWrite', () => {
     });
 
     await firestoreNotificationDeviceWrite(
-      { before: { data: () => {} }, after: firestore.doc(`notif-devices/${token1}`).get() } as any,
+      {
+        before: {
+          data: () => {
+            return;
+          },
+        },
+        after: firestore.doc(`notif-devices/${token1}`).get(),
+      } as any,
       { params: { token: token1 } } as any,
       firestore.adminApp(),
     );
@@ -134,7 +155,14 @@ describe('firestoreNotificationDeviceWrite', () => {
 
     const doc1 = firestore.doc(`notif-devices/${token1}`).get();
     await firestoreNotificationDeviceWrite(
-      { before: { data: () => {} }, after: doc1 } as any,
+      {
+        before: {
+          data: () => {
+            return;
+          },
+        },
+        after: doc1,
+      } as any,
       { params: { token: token1 } } as any,
       firestore.adminApp(),
     );

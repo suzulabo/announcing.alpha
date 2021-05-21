@@ -91,7 +91,11 @@ const archiveTimedNotification = async (firestore: admin.firestore.Firestore, ti
       let dataSize = 0;
       let dataFollowers = [] as [string, TimedNotificationArchive['followers'][string]][];
       while (archiveFollowers.length > 0) {
-        const [token, v] = archiveFollowers.shift()!;
+        const x = archiveFollowers.shift();
+        if (!x) {
+          continue;
+        }
+        const [token, v] = x;
         dataFollowers.push([token, v]);
         dataSize += token.length + 1 + getFollowsSize(v);
         const doArchive = dataSize > SHOULD_ARCHIVE_SIZE || archiveFollowers.length == 0;
@@ -103,8 +107,8 @@ const archiveTimedNotification = async (firestore: admin.firestore.Firestore, ti
           followers: Object.fromEntries(dataFollowers),
         };
 
-        if (deletions.length > 0) {
-          const id = deletions.shift()!;
+        const id = deletions.shift();
+        if (id) {
           t.set(archivesRef.doc(id), data);
           newArchives.push(id);
         } else {

@@ -31,11 +31,12 @@ const copyData = (src: DocData, dst: DocData) => {
         case 'ServerTimestampTransform':
           dst[k] = new Date();
           return;
-        case 'ArrayUnionTransform':
+        case 'ArrayUnionTransform': {
           const curArray = Array.isArray(dst[k]) ? dst[k] : [];
           dst[k] = [...new Set([...curArray, ...v.elements])];
           return;
-        case 'ArrayRemoveTransform':
+        }
+        case 'ArrayRemoveTransform': {
           const x = dst[k];
           if (Array.isArray(x)) {
             dst[k] = x.filter(a => {
@@ -45,6 +46,7 @@ const copyData = (src: DocData, dst: DocData) => {
             dst[k] = [];
           }
           return;
+        }
         case 'DeleteTransform':
           delete dst[k];
           return;
@@ -169,7 +171,6 @@ class DocSnapshot {
 
 class Batch {
   private updators = [] as (() => void)[];
-  constructor() {}
 
   set(ref: DocRef, data: DocData, options?: SetOptions) {
     this.updators.push(() => {
@@ -222,7 +223,7 @@ export class FakeFirestore {
   doc(id: string) {
     const p = id.split('/');
     let docRef: DocRef | undefined = undefined;
-    while (true) {
+    for (;;) {
       const c = p.shift();
       const d = p.shift();
       if (!c || !d) {

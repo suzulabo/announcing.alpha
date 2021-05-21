@@ -4,7 +4,7 @@ import { sass } from '@stencil/sass';
 
 // https://stenciljs.com/docs/config
 
-declare var process: {
+declare const process: {
   env: {
     [key: string]: string;
   };

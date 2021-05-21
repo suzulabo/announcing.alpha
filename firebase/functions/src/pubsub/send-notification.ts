@@ -50,9 +50,9 @@ export const pubsubSendNotification = async (
       }
 
       const token = tokens[i];
-      const err = res.error!;
+      const err = res.error;
       logger.warn('send error', { ...err, token });
-      if (err.code == 'messaging/registration-token-not-registered') {
+      if (err && err.code == 'messaging/registration-token-not-registered') {
         batch.delete(firestore.doc(`notif-devices/${token}`));
         update = true;
       }

@@ -117,7 +117,7 @@ const resizeImage = async (file: File, width: number, height: number) => {
   const canvas2 = document.createElement('canvas');
   canvas2.width = canvasSize.width;
   canvas2.height = canvasSize.height;
-  var ctx = canvas2.getContext('2d');
+  const ctx = canvas2.getContext('2d');
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(canvas, 0, 0);

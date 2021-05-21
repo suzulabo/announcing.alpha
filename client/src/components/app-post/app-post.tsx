@@ -41,7 +41,9 @@ export class AppPost {
   private shareClick = async () => {
     try {
       await this.app.share(location.href);
-    } catch {}
+    } catch {
+      //
+    }
   };
 
   render() {

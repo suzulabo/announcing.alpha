@@ -53,7 +53,9 @@ describe('firestoreTimedNotificationWrite', () => {
     );
     expect(firestore.data['notif-timed']['0000'].archives).toEqual(['1', '2']);
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const archives1 = firestore.doc('notif-timed/0000/archives/1').get().data()!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const archives2 = firestore.doc('notif-timed/0000/archives/2').get().data()!;
     const archivesFollowers = { ...archives1.followers, ...archives2.followers };
     expect(archivesFollowers).toEqual(followers);

@@ -12,8 +12,9 @@ const imagePattern = new RegExp('^/data/images/([a-zA-Z0-9]{15,25})$');
 
 const cache = new Cache();
 
-const getCacheFirst = async <T extends Object>(docRef: admin.firestore.DocumentReference) => {
-  const v = cache.get(docRef.path)!;
+// eslint-disable-next-line @typescript-eslint/ban-types
+const getCacheFirst = async <T extends object>(docRef: admin.firestore.DocumentReference) => {
+  const v = cache.get(docRef.path);
   if (v) {
     return v as T;
   }

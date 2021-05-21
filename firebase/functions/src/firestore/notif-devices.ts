@@ -148,9 +148,6 @@ const genUpdators = (
     });
   }
 
-  if (houlryMap.size > 0) {
-  }
-
   return result;
 };
 

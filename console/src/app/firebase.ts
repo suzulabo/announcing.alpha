@@ -29,7 +29,9 @@ const getCacheFirst = async <T>(
       if (doc.exists) {
         return doc.data() as T;
       }
-    } catch {}
+    } catch {
+      //
+    }
   }
   if (cacheOnly) {
     return;

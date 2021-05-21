@@ -94,14 +94,14 @@ export class AppRoot {
         break b;
       }
 
-      if (!!postEdit) {
+      if (postEdit) {
         if (postEdit == 'edit_') {
           return { tag: 'app-post-form', params: { announceID, postID } };
         }
         break b;
       }
 
-      if (!!postID) {
+      if (postID) {
         if (postID == 'edit_') {
           return { tag: 'app-announce-edit', params: { announceID } };
         }

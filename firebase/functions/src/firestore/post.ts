@@ -37,7 +37,7 @@ const getImmediateNotificationFollowers = async (
     return new Map(followers);
   } else {
     const filtered = followers.filter(([token]) => {
-      return !immediate.unfollows!.includes(token);
+      return immediate.unfollows && !immediate.unfollows.includes(token);
     });
     return new Map(filtered);
   }
@@ -90,7 +90,7 @@ export const firestoreCreatePost = async (
   };
   const data = { announceID, postID, ...(announceMeta.icon && { icon: announceMeta.icon }) };
 
-  let tokens = [...tokensSet] as string[];
+  const tokens = [...tokensSet] as string[];
   while (tokens.length > 0) {
     msgs.push({ data, notification, tokens: tokens.splice(0, 500) });
   }
