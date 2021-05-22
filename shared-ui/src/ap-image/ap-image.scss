@@ -1,0 +1,33 @@
+ap-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--light-color);
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 5px;
+  }
+
+  &.loading {
+    ap-icon {
+      width: 1em;
+      height: 1em;
+      animation: 3s linear infinite blink;
+
+      @keyframes blink {
+        0% {
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+    }
+  }
+}

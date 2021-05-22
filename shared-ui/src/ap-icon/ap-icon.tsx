@@ -2,6 +2,7 @@ import { Component, h, Host, Prop } from '@stencil/core';
 import squareChecked from 'bootstrap-icons/icons/check2-square.svg';
 import dizzy from 'bootstrap-icons/icons/emoji-dizzy.svg';
 import frown from 'bootstrap-icons/icons/emoji-frown.svg';
+import exclamationDiamondFill from 'bootstrap-icons/icons/exclamation-diamond-fill.svg';
 import github from 'bootstrap-icons/icons/github.svg';
 import google from 'bootstrap-icons/icons/google.svg';
 import image from 'bootstrap-icons/icons/image.svg';
@@ -23,6 +24,7 @@ const svgMap = {
   frown: toHTML(frown),
   square: toHTML(square),
   squareChecked: toHTML(squareChecked),
+  exclamationDiamondFill: toHTML(exclamationDiamondFill),
 };
 export type Icons = keyof typeof svgMap;
 

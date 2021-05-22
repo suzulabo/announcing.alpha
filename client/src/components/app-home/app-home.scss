@@ -54,12 +54,9 @@ app-home {
           font-size: 1.2rem;
         }
       }
-      img {
-        object-fit: contain;
+      ap-image {
         width: 80px;
         height: 80px;
-        border-radius: 5px;
-        border: 1px solid var(--light-border-color);
       }
     }
     .desc {

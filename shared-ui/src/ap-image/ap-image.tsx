@@ -8,11 +8,6 @@ export class ApImage {
   @Prop()
   loader: () => Promise<string>;
 
-  @Prop()
-  msgs: {
-    error: string;
-  };
-
   @State()
   src: string;
 
@@ -32,7 +27,11 @@ export class ApImage {
 
   render() {
     if (this.loaderError) {
-      return <Host>{this.msgs.error}</Host>;
+      return (
+        <Host class="error">
+          <ap-icon icon="exclamationDiamondFill" />
+        </Host>
+      );
     }
 
     if (this.src) {
@@ -42,6 +41,10 @@ export class ApImage {
         </Host>
       );
     }
-    return <Host class="loading"></Host>;
+    return (
+      <Host class="loading">
+        <ap-icon icon="image" />
+      </Host>
+    );
   }
 }

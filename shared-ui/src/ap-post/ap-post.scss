@@ -2,14 +2,18 @@ ap-post {
   display: flex;
   flex-direction: column;
 
-  img {
+  ap-image {
     min-width: 0;
     max-width: 100%;
     max-height: 300px;
-    border-radius: 5px;
-    object-fit: contain;
     align-self: center;
     margin-bottom: 20px;
+
+    font-size: 2em;
+
+    &.loading {
+      min-height: 100px;
+    }
   }
 
   .date {
