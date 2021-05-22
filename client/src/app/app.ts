@@ -7,6 +7,7 @@ import { AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
 import { FetchError, FETCH_ERROR, Follow, NOT_FOUND } from './datatypes';
 import { AppFirebase } from './firebase';
+import { AppIdbCache } from './idbcache';
 import { AppMsg } from './msg';
 import { AppState } from './state';
 import { AppStorage } from './storage';
@@ -28,6 +29,7 @@ export class App {
     private appFirebase: AppFirebase,
     private appState: AppState,
     private appStorage: AppStorage,
+    private appIdbCache: AppIdbCache,
   ) {}
 
   async init() {
@@ -37,7 +39,7 @@ export class App {
       this.dataURLPrefix = `${this.appEnv.env.sites.client}/data`;
     }
 
-    await this.appFirebase.init();
+    await Promise.all([this.appFirebase.init(), this.appIdbCache.init()]);
 
     // Check permission of notification
     // if not granted, clear local settings. Server settings will delete automatically.
@@ -182,8 +184,18 @@ export class App {
   }
 
   private async fetchData<T>(p: string): Promise<T | FetchError> {
+    const cacheKey = `fetch:${p}`;
+    {
+      const v = await this.appIdbCache.get<T>(cacheKey);
+      if (v) {
+        console.debug('hit fetch cache', p);
+        return v;
+      }
+    }
+
     const res = await Http.request({ method: 'GET', url: `${this.dataURLPrefix}/${p}` });
     if (res.status == 200 && typeof res.data == 'object') {
+      await this.appIdbCache.set(cacheKey, res.data);
       return res.data as T;
     }
     if (res.status == 404) {

@@ -2,6 +2,7 @@ import { Component, h, Host, Listen, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { NotifyPostEvent } from 'src/app/datatypes';
 import { AppFirebase } from 'src/app/firebase';
+import { AppIdbCache } from 'src/app/idbcache';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
 import { AppStorage } from 'src/app/storage';
@@ -53,7 +54,8 @@ export class AppRoot {
     const appFirebase = new AppFirebase(appEnv);
     const appState = new AppState();
     const appStorage = new AppStorage();
-    const app = new App(appEnv, appMsg, appFirebase, appState, appStorage);
+    const appIdbCache = new AppIdbCache();
+    const app = new App(appEnv, appMsg, appFirebase, appState, appStorage, appIdbCache);
     await app.init();
     this.app = app;
     this.handlePopState();
