@@ -13,6 +13,7 @@ const components = [
   'input',
   'image-input',
   'checkbox',
+  'image',
   'textview',
   'loading',
   'modal',

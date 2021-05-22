@@ -153,12 +153,19 @@ export class App {
       return;
     }
 
-    let iconData: string;
-    if (meta.icon) {
-      iconData = await this.appFirebase.getImage(meta.icon);
-    }
+    const iconData = meta.icon ? await this.appFirebase.getImage(meta.icon) : undefined;
 
-    return { id, ...a, ...meta, iconData };
+    return {
+      id,
+      ...a,
+      ...meta,
+      ...(iconData && {
+        iconData,
+        iconLoader: () => {
+          return Promise.resolve(iconData);
+        },
+      }),
+    };
   }
 
   async loadUser() {

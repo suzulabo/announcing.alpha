@@ -13,7 +13,7 @@ export type FetchError = typeof FETCH_ERROR;
 
 export interface AnnounceState extends Announce, AnnounceMetaJSON {
   id: string;
-  iconData?: string;
+  iconLoader?: () => Promise<string>;
 }
 
 export class NotifyPostEvent extends CustomEvent<{ announceID: string; postID: string }> {}

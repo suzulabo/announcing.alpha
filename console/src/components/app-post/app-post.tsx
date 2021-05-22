@@ -21,7 +21,7 @@ export class AppPost {
   showDelete = false;
 
   private announce: AnnounceState;
-  private post: PostJSON & { imgData?: string };
+  private post: PostJSON & { imgData?: string; imgLoader?: () => Promise<string> };
 
   async componentWillLoad() {
     await this.app.processLoading(async () => {
@@ -43,6 +43,7 @@ export class AppPost {
 
       if (this.post.img) {
         this.post.imgData = await this.app.getImage(this.post.img);
+        this.post.imgLoader = () => Promise.resolve(this.post.imgData);
       }
 
       this.app.setTitle(

@@ -81,7 +81,7 @@ export class AppHome {
               {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
               <span class="name">{a.name}</span>
             </div>
-            {a.iconData && <img src={a.iconData} />}
+            {a.iconLoader && <ap-image loader={a.iconLoader} />}
           </div>
           <span class="desc">{a.desc}</span>
         </a>

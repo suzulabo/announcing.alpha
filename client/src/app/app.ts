@@ -163,11 +163,20 @@ export class App {
           m.set(id, FETCH_ERROR);
           return;
         }
+
         m.set(id, {
           id,
           ...a,
           ...meta,
-          ...(!!meta.icon && { iconData: this.getImageURI(meta.icon) }),
+          ...(!!meta.icon && {
+            iconLoader: async () => {
+              const v = await this.fetchImage(meta.icon);
+              if (v == FETCH_ERROR) {
+                throw new Error('fetch error');
+              }
+              return v;
+            },
+          }),
         });
       } finally {
         this.appState.state.announces = new Map(m);
@@ -183,7 +192,10 @@ export class App {
     return this.appState.state.announces.get(id);
   }
 
-  private async fetchData<T>(p: string): Promise<T | FetchError> {
+  private async fetchData<T>(
+    p: string,
+    responseType: 'blob' | 'json' = 'json',
+  ): Promise<T | FetchError> {
     const cacheKey = `fetch:${p}`;
     {
       const v = await this.appIdbCache.get<T>(cacheKey);
@@ -193,15 +205,28 @@ export class App {
       }
     }
 
-    const res = await Http.request({ method: 'GET', url: `${this.dataURLPrefix}/${p}` });
-    if (res.status == 200 && typeof res.data == 'object') {
-      await this.appIdbCache.set(cacheKey, res.data);
-      return res.data as T;
+    const res = await Http.request({
+      method: 'GET',
+      url: `${this.dataURLPrefix}/${p}`,
+      responseType,
+    });
+    if (res.status == 200) {
+      const dataType = typeof res.data;
+      if (responseType == 'json' && dataType == 'object') {
+        await this.appIdbCache.set(cacheKey, res.data);
+        return res.data as T;
+      }
+      if (dataType == 'string') {
+        await this.appIdbCache.set(cacheKey, res.data);
+        return res.data as T;
+      }
     }
+
     if (res.status == 404) {
       return;
     }
-    console.error(`Fetch Error (${res.status})`);
+
+    console.error(`Fetch Error (${res.status})`, res.data);
     return FETCH_ERROR;
   }
 
@@ -211,6 +236,14 @@ export class App {
 
   fetchPost(id: string, postID: string) {
     return this.fetchData<PostJSON>(`announces/${id}/posts/${postID}`);
+  }
+
+  async fetchImage(id: string) {
+    const v = await this.fetchData<string>(`images/${id}`, 'blob');
+    if (v == FETCH_ERROR) {
+      return v;
+    }
+    return `data:image/jpeg;base64,${v}`;
   }
 
   getImageURI(id: string) {

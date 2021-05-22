@@ -18,7 +18,7 @@ export class AppPost {
   postID: string;
 
   @State()
-  post: PostJSON & { imgData?: string };
+  post: PostJSON & { imgLoader?: () => Promise<string> };
 
   async componentWillLoad() {
     this.app.setTitle('');
@@ -30,7 +30,13 @@ export class AppPost {
       }
       this.post = post;
       if (this.post.img) {
-        this.post.imgData = this.app.getImageURI(this.post.img);
+        this.post.imgLoader = async () => {
+          const v = await this.app.fetchImage(this.post.img);
+          if (v == FETCH_ERROR) {
+            throw new Error('fetch error');
+          }
+          return v;
+        };
       }
     });
   }

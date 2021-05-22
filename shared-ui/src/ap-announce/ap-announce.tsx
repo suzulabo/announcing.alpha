@@ -24,7 +24,7 @@ export class ApAnnounce {
   announce: {
     name: string;
     desc?: string;
-    iconData?: string;
+    iconLoader?: () => Promise<string>;
     link?: string;
     posts: {
       [postID: string]: {
@@ -148,7 +148,7 @@ export class ApAnnounce {
       <Host>
         <div class="head">
           <span class="name">{announce.name}</span>
-          {announce.iconData && <img src={announce.iconData} />}
+          {announce.iconLoader && <ap-image loader={announce.iconLoader} />}
         </div>
         {announce.desc && <ap-textview class="desc" text={announce.desc} />}
         {announce.link && (

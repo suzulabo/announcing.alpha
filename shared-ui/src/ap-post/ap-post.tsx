@@ -10,7 +10,7 @@ export class ApTextView {
     title?: string;
     body?: string;
     link?: string;
-    imgData?: string;
+    imgLoader?: () => Promise<string>;
     pT: number;
   };
 
@@ -24,11 +24,7 @@ export class ApTextView {
 
     return (
       <Host>
-        {this.post.imgData && (
-          <a href={post.imgData}>
-            <img src={post.imgData} />
-          </a>
-        )}
+        {this.post.imgLoader && <ap-image loader={this.post.imgLoader} />}
         <span class="date">{this.msgs.datetime(post.pT)}</span>
         {post.title && <span class="title">{post.title}</span>}
         {post.body && <ap-textview class="body" text={post.body} />}

@@ -27,7 +27,7 @@ export class AppHome {
         <a class="announce-box" {...this.app.href(`/${v.id}`)}>
           <div class="head">
             <span class="name">{v.name}</span>
-            {v.iconData && <img src={v.iconData} />}
+            {v.iconLoader && <ap-image loader={v.iconLoader} />}
           </div>
           <span class="desc">{v.desc}</span>
         </a>
