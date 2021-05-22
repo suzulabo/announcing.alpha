@@ -115,6 +115,13 @@ const createDevProxy = (port: number, httpsPort: number, patterns: ProxyConfig[]
   }
 };
 
+/*
+const errorProxy = (req: http.IncomingMessage, res: http.ServerResponse) => {
+  res.writeHead(500, { 'Content-Type': 'text/plain' });
+  res.end('Error from dev-proxy config');
+};
+*/
+
 createDevProxy(9292, 9392, [
   {
     pattern: '/www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig',
