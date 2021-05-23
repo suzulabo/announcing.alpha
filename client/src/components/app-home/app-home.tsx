@@ -8,10 +8,10 @@ import { FETCH_ERROR, Follow, NOT_FOUND } from 'src/app/datatypes';
 })
 export class AppHome {
   @Prop()
-  app: App;
+  app!: App;
 
   @State()
-  follows: [string, Follow][];
+  follows!: [string, Follow][];
 
   async componentWillLoad() {
     await this.app.processLoading(async () => {
@@ -29,8 +29,10 @@ export class AppHome {
 
   private handleUnfollowClick = async (event: Event) => {
     const id = (event.target as HTMLElement).getAttribute('data-announce-id');
-    await this.app.deleteFollow(id);
-    this.follows = await this.app.getFollows();
+    if (id) {
+      await this.app.deleteFollow(id);
+      this.follows = await this.app.getFollows();
+    }
   };
 
   private renderAnnounces() {

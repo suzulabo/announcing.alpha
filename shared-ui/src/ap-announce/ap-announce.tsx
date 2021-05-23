@@ -13,15 +13,16 @@ export class ApAnnounce {
   }
 
   componentDidLoad() {
-    if (scrollPosMap.has(location.href)) {
+    const v = scrollPosMap.get(location.href);
+    if (v) {
       readTask(() => {
-        window.scroll(0, scrollPosMap.get(location.href));
+        window.scroll(0, v);
       });
     }
   }
 
   @Prop()
-  announce: {
+  announce!: {
     name: string;
     desc?: string;
     iconLoader?: () => Promise<string>;
@@ -36,19 +37,22 @@ export class ApAnnounce {
   };
 
   @Prop()
-  postLoader: (
+  postLoader?: (
     id: string,
-  ) => Promise<{
-    title?: string;
-    body?: string;
-    imgData?: string;
-    link?: string;
-    pT: number;
-    anchorAttrs: { [k: string]: any };
-  }>;
+  ) => Promise<
+    | {
+        title?: string;
+        body?: string;
+        imgData?: string;
+        link?: string;
+        pT: number;
+        anchorAttrs: { [k: string]: any };
+      }
+    | undefined
+  >;
 
   @Prop()
-  msgs: {
+  msgs!: {
     datetime: (d: number) => string;
     noPosts: string;
   };
@@ -83,7 +87,7 @@ export class ApAnnounce {
     }
   };
 
-  componentWillLoad() {
+  constructor() {
     this.iob = new IntersectionObserver(this.iobCallback, {});
   }
 
@@ -91,7 +95,7 @@ export class ApAnnounce {
     this.iob?.disconnect();
   }
   private handleRef = {
-    observe: (el: HTMLElement) => {
+    observe: (el: HTMLElement | undefined) => {
       if (el) {
         this.iob.observe(el);
       }
@@ -114,6 +118,9 @@ export class ApAnnounce {
   }
 
   private async renderPost(postID: string) {
+    if (!this.postLoader) {
+      return;
+    }
     const post = await this.postLoader(postID);
     if (!post) {
       return <div class="post">no post data: [{postID}]</div>;

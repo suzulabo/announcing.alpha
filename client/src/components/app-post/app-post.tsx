@@ -9,16 +9,16 @@ import { PostJSON } from 'src/shared';
 })
 export class AppPost {
   @Prop()
-  app: App;
+  app!: App;
 
   @Prop()
-  announceID: string;
+  announceID!: string;
 
   @Prop()
-  postID: string;
+  postID!: string;
 
   @State()
-  post: PostJSON & { imgLoader?: () => Promise<string> };
+  post?: PostJSON & { imgLoader?: () => Promise<string> };
 
   async componentWillLoad() {
     this.app.setTitle('');
@@ -29,9 +29,11 @@ export class AppPost {
         return;
       }
       this.post = post;
-      if (this.post.img) {
+
+      const img = this.post.img;
+      if (img) {
         this.post.imgLoader = async () => {
-          const v = await this.app.fetchImage(this.post.img);
+          const v = await this.app.fetchImage(img);
           if (v == FETCH_ERROR) {
             throw new Error('fetch error');
           }
@@ -63,7 +65,10 @@ export class AppPost {
     }
 
     this.app.setTitle(
-      this.app.msgs.post.pageTitle(a.name, this.post.title || this.post.body.substr(0, 20)),
+      this.app.msgs.post.pageTitle(
+        a.name,
+        this.post?.title || this.post?.body?.substr(0, 20) || '',
+      ),
     );
 
     if (!this.post) {

@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { FETCH_ERROR, Follow, NOT_FOUND } from 'src/app/datatypes';
+import { AnnounceMetaJSON } from 'src/shared';
 
 @Component({
   tag: 'app-announce',
@@ -8,15 +9,13 @@ import { FETCH_ERROR, Follow, NOT_FOUND } from 'src/app/datatypes';
 })
 export class AppAnnounce {
   @Prop()
-  app: App;
+  app!: App;
 
   @Prop()
-  announceID: string;
+  announceID!: string;
 
   @State()
-  follow: Follow;
-
-  private announceName: string;
+  follow?: Follow;
 
   async componentWillLoad() {
     this.app.loadAnnounce(this.announceID);
@@ -26,8 +25,12 @@ export class AppAnnounce {
 
   private handleFollowClick = async () => {
     await this.app.processLoading(async () => {
+      const announce = this.app.getAnnounceState(this.announceID);
+      if (!announce) {
+        return;
+      }
       const follow: Follow = {
-        name: this.announceName,
+        name: (announce as AnnounceMetaJSON).name,
         readTime: Date.now(),
       };
       await this.app.setFollow(this.announceID, follow);

@@ -6,16 +6,16 @@ import { Component, h, Host, Prop, readTask } from '@stencil/core';
 })
 export class ApInput {
   @Prop()
-  label: string;
+  label?: string;
 
   @Prop()
-  value: string;
+  value?: string;
 
   @Prop()
-  maxLength: number;
+  maxLength?: number;
 
   @Prop()
-  textarea: boolean;
+  textarea?: boolean;
 
   componentDidLoad() {
     this.autoGrow.run();
@@ -23,8 +23,8 @@ export class ApInput {
 
   private autoGrow = (() => {
     let el: HTMLTextAreaElement;
-    const handleRef = (_el: HTMLTextAreaElement) => {
-      el = _el;
+    const handleRef = (_el: HTMLTextAreaElement | undefined) => {
+      if (_el) el = _el;
     };
     const handleInput = () => {
       this.autoGrow.run();

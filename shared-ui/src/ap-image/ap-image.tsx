@@ -6,7 +6,7 @@ import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 })
 export class ApImage {
   @Prop()
-  loader: () => Promise<string>;
+  loader?: () => Promise<string>;
 
   @Watch('loader')
   watchLoader(loader: ApImage['loader']) {
@@ -29,7 +29,7 @@ export class ApImage {
   }
 
   @State()
-  src: string;
+  src?: string;
 
   @State()
   loaderError = false;

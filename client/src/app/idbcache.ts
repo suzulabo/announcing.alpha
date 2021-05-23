@@ -4,7 +4,7 @@ const DB_NAME = 'announcing-idb-cache';
 const STORE_NAME = 'cache';
 
 export class AppIdbCache {
-  private db: IDBPDatabase;
+  private db!: IDBPDatabase;
 
   async init() {
     this.db = await openDB(DB_NAME, 1, {

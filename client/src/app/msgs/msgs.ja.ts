@@ -16,6 +16,7 @@ export const msgs: Msgs = {
       if (d > 0) {
         return format(d, 'yyyy/MM/dd H:mm');
       }
+      return '';
     },
     hour: (v: number) => {
       return `${v}時`;
@@ -29,6 +30,7 @@ export const msgs: Msgs = {
       if (d > 0) {
         return format(d, 'yyyy/MM/dd H:mm:ss');
       }
+      return '';
     },
   },
   footer: {

@@ -6,16 +6,16 @@ import { Component, Event, EventEmitter, h, Host, Prop, State } from '@stencil/c
 })
 export class ApClockSelect {
   @Prop()
-  msgs: {
+  msgs!: {
     am: string;
     pm: string;
   };
 
   @Prop()
-  selected: number[];
+  selected?: number[];
 
   @Event()
-  hourClick: EventEmitter<number>;
+  hourClick!: EventEmitter<number>;
 
   @State()
   ampm: 'am' | 'pm' = 'am';
@@ -29,7 +29,7 @@ export class ApClockSelect {
   };
 
   private handleItemClick = (event: Event) => {
-    const v = parseInt((event.target as HTMLElement).getAttribute('data-hour'));
+    const v = parseInt((event.target as HTMLElement).getAttribute('data-hour') || '');
     this.hourClick.emit(v);
   };
 
@@ -45,7 +45,7 @@ export class ApClockSelect {
                 class={{
                   hour: true,
                   [`hour${i}`]: true,
-                  selected: this.selected?.includes(i + hourStart),
+                  selected: this.selected?.includes(i + hourStart) == true,
                 }}
                 data-hour={i + hourStart}
                 onClick={this.handleItemClick}

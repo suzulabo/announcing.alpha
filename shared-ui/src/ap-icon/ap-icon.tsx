@@ -34,9 +34,9 @@ export type Icons = keyof typeof svgMap;
 })
 export class ApIcon {
   @Prop()
-  icon: Icons;
+  icon?: Icons;
 
   render() {
-    return <Host innerHTML={svgMap[this.icon]}></Host>;
+    return <Host innerHTML={this.icon && svgMap[this.icon]}></Host>;
   }
 }

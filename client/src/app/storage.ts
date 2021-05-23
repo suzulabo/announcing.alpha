@@ -22,6 +22,7 @@ const objectGetSet = <T>(key: string) => {
       if (s) {
         return JSON.parse(s) as T;
       }
+      return;
     },
     set: (value: T) => {
       return Storage.set({ key: key, value: JSON.stringify(value) });
@@ -56,7 +57,10 @@ const objectMulti = <T>(prefix: string) => {
       const keys = await x.keys();
       const entries: [string, T][] = [];
       for (const key of keys) {
-        entries.push([key, await x.get(key)]);
+        const v = await x.get(key);
+        if (v) {
+          entries.push([key, v]);
+        }
       }
       return entries;
     },

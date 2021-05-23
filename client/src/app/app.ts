@@ -30,15 +30,15 @@ export class App {
     private appState: AppState,
     private appStorage: AppStorage,
     private appIdbCache: AppIdbCache,
-  ) {}
-
-  async init() {
+  ) {
     if (Build.isDev || Capacitor.getPlatform() == 'web') {
       this.dataURLPrefix = '/data';
     } else {
       this.dataURLPrefix = `${this.appEnv.env.sites.client}/data`;
     }
+  }
 
+  async init() {
     await Promise.all([this.appFirebase.init(), this.appIdbCache.init()]);
 
     // Check permission of notification
@@ -81,7 +81,7 @@ export class App {
       return;
     }
 
-    history.replaceState(history.state, null, url.pathname);
+    history.replaceState(history.state, '', url.pathname);
     window.dispatchEvent(new PopStateEvent('popstate'));
   }
 
@@ -94,7 +94,7 @@ export class App {
     if (back && history.state?.beforeRoute == url.pathname) {
       history.back();
     } else {
-      history.pushState({ beforeRoute: location.pathname }, null, url.pathname);
+      history.pushState({ beforeRoute: location.pathname }, '', url.pathname);
       window.dispatchEvent(new PopStateEvent('popstate'));
     }
   }
@@ -108,10 +108,12 @@ export class App {
   private setLoadingClass = () => {
     readTask(() => {
       const apLoading = document.querySelector('ap-loading');
-      if (this._loading) {
-        apLoading.classList.add('show');
-      } else {
-        apLoading.classList.remove('show');
+      if (apLoading) {
+        if (this._loading) {
+          apLoading.classList.add('show');
+        } else {
+          apLoading.classList.remove('show');
+        }
       }
     });
   };
@@ -133,7 +135,7 @@ export class App {
     if (Capacitor.getPlatform() != 'web') {
       return true;
     }
-    if (navigator.share) {
+    if (navigator.share != null) {
       return true;
     }
 
@@ -168,15 +170,15 @@ export class App {
           id,
           ...a,
           ...meta,
-          ...(!!meta.icon && {
-            iconLoader: async () => {
-              const v = await this.fetchImage(meta.icon);
-              if (v == FETCH_ERROR) {
-                throw new Error('fetch error');
-              }
-              return v;
-            },
-          }),
+          iconLoader: !meta.icon
+            ? undefined
+            : async () => {
+                const v = await this.fetchImage(meta.icon || '');
+                if (v == FETCH_ERROR) {
+                  throw new Error('fetch error');
+                }
+                return v;
+              },
         });
       } finally {
         this.appState.state.announces = new Map(m);
@@ -195,7 +197,7 @@ export class App {
   private async fetchData<T>(
     p: string,
     responseType: 'blob' | 'json' = 'json',
-  ): Promise<T | FetchError> {
+  ): Promise<T | FetchError | undefined> {
     const cacheKey = `fetch:${p}`;
     {
       const v = await this.appIdbCache.get<T>(cacheKey);

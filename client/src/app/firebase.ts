@@ -11,7 +11,7 @@ import { NotFound, NotifyPostEvent, NOT_FOUND } from './datatypes';
 import { bs62 } from './utils';
 
 class CapNotification {
-  private token: string;
+  private token?: string;
 
   constructor() {
     void PushNotifications.addListener('pushNotificationReceived', notification => {
@@ -75,8 +75,8 @@ class CapNotification {
     }
 
     const p = (() => {
-      let resolve: (v: string) => void;
-      let reject: (r: any) => void;
+      let resolve!: (v: string) => void;
+      let reject!: (r: any) => void;
       const promise = new Promise<string>((_resolve, _reject) => {
         resolve = _resolve;
         reject = _reject;
@@ -103,11 +103,14 @@ class CapNotification {
   }
 }
 
-const getCache = async <T>(docRef: firebase.firestore.DocumentReference): Promise<T> => {
+const getCache = async <T>(
+  docRef: firebase.firestore.DocumentReference,
+): Promise<T | undefined> => {
   const doc = await docRef.get({ source: 'cache' });
   if (doc.exists) {
     return doc.data() as T;
   }
+  return;
 };
 
 export class AppFirebase {
@@ -117,10 +120,25 @@ export class AppFirebase {
   private messaging?: firebase.messaging.Messaging;
   private capNotification?: CapNotification;
 
-  constructor(private appEnv: AppEnv, private _firebaseApp?: firebase.app.App) {
+  constructor(private appEnv: AppEnv, _firebaseApp?: firebase.app.App) {
+    if (!_firebaseApp) {
+      _firebaseApp = firebase.initializeApp(this.appEnv.env.firebaseConfig);
+    }
+    this.functions = _firebaseApp.functions(this.appEnv.env.functionsRegion);
+    this.firestore = _firebaseApp.firestore();
+
     if (Capacitor.getPlatform() != 'web') {
       this.capNotification = new CapNotification();
     }
+
+    if (!this.capNotification) {
+      try {
+        this.messaging = _firebaseApp.messaging();
+      } catch (err) {
+        console.warn('create messaging', err);
+      }
+    }
+    this.devonly_setEmulator();
   }
 
   private devonly_setEmulator() {
@@ -133,23 +151,6 @@ export class AppFirebase {
   }
 
   async init() {
-    if (this._firebaseApp) {
-      return;
-    }
-
-    this._firebaseApp = firebase.initializeApp(this.appEnv.env.firebaseConfig);
-    this.functions = this._firebaseApp.functions(this.appEnv.env.functionsRegion);
-    this.firestore = this._firebaseApp.firestore();
-
-    if (!this.capNotification) {
-      try {
-        this.messaging = this._firebaseApp.messaging();
-      } catch (err) {
-        console.warn('create messaging', err);
-      }
-    }
-    this.devonly_setEmulator();
-
     try {
       await this.firestore.enablePersistence({ synchronizeTabs: true });
     } catch (err) {
@@ -213,7 +214,7 @@ export class AppFirebase {
     return this.listeners.add(`announces/${id}`, cb);
   }
 
-  getAnnounce(id: string): Promise<Announce | NotFound> {
+  getAnnounce(id: string): Promise<Announce | NotFound | undefined> {
     const p = `announces/${id}`;
     if (this.listeners.notFounds.has(p)) {
       return Promise.resolve(NOT_FOUND);
@@ -228,7 +229,7 @@ export class AppFirebase {
     }
 
     const serviceWorkerRegistration = await navigator.serviceWorker.getRegistration();
-    const token = await this.messaging.getToken({
+    const token = await this.messaging?.getToken({
       vapidKey: this.appEnv.env.vapidKey,
       serviceWorkerRegistration,
     });
@@ -280,6 +281,9 @@ export class AppFirebase {
     follows: { [id: string]: { hours?: number[] } },
   ) {
     const fcmToken = await this.messageToken();
+    if (!fcmToken) {
+      throw new Error("can't get fcmToken");
+    }
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     const ids = Object.keys(follows);

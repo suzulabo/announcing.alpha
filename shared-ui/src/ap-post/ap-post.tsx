@@ -6,7 +6,7 @@ import { Component, h, Host, Prop } from '@stencil/core';
 })
 export class ApTextView {
   @Prop()
-  post: {
+  post!: {
     title?: string;
     body?: string;
     link?: string;
@@ -15,7 +15,7 @@ export class ApTextView {
   };
 
   @Prop()
-  msgs: {
+  msgs!: {
     datetime: (v: number) => string;
   };
 

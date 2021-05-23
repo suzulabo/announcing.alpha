@@ -7,10 +7,10 @@ import { Component, Element, Event, EventEmitter, h, Host } from '@stencil/core'
 export class ApModal {
   @Element()
   // eslint-disable-next-line @stencil/element-type
-  el: HTMLElement;
+  el!: HTMLElement;
 
   @Event()
-  close: EventEmitter;
+  close!: EventEmitter;
 
   private handleClick = (ev: MouseEvent) => {
     if (ev.target == this.el) {

@@ -9,13 +9,13 @@ import { PromiseValue } from 'type-fest';
 })
 export class AppAnnounceConfig {
   @Prop()
-  app: App;
+  app!: App;
 
   @Prop()
-  announceID: string;
+  announceID!: string;
 
   @State()
-  values: { enable: boolean; hours: number[] };
+  values!: { enable: boolean; hours: number[] };
 
   @State()
   showUnfollowConfirm = false;
@@ -23,10 +23,10 @@ export class AppAnnounceConfig {
   @State()
   showHoursModal = false;
 
-  private permission: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
+  private permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
 
-  private follow: Follow;
-  private notification: { hours?: number[] };
+  private follow!: Follow;
+  private notification?: { hours?: number[] };
 
   async componentWillLoad() {
     await this.app.processLoading(async () => {
@@ -36,11 +36,12 @@ export class AppAnnounceConfig {
         this.app.redirectRoute('/');
         return;
       }
-      this.follow = await this.app.getFollow(id);
-      if (!this.follow) {
+      const follow = await this.app.getFollow(id);
+      if (!follow) {
         this.app.redirectRoute(`/${id}`);
         return;
       }
+      this.follow = follow;
 
       this.notification = await this.app.getNotification(id);
 
@@ -98,7 +99,7 @@ export class AppAnnounceConfig {
         this.values = { ...this.values, hours };
       },
       hoursClick: (event: MouseEvent) => {
-        const hour = parseInt((event.target as HTMLElement).getAttribute('data-hour'));
+        const hour = parseInt((event.target as HTMLElement).getAttribute('data-hour') || '');
         let hours = [...this.values.hours];
         if (hours.includes(hour)) {
           hours = hours.filter(v => {
@@ -152,7 +153,7 @@ export class AppAnnounceConfig {
 
     const modified =
       values.enable != !!notify ||
-      (values.enable && values.hours.join(':') != notify.hours?.join(':'));
+      (values.enable && values.hours.join(':') != notify?.hours?.join(':'));
 
     const canSubmit = modified;
 

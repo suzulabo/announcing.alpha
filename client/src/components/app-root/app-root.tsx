@@ -20,8 +20,22 @@ interface MatchPathResult {
 export class AppRoot {
   private app: App;
 
+  constructor() {
+    const appMsg = new AppMsg();
+    const apError = document.querySelector('ap-error');
+    if (apError) {
+      apError.msgs = appMsg.msgs.error;
+    }
+    const appEnv = new AppEnv();
+    const appFirebase = new AppFirebase(appEnv);
+    const appState = new AppState();
+    const appStorage = new AppStorage();
+    const appIdbCache = new AppIdbCache();
+    this.app = new App(appEnv, appMsg, appFirebase, appState, appStorage, appIdbCache);
+  }
+
   @State()
-  path: string;
+  path?: string;
 
   @Listen('popstate', { target: 'window' })
   handlePopState() {
@@ -47,17 +61,7 @@ export class AppRoot {
   }
 
   async componentWillLoad() {
-    const appMsg = new AppMsg();
-    document.querySelector('ap-error').msgs = appMsg.msgs.error;
-
-    const appEnv = new AppEnv();
-    const appFirebase = new AppFirebase(appEnv);
-    const appState = new AppState();
-    const appStorage = new AppStorage();
-    const appIdbCache = new AppIdbCache();
-    const app = new App(appEnv, appMsg, appFirebase, appState, appStorage, appIdbCache);
-    await app.init();
-    this.app = app;
+    await this.app.init();
     this.handlePopState();
   }
 
@@ -65,13 +69,14 @@ export class AppRoot {
     if (!this.getRoute()) {
       return '/';
     }
+    return;
   }
 
   private staticRouteMap = new Map([['/', 'app-home']]);
   private announceIDPattern = /^[A-Z0-9]{12}$/;
   private postIDPattern = /^[a-zA-Z0-9]{8}$/;
 
-  private getRoute(): MatchPathResult {
+  private getRoute(): MatchPathResult | undefined {
     const p = location.pathname;
 
     {
@@ -103,6 +108,7 @@ export class AppRoot {
         return { tag: 'app-announce', params: { announceID } };
       }
     }
+    return;
   }
 
   render() {
@@ -110,7 +116,7 @@ export class AppRoot {
 
     return (
       <Host>
-        <m.tag class="page" app={this.app} {...m.params} />
+        {m && <m.tag class="page" app={this.app} {...m.params} />}
         <footer>
           <div class="title">
             <a {...this.app.href('/')}>{this.app.msgs.footer.title}</a>

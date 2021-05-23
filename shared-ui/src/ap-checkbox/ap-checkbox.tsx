@@ -6,10 +6,10 @@ import { Component, h, Host, Prop } from '@stencil/core';
 })
 export class ApCheckBox {
   @Prop()
-  checked: boolean;
+  checked?: boolean;
 
   @Prop()
-  label: string;
+  label?: string;
 
   render() {
     return (

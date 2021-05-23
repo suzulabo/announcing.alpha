@@ -7,31 +7,34 @@ import pica from 'pica';
 })
 export class ApImageInput {
   @Prop()
-  resizeRect: { width: number; height: number };
+  resizeRect: { width: number; height: number } = { width: 200, height: 200 };
 
   @Prop()
-  label: string;
+  label?: string;
 
   @Prop()
-  data: string;
+  data?: string;
 
   @Event()
-  imageResizing: EventEmitter<boolean>;
+  imageResizing!: EventEmitter<boolean>;
 
   @Event()
-  imageChange: EventEmitter<string>;
+  imageChange!: EventEmitter<string>;
 
   private handlers = {
-    fileInput: null as HTMLInputElement,
-    ref: (el: HTMLInputElement) => {
-      this.handlers.fileInput = el;
+    fileInput: null as HTMLInputElement | null,
+    ref: (el: HTMLInputElement | undefined) => {
+      if (el) this.handlers.fileInput = el;
     },
     click: () => {
-      this.handlers.fileInput.click();
+      this.handlers.fileInput?.click();
     },
     change: async () => {
       this.imageResizing.emit(true);
       try {
+        if (!this.handlers.fileInput?.files) {
+          return;
+        }
         const newData = await resizeImage(
           this.handlers.fileInput.files[0],
           this.resizeRect.width,
@@ -44,7 +47,7 @@ export class ApImageInput {
       this.handlers.fileInput.value = '';
     },
     delete: () => {
-      this.imageChange.emit(null);
+      this.imageChange.emit('');
     },
   };
 
@@ -87,7 +90,7 @@ const resizeImage = async (file: File, width: number, height: number) => {
   const dataURL = await new Promise<string>(resolve => {
     const reader = new FileReader();
     reader.onload = ev => {
-      resolve(ev.target.result as string);
+      resolve(ev.target?.result as string);
     };
     reader.readAsDataURL(file);
   });
@@ -118,9 +121,11 @@ const resizeImage = async (file: File, width: number, height: number) => {
   canvas2.width = canvasSize.width;
   canvas2.height = canvasSize.height;
   const ctx = canvas2.getContext('2d');
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(canvas, 0, 0);
+  if (ctx) {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(canvas, 0, 0);
+  }
 
   return canvas2.toDataURL('image/jpeg', 0.85);
 };

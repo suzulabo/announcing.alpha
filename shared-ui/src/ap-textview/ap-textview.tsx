@@ -7,9 +7,9 @@ import Autolinker from 'autolinker';
 })
 export class ApTextView {
   @Prop()
-  text: string;
+  text?: string;
 
-  private effectedText: string;
+  private effectedText?: string;
 
   componentWillLoad() {
     this.effect();
