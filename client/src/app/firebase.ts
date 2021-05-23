@@ -171,13 +171,16 @@ export class AppFirebase {
       if (listenMap.has(p)) {
         return;
       }
+      if (notFounds.has(p)) {
+        return;
+      }
 
       const unsubscribe = this.firestore.doc(p).onSnapshot(
         ds => {
-          if (ds.exists) {
-            notFounds.delete(p);
-          } else {
+          if (!ds.exists) {
             notFounds.add(p);
+            unsubscribe();
+            listenMap.delete(p);
           }
           if (cb) {
             cb();
