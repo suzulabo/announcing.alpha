@@ -1,7 +1,6 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { FETCH_ERROR, Follow, NOT_FOUND } from 'src/app/datatypes';
-import { AnnounceMetaJSON } from 'src/shared';
 
 @Component({
   tag: 'app-announce',
@@ -16,9 +15,6 @@ export class AppAnnounce {
 
   @State()
   follow: Follow;
-
-  @State()
-  meta: AnnounceMetaJSON;
 
   private announceName: string;
 
