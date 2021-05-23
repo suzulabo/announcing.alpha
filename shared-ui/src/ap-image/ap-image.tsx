@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 
 @Component({
   tag: 'ap-image',
@@ -8,6 +8,26 @@ export class ApImage {
   @Prop()
   loader: () => Promise<string>;
 
+  @Watch('loader')
+  watchLoader(loader: ApImage['loader']) {
+    if (loader) {
+      this.src = '';
+      this.loaderError = false;
+      loader()
+        .then(src => {
+          if (loader == this.loader) {
+            this.src = src;
+          }
+        })
+        .catch(err => {
+          console.error('ap-image loader error', err);
+          if (loader == this.loader) {
+            this.loaderError = true;
+          }
+        });
+    }
+  }
+
   @State()
   src: string;
 
@@ -15,14 +35,7 @@ export class ApImage {
   loaderError = false;
 
   componentWillLoad() {
-    if (this.loader) {
-      this.loader()
-        .then(src => (this.src = src))
-        .catch(err => {
-          console.error('ap-image loader error', err);
-          this.loaderError = true;
-        });
-    }
+    this.watchLoader(this.loader);
   }
 
   render() {
