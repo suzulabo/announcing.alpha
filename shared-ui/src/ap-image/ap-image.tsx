@@ -8,6 +8,9 @@ export class ApImage {
   @Prop()
   loader?: () => Promise<string>;
 
+  @Prop()
+  canOpen = true;
+
   @Watch('loader')
   watchLoader(loader: ApImage['loader']) {
     if (loader) {
@@ -34,9 +37,34 @@ export class ApImage {
   @State()
   loaderError = false;
 
+  @State()
+  open = false;
+
   componentWillLoad() {
     this.watchLoader(this.loader);
   }
+
+  private iamgeClick = () => {
+    if (!this.canOpen) {
+      return;
+    }
+    this.open = true;
+  };
+
+  private closeClick = () => {
+    this.open = false;
+  };
+
+  private wrapperEl?: HTMLElement;
+  private wrapperRef = (el?: HTMLElement) => {
+    this.wrapperEl = el;
+  };
+
+  private wrapperClick = (ev: Event) => {
+    if (ev.target == this.wrapperEl) {
+      this.open = false;
+    }
+  };
 
   render() {
     if (this.loaderError) {
@@ -50,7 +78,14 @@ export class ApImage {
     if (this.src) {
       return (
         <Host class="loaded">
-          <img src={this.src} />
+          <div
+            class={{ wrapper: true, open: this.open }}
+            ref={this.wrapperRef}
+            onClick={this.wrapperClick}
+          >
+            <img class={{ ['can-open']: this.canOpen }} src={this.src} onClick={this.iamgeClick} />
+            {this.open && <ap-icon onClick={this.closeClick} icon="xCircle" />}
+          </div>
         </Host>
       );
     }

@@ -9,6 +9,7 @@ import image from 'bootstrap-icons/icons/image.svg';
 import square from 'bootstrap-icons/icons/square.svg';
 import trash from 'bootstrap-icons/icons/trash.svg';
 import twitter from 'bootstrap-icons/icons/twitter.svg';
+import xCircle from 'bootstrap-icons/icons/x-circle.svg';
 
 const toHTML = (s: string) => {
   return atob(s.split(',')[1]);
@@ -24,6 +25,7 @@ const svgMap = {
   frown: toHTML(frown),
   square: toHTML(square),
   squareChecked: toHTML(squareChecked),
+  xCircle: toHTML(xCircle),
   exclamationDiamondFill: toHTML(exclamationDiamondFill),
 };
 export type Icons = keyof typeof svgMap;
