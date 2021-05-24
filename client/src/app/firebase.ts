@@ -104,9 +104,16 @@ class CapNotification {
 const getCache = async <T>(
   docRef: firebase.firestore.DocumentReference,
 ): Promise<DataResult<T> | undefined> => {
-  const doc = await docRef.get({ source: 'cache' });
-  if (doc.exists) {
-    return { state: 'SUCCESS', value: doc.data() as T };
+  try {
+    const doc = await docRef.get({ source: 'cache' });
+    if (doc.exists) {
+      return { state: 'SUCCESS', value: doc.data() as T };
+    }
+  } catch (err) {
+    if (err.code == 'unavailable') {
+      return;
+    }
+    throw err;
   }
   return;
 };
