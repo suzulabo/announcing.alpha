@@ -177,6 +177,11 @@ export class App {
                   },
             },
           });
+          const follow = await this.getFollow(id);
+          if (follow && follow.name != meta.value.name) {
+            follow.name = meta.value.name;
+            await this.setFollow(id, follow);
+          }
           break;
         }
         default:
