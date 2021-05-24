@@ -148,46 +148,39 @@ export class App {
 
   loadAnnounce(id: string) {
     const cb = async () => {
+      const announceState = this.appState.announce;
       const a = await this.appFirebase.getAnnounce(id);
-      const m = this.appState.state.announces;
-      try {
-        if (!a) {
-          m.delete(id);
-          return;
+      switch (a?.state) {
+        case 'NOT_FOUND':
+          announceState.set(id, a);
+          break;
+        case 'SUCCESS': {
+          const meta = await this.fetchAnnounceMeta(id, a.value.mid);
+          if (meta?.state != 'SUCCESS') {
+            announceState.set(id, DATA_ERROR);
+            return;
+          }
+          announceState.set(id, {
+            state: 'SUCCESS',
+            value: {
+              id,
+              ...a.value,
+              ...meta.value,
+              iconLoader: !meta.value.icon
+                ? undefined
+                : async () => {
+                    const v = await this.fetchImage(meta.value.icon || '');
+                    if (v?.state != 'SUCCESS') {
+                      throw new Error('fetch error');
+                    }
+                    return v.value;
+                  },
+            },
+          });
+          break;
         }
-        if (a.state == 'NOT_FOUND') {
-          m.set(id, a);
-          return;
-        }
-        if (a.state != 'SUCCESS') {
-          return;
-        }
-
-        const meta = await this.fetchAnnounceMeta(id, a.value.mid);
-        if (meta?.state != 'SUCCESS') {
-          m.set(id, DATA_ERROR);
-          return;
-        }
-
-        m.set(id, {
-          state: 'SUCCESS',
-          value: {
-            id,
-            ...a.value,
-            ...meta.value,
-            iconLoader: !meta.value.icon
-              ? undefined
-              : async () => {
-                  const v = await this.fetchImage(meta.value.icon || '');
-                  if (v?.state != 'SUCCESS') {
-                    throw new Error('fetch error');
-                  }
-                  return v.value;
-                },
-          },
-        });
-      } finally {
-        this.appState.state.announces = new Map(m);
+        default:
+          announceState.delete(id);
       }
     };
 
@@ -197,7 +190,7 @@ export class App {
   }
 
   getAnnounceState(id: string) {
-    return this.appState.state.announces.get(id);
+    return this.appState.announce.get(id);
   }
 
   private async fetchData<T>(

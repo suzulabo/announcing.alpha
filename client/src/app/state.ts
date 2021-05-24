@@ -1,16 +1,18 @@
 import { createStore } from '@stencil/store';
-import { AnnounceState, DataResult, Follow } from './datatypes';
+import { AnnounceState, DataResult } from './datatypes';
 
-interface State {
-  announces: Map<string, DataResult<AnnounceState>>;
-  follows: Follow[];
-}
-
-const store = createStore<State>({
-  announces: new Map(),
-  follows: [],
-});
+const store = createStore<{ [k: string]: any }>({});
 
 export class AppState {
-  readonly state = store.state;
+  announce = {
+    set: (id: string, v: DataResult<AnnounceState>) => {
+      store.set(`announce.${id}`, v);
+    },
+    get: (id: string) => {
+      return store.get(`announce.${id}`) as DataResult<AnnounceState>;
+    },
+    delete: (id: string) => {
+      delete store.state[`announce.${id}`];
+    },
+  };
 }
