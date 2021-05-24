@@ -1,7 +1,6 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { FETCH_ERROR, Follow, NOT_FOUND } from 'src/app/datatypes';
-import { AnnounceMetaJSON } from 'src/shared';
+import { Follow } from 'src/app/datatypes';
 
 @Component({
   tag: 'app-announce',
@@ -26,11 +25,11 @@ export class AppAnnounce {
   private handleFollowClick = async () => {
     await this.app.processLoading(async () => {
       const announce = this.app.getAnnounceState(this.announceID);
-      if (!announce) {
+      if (announce?.state != 'SUCCESS') {
         return;
       }
       const follow: Follow = {
-        name: (announce as AnnounceMetaJSON).name,
+        name: announce.value.name,
         readTime: Date.now(),
       };
       await this.app.setFollow(this.announceID, follow);
@@ -40,13 +39,13 @@ export class AppAnnounce {
 
   private postLoader = async (postID: string) => {
     const post = await this.app.fetchPost(this.announceID, postID);
-    if (!post || post == FETCH_ERROR) {
+    if (post?.state != 'SUCCESS') {
       return;
     }
 
-    await this.app.setReadTime(this.announceID, post.pT);
+    await this.app.setReadTime(this.announceID, post.value.pT);
 
-    return { ...post, anchorAttrs: this.app.href(`/${this.announceID}/${postID}`) };
+    return { ...post.value, anchorAttrs: this.app.href(`/${this.announceID}/${postID}`) };
   };
 
   render() {
@@ -54,59 +53,55 @@ export class AppAnnounce {
 
     const announce = this.app.getAnnounceState(this.announceID);
 
-    if (!announce) {
-      return;
+    switch (announce?.state) {
+      case 'NOT_FOUND':
+        return (
+          <Host>
+            <div class="deleted">{msgs.announce.deleted}</div>
+            <a {...this.app.href('/', true)}>{msgs.common.back}</a>
+          </Host>
+        );
+      case 'DATA_ERROR':
+        return (
+          <Host>
+            <div class="fetch-error">{msgs.announce.fetchError}</div>
+            <a {...this.app.href('/', true)}>{msgs.common.back}</a>
+          </Host>
+        );
+      case 'SUCCESS': {
+        const follow = this.follow;
+
+        this.app.setTitle(this.app.msgs.announce.pageTitle(announce.value.name));
+
+        return (
+          <Host>
+            <ap-announce
+              announce={announce.value}
+              postLoader={this.postLoader}
+              msgs={{
+                datetime: msgs.common.datetime,
+                noPosts: msgs.announce.noPosts,
+              }}
+            >
+              <div class="buttons" slot="bottomAnnounce">
+                {!follow && (
+                  <button class="slim" onClick={this.handleFollowClick}>
+                    {msgs.announce.followBtn}
+                  </button>
+                )}
+                {follow && (
+                  <Fragment>
+                    <a class="button slim" {...this.app.href(`/${this.announceID}/config_`)}>
+                      {msgs.announce.configBtn}
+                    </a>
+                  </Fragment>
+                )}
+              </div>
+            </ap-announce>
+            <a {...this.app.href('/', true)}>{msgs.common.back}</a>
+          </Host>
+        );
+      }
     }
-
-    if (announce == NOT_FOUND) {
-      return (
-        <Host>
-          <div class="deleted">{msgs.announce.deleted}</div>
-          <a {...this.app.href('/', true)}>{msgs.common.back}</a>
-        </Host>
-      );
-    }
-
-    if (announce == FETCH_ERROR) {
-      return (
-        <Host>
-          <div class="fetch-error">{msgs.announce.fetchError}</div>
-          <a {...this.app.href('/', true)}>{msgs.common.back}</a>
-        </Host>
-      );
-    }
-
-    const follow = this.follow;
-
-    this.app.setTitle(this.app.msgs.announce.pageTitle(announce.name));
-
-    return (
-      <Host>
-        <ap-announce
-          announce={announce}
-          postLoader={this.postLoader}
-          msgs={{
-            datetime: msgs.common.datetime,
-            noPosts: msgs.announce.noPosts,
-          }}
-        >
-          <div class="buttons" slot="bottomAnnounce">
-            {!follow && (
-              <button class="slim" onClick={this.handleFollowClick}>
-                {msgs.announce.followBtn}
-              </button>
-            )}
-            {follow && (
-              <Fragment>
-                <a class="button slim" {...this.app.href(`/${this.announceID}/config_`)}>
-                  {msgs.announce.configBtn}
-                </a>
-              </Fragment>
-            )}
-          </div>
-        </ap-announce>
-        <a {...this.app.href('/', true)}>{msgs.common.back}</a>
-      </Host>
-    );
   }
 }

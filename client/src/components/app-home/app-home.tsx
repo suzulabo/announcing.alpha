@@ -1,6 +1,6 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { FETCH_ERROR, Follow, NOT_FOUND } from 'src/app/datatypes';
+import { Follow } from 'src/app/datatypes';
 
 @Component({
   tag: 'app-home',
@@ -41,53 +41,59 @@ export class AppHome {
     return this.follows?.map(([id, follow]) => {
       const a = this.app.getAnnounceState(id);
 
-      if (!a) {
-        return <div class="announce-box"></div>;
-      }
-
-      if (a == FETCH_ERROR) {
-        return (
-          <div class="announce-box">
-            <div class="head">
-              <div class="name-box">
-                <span class="name">{follow.name}</span>
+      switch (a?.state) {
+        case 'DATA_ERROR':
+          return (
+            <div class="announce-box">
+              <div class="head">
+                <div class="name-box">
+                  <span class="name">{follow.name}</span>
+                </div>
               </div>
+              <span>{msgs.home.fetchError}</span>
+              <button
+                class="small unfollow"
+                data-announce-id={id}
+                onClick={this.handleUnfollowClick}
+              >
+                {msgs.home.unfollowBtn}
+              </button>
             </div>
-            <span>{msgs.home.fetchError}</span>
-            <button class="small unfollow" data-announce-id={id} onClick={this.handleUnfollowClick}>
-              {msgs.home.unfollowBtn}
-            </button>
-          </div>
-        );
-      }
-
-      if (a == NOT_FOUND) {
-        return (
-          <div class="announce-box">
-            <span>{msgs.home.deleted(follow.name)}</span>
-            <button class="small unfollow" data-announce-id={id} onClick={this.handleUnfollowClick}>
-              {msgs.home.unfollowBtn}
-            </button>
-          </div>
-        );
-      }
-
-      const hasNew = Object.values(a.posts).find(v => {
-        return v.pT.toMillis() > follow.readTime;
-      });
-
-      return (
-        <a class="announce-box" {...this.app.href(`/${a.id}`)}>
-          <div class="head">
-            <div class="name-box">
-              {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
-              <span class="name">{a.name}</span>
+          );
+        case 'NOT_FOUND':
+          return (
+            <div class="announce-box">
+              <span>{msgs.home.deleted(follow.name)}</span>
+              <button
+                class="small unfollow"
+                data-announce-id={id}
+                onClick={this.handleUnfollowClick}
+              >
+                {msgs.home.unfollowBtn}
+              </button>
             </div>
-            {a.iconLoader && <ap-image loader={a.iconLoader} />}
-          </div>
-          <span class="desc">{a.desc}</span>
-        </a>
-      );
+          );
+        case 'SUCCESS': {
+          const hasNew = Object.values(a.value.posts).find(v => {
+            return v.pT.toMillis() > follow.readTime;
+          });
+
+          return (
+            <a class="announce-box" {...this.app.href(`/${a.value.id}`)}>
+              <div class="head">
+                <div class="name-box">
+                  {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
+                  <span class="name">{a.value.name}</span>
+                </div>
+                {a.value.iconLoader && <ap-image loader={a.value.iconLoader} />}
+              </div>
+              <span class="desc">{a.value.desc}</span>
+            </a>
+          );
+        }
+        default:
+          return <div class="announce-box"></div>;
+      }
     });
   }
 

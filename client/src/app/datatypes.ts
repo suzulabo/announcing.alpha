@@ -5,11 +5,22 @@ export interface Follow {
   readTime: number;
 }
 
-export const NOT_FOUND = 'NOT_FOUND';
-export type NotFound = typeof NOT_FOUND;
+export type DataResult<T> =
+  | { state: 'NOT_FOUND' | 'DATA_ERROR' }
+  | {
+      state: 'SUCCESS';
+      value: T;
+    };
 
-export const FETCH_ERROR = 'FETCH_ERROR';
-export type FetchError = typeof FETCH_ERROR;
+export interface NotFound {
+  state: 'NOT_FOUND';
+}
+export const NOT_FOUND: NotFound = { state: 'NOT_FOUND' };
+
+export interface DataError {
+  state: 'DATA_ERROR';
+}
+export const DATA_ERROR: DataError = { state: 'DATA_ERROR' };
 
 export interface AnnounceState extends Announce, AnnounceMetaJSON {
   id: string;

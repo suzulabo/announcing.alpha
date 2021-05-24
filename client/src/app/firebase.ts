@@ -7,7 +7,7 @@ import 'firebase/functions';
 import 'firebase/messaging';
 import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 import nacl from 'tweetnacl';
-import { NotFound, PostNotificationRecievedEvent, NOT_FOUND } from './datatypes';
+import { DataResult, NOT_FOUND, PostNotificationRecievedEvent } from './datatypes';
 import { bs62 } from './utils';
 
 class CapNotification {
@@ -103,10 +103,10 @@ class CapNotification {
 
 const getCache = async <T>(
   docRef: firebase.firestore.DocumentReference,
-): Promise<T | undefined> => {
+): Promise<DataResult<T> | undefined> => {
   const doc = await docRef.get({ source: 'cache' });
   if (doc.exists) {
-    return doc.data() as T;
+    return { state: 'SUCCESS', value: doc.data() as T };
   }
   return;
 };
@@ -212,7 +212,7 @@ export class AppFirebase {
     return this.listeners.add(`announces/${id}`, cb);
   }
 
-  getAnnounce(id: string): Promise<Announce | NotFound | undefined> {
+  getAnnounce(id: string): Promise<DataResult<Announce> | undefined> {
     const p = `announces/${id}`;
     if (this.listeners.notFounds.has(p)) {
       return Promise.resolve(NOT_FOUND);

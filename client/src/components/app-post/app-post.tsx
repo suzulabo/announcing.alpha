@@ -1,6 +1,5 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { FETCH_ERROR, NOT_FOUND } from 'src/app/datatypes';
 import { PostJSON } from 'src/shared';
 
 @Component({
@@ -25,19 +24,19 @@ export class AppPost {
     this.app.loadAnnounce(this.announceID);
     await this.app.processLoading(async () => {
       const post = await this.app.fetchPost(this.announceID, this.postID);
-      if (!post || post == FETCH_ERROR) {
+      if (post?.state != 'SUCCESS') {
         return;
       }
-      this.post = post;
+      this.post = post.value;
 
       const img = this.post.img;
       if (img) {
         this.post.imgLoader = async () => {
           const v = await this.app.fetchImage(img);
-          if (v == FETCH_ERROR) {
+          if (v?.state != 'SUCCESS') {
             throw new Error('fetch error');
           }
-          return v;
+          return v.value;
         };
       }
     });
@@ -54,19 +53,13 @@ export class AppPost {
   render() {
     const a = this.app.getAnnounceState(this.announceID);
 
-    if (!a) {
-      return;
-    }
-    if (a == NOT_FOUND) {
-      return;
-    }
-    if (a == FETCH_ERROR) {
+    if (a?.state != 'SUCCESS') {
       return;
     }
 
     this.app.setTitle(
       this.app.msgs.post.pageTitle(
-        a.name,
+        a.value.name,
         this.post?.title || this.post?.body?.substr(0, 20) || '',
       ),
     );

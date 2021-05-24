@@ -5,7 +5,7 @@ import { Share } from '@capacitor/share';
 import { Build, readTask } from '@stencil/core';
 import { AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
-import { FetchError, FETCH_ERROR, Follow, NOT_FOUND } from './datatypes';
+import { DataResult, DATA_ERROR, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppIdbCache } from './idbcache';
 import { AppMsg } from './msg';
@@ -155,30 +155,36 @@ export class App {
           m.delete(id);
           return;
         }
-        if (a == NOT_FOUND) {
+        if (a.state == 'NOT_FOUND') {
           m.set(id, a);
           return;
         }
+        if (a.state != 'SUCCESS') {
+          return;
+        }
 
-        const meta = await this.fetchAnnounceMeta(id, a.mid);
-        if (!meta || meta == FETCH_ERROR) {
-          m.set(id, FETCH_ERROR);
+        const meta = await this.fetchAnnounceMeta(id, a.value.mid);
+        if (meta?.state != 'SUCCESS') {
+          m.set(id, DATA_ERROR);
           return;
         }
 
         m.set(id, {
-          id,
-          ...a,
-          ...meta,
-          iconLoader: !meta.icon
-            ? undefined
-            : async () => {
-                const v = await this.fetchImage(meta.icon || '');
-                if (v == FETCH_ERROR) {
-                  throw new Error('fetch error');
-                }
-                return v;
-              },
+          state: 'SUCCESS',
+          value: {
+            id,
+            ...a.value,
+            ...meta.value,
+            iconLoader: !meta.value.icon
+              ? undefined
+              : async () => {
+                  const v = await this.fetchImage(meta.value.icon || '');
+                  if (v?.state != 'SUCCESS') {
+                    throw new Error('fetch error');
+                  }
+                  return v.value;
+                },
+          },
         });
       } finally {
         this.appState.state.announces = new Map(m);
@@ -197,13 +203,13 @@ export class App {
   private async fetchData<T>(
     p: string,
     responseType: 'blob' | 'json' = 'json',
-  ): Promise<T | FetchError | undefined> {
+  ): Promise<DataResult<T> | undefined> {
     const cacheKey = `fetch:${p}`;
     {
       const v = await this.appIdbCache.get<T>(cacheKey);
       if (v) {
         console.debug('hit fetch cache', p);
-        return v;
+        return { state: 'SUCCESS', value: v };
       }
     }
 
@@ -216,11 +222,11 @@ export class App {
       const dataType = typeof res.data;
       if (responseType == 'json' && dataType == 'object') {
         await this.appIdbCache.set(cacheKey, res.data);
-        return res.data as T;
+        return { state: 'SUCCESS', value: res.data };
       }
       if (dataType == 'string') {
         await this.appIdbCache.set(cacheKey, res.data);
-        return res.data as T;
+        return { state: 'SUCCESS', value: res.data };
       }
     }
 
@@ -229,7 +235,7 @@ export class App {
     }
 
     console.error(`Fetch Error (${res.status})`, res.data);
-    return FETCH_ERROR;
+    return DATA_ERROR;
   }
 
   fetchAnnounceMeta(id: string, metaID: string) {
@@ -242,10 +248,10 @@ export class App {
 
   async fetchImage(id: string) {
     const v = await this.fetchData<string>(`images/${id}`, 'blob');
-    if (v == FETCH_ERROR) {
+    if (v?.state != 'SUCCESS') {
       return v;
     }
-    return `data:image/jpeg;base64,${v}`;
+    return { state: 'SUCCESS', value: `data:image/jpeg;base64,${v.value}` };
   }
 
   getImageURI(id: string) {
