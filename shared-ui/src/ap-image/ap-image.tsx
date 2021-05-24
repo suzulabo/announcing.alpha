@@ -55,17 +55,6 @@ export class ApImage {
     this.open = false;
   };
 
-  private wrapperEl?: HTMLElement;
-  private wrapperRef = (el?: HTMLElement) => {
-    this.wrapperEl = el;
-  };
-
-  private wrapperClick = (ev: Event) => {
-    if (ev.target == this.wrapperEl) {
-      this.open = false;
-    }
-  };
-
   render() {
     if (this.loaderError) {
       return (
@@ -76,18 +65,30 @@ export class ApImage {
     }
 
     if (this.src) {
-      return (
-        <Host class="loaded">
-          <div
-            class={{ wrapper: true, open: this.open }}
-            ref={this.wrapperRef}
-            onClick={this.wrapperClick}
-          >
-            <img class={{ ['can-open']: this.canOpen }} src={this.src} onClick={this.iamgeClick} />
-            {this.open && <ap-icon onClick={this.closeClick} icon="xCircle" />}
-          </div>
-        </Host>
-      );
+      if (!this.open) {
+        return (
+          <Host class="loaded">
+            <div class="wrapper">
+              <img
+                class={{ ['can-open']: this.canOpen }}
+                src={this.src}
+                onClick={this.iamgeClick}
+              />
+            </div>
+          </Host>
+        );
+      } else {
+        return (
+          <Host class="loaded">
+            <div class="wrapper open">
+              <pinch-zoom>
+                <img src={this.src} />
+              </pinch-zoom>
+              <ap-icon onClick={this.closeClick} icon="xCircle" />
+            </div>
+          </Host>
+        );
+      }
     }
     return (
       <Host class="loading">
