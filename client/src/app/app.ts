@@ -58,8 +58,12 @@ export class App {
     });
   }
 
+  private _title = '';
   setTitle(v: string) {
-    document.title = v;
+    this._title = v;
+    readTask(() => {
+      document.title = this._title;
+    });
   }
 
   href(p: string, back?: boolean) {

@@ -20,7 +20,6 @@ export class AppPost {
   post?: PostJSON & { imgLoader?: () => Promise<string> };
 
   async componentWillLoad() {
-    this.app.setTitle('');
     this.app.loadAnnounce(this.announceID);
     await this.app.processLoading(async () => {
       const post = await this.app.fetchPost(this.announceID, this.postID);

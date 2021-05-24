@@ -31,11 +31,8 @@ export class AppAnnounceConfig {
   async componentWillLoad() {
     await this.app.processLoading(async () => {
       const id = this.announceID;
-      await this.app.loadAnnounce(id);
-      if (!this.app.getAnnounceState(id)) {
-        this.app.redirectRoute('/');
-        return;
-      }
+      this.app.loadAnnounce(id);
+
       const follow = await this.app.getFollow(id);
       if (!follow) {
         this.app.redirectRoute(`/${id}`);
@@ -49,8 +46,6 @@ export class AppAnnounceConfig {
 
       this.permission = await this.app.checkNotifyPermission(true);
     });
-
-    this.app.setTitle(this.app.msgs.announceConfig.pageTitle(this.follow.name));
   }
 
   private unfollow = {
@@ -140,6 +135,18 @@ export class AppAnnounceConfig {
         <div>{this.app.msgs.announceConfig.notPermitted}</div>
       </div>
     );
+  }
+
+  componentWillRender() {
+    const a = this.app.getAnnounceState(this.announceID);
+    if (!a) {
+      return;
+    }
+    if (a.state != 'SUCCESS') {
+      this.app.redirectRoute('/');
+      return;
+    }
+    this.app.setTitle(this.app.msgs.announceConfig.pageTitle(a.value.name));
   }
 
   render() {

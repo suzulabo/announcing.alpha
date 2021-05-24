@@ -19,7 +19,6 @@ export class AppAnnounce {
   async componentWillLoad() {
     this.app.loadAnnounce(this.announceID);
     this.follow = await this.app.getFollow(this.announceID);
-    this.app.setTitle('');
   }
 
   private handleFollowClick = async () => {
@@ -69,9 +68,8 @@ export class AppAnnounce {
           </Host>
         );
       case 'SUCCESS': {
-        const follow = this.follow;
-
         this.app.setTitle(this.app.msgs.announce.pageTitle(announce.value.name));
+        const follow = this.follow;
 
         return (
           <Host>

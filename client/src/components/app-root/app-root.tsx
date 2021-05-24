@@ -112,6 +112,8 @@ export class AppRoot {
   }
 
   render() {
+    this.app.setTitle('');
+
     const m = this.getRoute();
 
     return (
