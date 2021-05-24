@@ -48,7 +48,7 @@ export class ApError {
     event.preventDefault();
 
     const reason = event.reason;
-    this.addError(reason?.message || reason?.toString());
+    this.addError(reason?.toString() || reason?.message);
   }
 
   private handleClose = () => {
