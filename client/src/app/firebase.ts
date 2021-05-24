@@ -7,7 +7,7 @@ import 'firebase/functions';
 import 'firebase/messaging';
 import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 import nacl from 'tweetnacl';
-import { NotFound, NotifyPostEvent, NOT_FOUND } from './datatypes';
+import { NotFound, PostNotificationRecievedEvent, NOT_FOUND } from './datatypes';
 import { bs62 } from './utils';
 
 class CapNotification {
@@ -36,9 +36,7 @@ class CapNotification {
       return;
     }
 
-    const event = new NotifyPostEvent('notifyPost', {
-      detail: { announceID, postID },
-    });
+    const event = new PostNotificationRecievedEvent({ announceID, postID });
     dispatchEvent(event);
   }
 

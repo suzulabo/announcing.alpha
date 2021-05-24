@@ -16,7 +16,14 @@ export interface AnnounceState extends Announce, AnnounceMetaJSON {
   iconLoader?: () => Promise<string>;
 }
 
-export class NotifyPostEvent extends CustomEvent<{ announceID: string; postID: string }> {}
+export class PostNotificationRecievedEvent extends CustomEvent<{
+  announceID: string;
+  postID: string;
+}> {
+  constructor(detail: { announceID: string; postID: string }) {
+    super('PostNotificationRecieved', { detail });
+  }
+}
 
 /*
 import { Announce, AnnounceMetaJSON } from 'src/shared';
