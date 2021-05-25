@@ -83,12 +83,7 @@
     },
     {
       "collectionGroup": "notif-devices",
-      "fieldPath": "tz",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "notif-devices",
-      "fieldPath": "follows",
+      "fieldPath": "announces",
       "indexes": []
     },
     {
@@ -103,12 +98,12 @@
     },
     {
       "collectionGroup": "notif-imm",
-      "fieldPath": "followers",
+      "fieldPath": "devices",
       "indexes": []
     },
     {
       "collectionGroup": "notif-imm",
-      "fieldPath": "unfollows",
+      "fieldPath": "cancels",
       "indexes": []
     },
     {
@@ -123,7 +118,7 @@
     },
     {
       "collectionGroup": "archives",
-      "fieldPath": "followers",
+      "fieldPath": "devices",
       "indexes": []
     }
   ]
