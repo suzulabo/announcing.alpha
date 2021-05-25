@@ -304,12 +304,15 @@ export class App {
       }
     }
 
-    const announces = await this.appStorage.notifications.keys();
-    if (enable && !announces.includes(announceID)) {
-      announces.push(announceID);
+    const announces = new Set(await this.appStorage.notifications.keys());
+    if (enable) {
+      announces.add(announceID);
+    } else {
+      announces.delete(announceID);
     }
+
     const signKey = await this.getSignKey();
-    await this.appFirebase.registerMessaging(signKey, this.appMsg.lang, announces);
+    await this.appFirebase.registerMessaging(signKey, this.appMsg.lang, Array.from(announces));
 
     if (enable) {
       await this.appStorage.notifications.set(announceID, {});
