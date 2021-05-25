@@ -36,8 +36,8 @@ export interface Msgs {
     pageTitle: (announceName: string) => string;
     unfollowBtn: string;
     unfollowConfirm: string;
-    enable: string;
-    submitBtn: string;
+    enableNotifyBtn: string;
+    disableNotifyBtn: string;
     unsupported: string;
     notPermitted: string;
   };

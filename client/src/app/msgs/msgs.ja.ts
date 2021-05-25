@@ -55,10 +55,10 @@ export const msgs: Msgs = {
     },
     unfollowBtn: 'フォローを解除',
     unfollowConfirm: 'フォローを解除します。よろしいですか？',
-    enable: '通知を有効にする',
-    submitBtn: '登録',
+    enableNotifyBtn: '通知を有効にする',
+    disableNotifyBtn: '通知を無効にする',
     unsupported: 'このブラウザで通知はご利用になれません',
-    notPermitted: '通知が許可されていません\nブラウザの設定をご確認ください',
+    notPermitted: '通知が許可されていません\n設定をご確認ください',
   },
   post: {
     pageTitle: (announceName: string, postTitle: string) => {

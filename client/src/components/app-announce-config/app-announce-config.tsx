@@ -14,14 +14,12 @@ export class AppAnnounceConfig {
   announceID!: string;
 
   @State()
-  values!: { enable: boolean };
+  private enableNotification!: boolean;
 
   @State()
   showUnfollowConfirm = false;
 
   private permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
-
-  private notification!: boolean;
 
   async componentWillLoad() {
     await this.app.processLoading(async () => {
@@ -34,9 +32,7 @@ export class AppAnnounceConfig {
         return;
       }
 
-      this.notification = (await this.app.getNotification(id)) != null;
-
-      this.values = { enable: this.notification };
+      this.enableNotification = (await this.app.getNotification(id)) != null;
 
       this.permission = await this.app.checkNotifyPermission(true);
     });
@@ -60,14 +56,17 @@ export class AppAnnounceConfig {
     },
   };
 
-  private handleEnableChange = () => {
-    this.values = { ...this.values, enable: !this.values.enable };
+  private handleEnableNotifyClick = async () => {
+    await this.app.processLoading(async () => {
+      await this.app.setNotify(this.announceID, true);
+      this.enableNotification = true;
+    });
   };
 
-  private handleSubmitClick = async () => {
+  private handleDisableNotifyClick = async () => {
     await this.app.processLoading(async () => {
-      await this.app.setNotify(this.announceID, this.values.enable);
-      this.app.pushRoute(`/${this.announceID}`);
+      await this.app.setNotify(this.announceID, false);
+      this.enableNotification = false;
     });
   };
 
@@ -103,11 +102,6 @@ export class AppAnnounceConfig {
     this.app.setTitle(this.app.msgs.announceConfig.pageTitle(a.value.name));
 
     const msgs = this.app.msgs;
-    const values = this.values;
-
-    const modified = values.enable != this.notification;
-
-    const canSubmit = modified;
 
     const renderNotify = () => {
       if (this.permission == 'unsupported') {
@@ -119,16 +113,16 @@ export class AppAnnounceConfig {
 
       return (
         <Fragment>
-          <label>
-            <ap-checkbox
-              label={msgs.announceConfig.enable}
-              checked={values.enable}
-              onClick={this.handleEnableChange}
-            />
-          </label>
-          <button class="submit" disabled={!canSubmit} onClick={this.handleSubmitClick}>
-            {msgs.announceConfig.submitBtn}
-          </button>
+          {!this.enableNotification && (
+            <button class="submit" onClick={this.handleEnableNotifyClick}>
+              {msgs.announceConfig.enableNotifyBtn}
+            </button>
+          )}
+          {this.enableNotification && (
+            <button class="submit" onClick={this.handleDisableNotifyClick}>
+              {msgs.announceConfig.disableNotifyBtn}
+            </button>
+          )}
         </Fragment>
       );
     };
