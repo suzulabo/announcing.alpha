@@ -50,7 +50,7 @@ export class AppHome {
                   <span class="name">{follow.name}</span>
                 </div>
               </div>
-              <span>{msgs.home.fetchError}</span>
+              <span class="data-error">{msgs.home.dataError}</span>
               <button
                 class="small unfollow"
                 data-announce-id={id}
@@ -63,7 +63,12 @@ export class AppHome {
         case 'NOT_FOUND':
           return (
             <div class="announce-box">
-              <span>{msgs.home.deleted(follow.name)}</span>
+              <div class="head">
+                <div class="name-box">
+                  <span class="name">{follow.name}</span>
+                </div>
+              </div>
+              <span class="deleted">{msgs.home.deleted}</span>
               <button
                 class="small unfollow"
                 data-announce-id={id}

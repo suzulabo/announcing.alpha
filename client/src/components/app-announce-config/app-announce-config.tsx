@@ -143,7 +143,7 @@ export class AppAnnounceConfig {
       return;
     }
     if (a.state != 'SUCCESS') {
-      this.app.redirectRoute('/');
+      this.app.redirectRoute(`/${this.announceID}`);
       return;
     }
     this.app.setTitle(this.app.msgs.announceConfig.pageTitle(a.value.name));

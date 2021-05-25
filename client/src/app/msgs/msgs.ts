@@ -23,14 +23,14 @@ export interface Msgs {
     pageTitle: string;
     noFollows: string;
     newBadge: string;
-    deleted: (name: string) => string;
-    fetchError: string;
+    deleted: string;
+    dataError: string;
     unfollowBtn: string;
   };
   announce: {
     pageTitle: (announceName: string) => string;
     deleted: string;
-    fetchError: string;
+    dataError: string;
     noPosts: string;
     followBtn: string;
     configBtn: string;

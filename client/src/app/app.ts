@@ -5,7 +5,7 @@ import { Share } from '@capacitor/share';
 import { Build, readTask } from '@stencil/core';
 import { AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
-import { DataResult, DATA_ERROR, Follow } from './datatypes';
+import { DataResult, DATA_ERROR, Follow, NOT_FOUND } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppIdbCache } from './idbcache';
 import { AppMsg } from './msg';
@@ -160,7 +160,7 @@ export class App {
           break;
         case 'SUCCESS': {
           const meta = await this.fetchAnnounceMeta(id, a.value.mid);
-          if (meta?.state != 'SUCCESS') {
+          if (meta.state != 'SUCCESS') {
             announceState.set(id, DATA_ERROR);
             return;
           }
@@ -174,7 +174,7 @@ export class App {
                 ? undefined
                 : async () => {
                     const v = await this.fetchImage(meta.value.icon || '');
-                    if (v?.state != 'SUCCESS') {
+                    if (v.state != 'SUCCESS') {
                       throw new Error('fetch error');
                     }
                     return v.value;
@@ -205,7 +205,7 @@ export class App {
   private async fetchData<T>(
     p: string,
     responseType: 'blob' | 'json' = 'json',
-  ): Promise<DataResult<T> | undefined> {
+  ): Promise<DataResult<T>> {
     const cacheKey = `fetch:${p}`;
     {
       const v = await this.appIdbCache.get<T>(cacheKey);
@@ -233,7 +233,7 @@ export class App {
     }
 
     if (res.status == 404) {
-      return;
+      return NOT_FOUND;
     }
 
     console.error(`Fetch Error (${res.status})`, res.data);
@@ -250,7 +250,7 @@ export class App {
 
   async fetchImage(id: string) {
     const v = await this.fetchData<string>(`images/${id}`, 'blob');
-    if (v?.state != 'SUCCESS') {
+    if (v.state != 'SUCCESS') {
       return v;
     }
     return { state: 'SUCCESS', value: `data:image/jpeg;base64,${v.value}` };

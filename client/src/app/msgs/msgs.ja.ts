@@ -40,10 +40,8 @@ export const msgs: Msgs = {
     pageTitle: titleSuffix,
     noFollows: 'フォローしているアナウンスはありません',
     newBadge: '新着',
-    deleted: (name: string) => {
-      return `「${name}」は削除されました`;
-    },
-    fetchError: 'データの読み込み中にエラーが発生しました',
+    deleted: 'このアナウンスは削除されました',
+    dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     unfollowBtn: 'フォローを解除する',
   },
   announce: {
@@ -51,7 +49,7 @@ export const msgs: Msgs = {
       return `${announceName} - ${titleSuffix}`;
     },
     deleted: 'このアナウンスは削除されました',
-    fetchError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
+    dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     noPosts: 'お知らせはまだありません',
     followBtn: 'フォローする',
     configBtn: '設定',

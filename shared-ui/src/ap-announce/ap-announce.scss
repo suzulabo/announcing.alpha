@@ -105,4 +105,12 @@ ap-announce {
     align-self: center;
     margin-bottom: 20px;
   }
+
+  .post-data-error {
+    white-space: pre-line;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

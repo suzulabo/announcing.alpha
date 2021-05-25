@@ -55,6 +55,7 @@ export class ApAnnounce {
   msgs!: {
     datetime: (d: number) => string;
     noPosts: string;
+    postDataError: string;
   };
 
   @State()
@@ -123,7 +124,7 @@ export class ApAnnounce {
     }
     const post = await this.postLoader(postID);
     if (!post) {
-      return <div class="post">no post data: [{postID}]</div>;
+      return <div class="post post-data-error">{this.msgs.postDataError}</div>;
     }
 
     return (

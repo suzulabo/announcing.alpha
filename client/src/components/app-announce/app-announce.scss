@@ -17,7 +17,10 @@ app-announce {
     }
   }
 
-  .deleted {
+  .deleted,
+  .data-error {
     margin-bottom: 50px;
+    white-space: pre-line;
+    text-align: center;
   }
 }

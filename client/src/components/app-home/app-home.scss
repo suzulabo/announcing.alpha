@@ -67,4 +67,10 @@ app-home {
       overflow: scroll;
     }
   }
+
+  .deleted,
+  .data-error {
+    white-space: pre-line;
+    text-align: center;
+  }
 }

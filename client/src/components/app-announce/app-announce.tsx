@@ -38,7 +38,7 @@ export class AppAnnounce {
 
   private postLoader = async (postID: string) => {
     const post = await this.app.fetchPost(this.announceID, postID);
-    if (post?.state != 'SUCCESS') {
+    if (post.state != 'SUCCESS') {
       return;
     }
 
@@ -63,7 +63,7 @@ export class AppAnnounce {
       case 'DATA_ERROR':
         return (
           <Host>
-            <div class="fetch-error">{msgs.announce.fetchError}</div>
+            <div class="data-error">{msgs.announce.dataError}</div>
             <a {...this.app.href('/', true)}>{msgs.common.back}</a>
           </Host>
         );
@@ -79,6 +79,7 @@ export class AppAnnounce {
               msgs={{
                 datetime: msgs.common.datetime,
                 noPosts: msgs.announce.noPosts,
+                postDataError: msgs.announce.dataError,
               }}
             >
               <div class="buttons" slot="bottomAnnounce">
