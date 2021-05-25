@@ -7,9 +7,13 @@ steps:
     name: bash
     args: ['-c', "echo '${_FIREBASERC}' > firebase/.firebaserc"]
 
+  - id: 'write assetlinks'
+    name: bash
+    args: ['-c', "echo '${_ASSETLINKS_JSON}' > client/assetlinks.json"]
+
   - id: 'check output'
     name: bash
-    args: ['cat', 'firebase/.firebaserc', 'shared/src/appenv.env.ts']
+    args: ['cat', 'shared/src/appenv.env.ts', 'firebase/.firebaserc', 'client/assetlinks.json']
 
   - id: 'install firebase packages'
     name: node:14
