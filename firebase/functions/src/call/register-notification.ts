@@ -10,7 +10,6 @@ export const callRegisterNotification = async (
   _context: CallableContext,
   adminApp: admin.app.App,
 ): Promise<void> => {
-  logger.debug('params:', params);
   const { token, signKey, sign, lang, announces } = params;
 
   if (!token) {
