@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "noImplicitReturns": true,
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowUnreachableCode": false,
+
+    "module": "commonjs",
     "outDir": "lib",
     "sourceMap": true,
-    "strict": true,
     "target": "es2017",
     "esModuleInterop": true,
     "lib": ["ESNext"],
