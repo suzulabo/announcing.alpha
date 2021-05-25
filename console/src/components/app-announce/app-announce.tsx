@@ -130,6 +130,7 @@ export class AppAnnounce {
           msgs={{
             datetime: msgs.common.datetime,
             noPosts: msgs.announce.noPosts,
+            postDataError: msgs.announce.dataError,
           }}
         >
           <div class="buttons" slot="bottomAnnounce">

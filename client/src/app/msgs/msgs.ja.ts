@@ -10,16 +10,11 @@ export const msgs: Msgs = {
     cancel: 'キャンセル',
     close: '閉じる',
     ok: 'OK',
-    am: '午前',
-    pm: '午後',
     datetime: (d: number) => {
       if (d > 0) {
         return format(d, 'yyyy/MM/dd H:mm');
       }
       return '';
-    },
-    hour: (v: number) => {
-      return `${v}時`;
     },
   },
   error: {
@@ -61,10 +56,6 @@ export const msgs: Msgs = {
     unfollowBtn: 'フォローを解除',
     unfollowConfirm: 'フォローを解除します。よろしいですか？',
     enable: '通知を有効にする',
-    hours: (hours: number[]) => {
-      return `${hours.join('時,')}時に通知する`;
-    },
-    hoursBtn: '通知時刻を設定',
     submitBtn: '登録',
     unsupported: 'このブラウザで通知はご利用になれません',
     notPermitted: '通知が許可されていません\nブラウザの設定をご確認ください',

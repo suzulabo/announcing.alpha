@@ -1,6 +1,5 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { Follow } from 'src/app/datatypes';
 import { PromiseValue } from 'type-fest';
 
 @Component({
@@ -15,18 +14,14 @@ export class AppAnnounceConfig {
   announceID!: string;
 
   @State()
-  values!: { enable: boolean; hours: number[] };
+  values!: { enable: boolean };
 
   @State()
   showUnfollowConfirm = false;
 
-  @State()
-  showHoursModal = false;
-
   private permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
 
-  private follow!: Follow;
-  private notification?: { hours?: number[] };
+  private notification!: boolean;
 
   async componentWillLoad() {
     await this.app.processLoading(async () => {
@@ -38,11 +33,10 @@ export class AppAnnounceConfig {
         this.app.redirectRoute(`/${id}`);
         return;
       }
-      this.follow = follow;
 
-      this.notification = await this.app.getNotification(id);
+      this.notification = (await this.app.getNotification(id)) != null;
 
-      this.values = { enable: !!this.notification, hours: this.notification?.hours || [] };
+      this.values = { enable: this.notification };
 
       this.permission = await this.app.checkNotifyPermission(true);
     });
@@ -70,49 +64,9 @@ export class AppAnnounceConfig {
     this.values = { ...this.values, enable: !this.values.enable };
   };
 
-  private hoursModal = {
-    handlers: {
-      show: () => {
-        this.showHoursModal = true;
-      },
-      close: () => {
-        this.showHoursModal = false;
-      },
-      hourClick: (event: CustomEvent<number>) => {
-        const hour = event.detail;
-        let hours = [...this.values.hours];
-        if (hours.includes(hour)) {
-          hours = hours.filter(v => {
-            return v != hour;
-          });
-        } else {
-          hours.push(hour);
-        }
-        hours.sort((a, b) => {
-          return a - b;
-        });
-        this.values = { ...this.values, hours };
-      },
-      hoursClick: (event: MouseEvent) => {
-        const hour = parseInt((event.target as HTMLElement).getAttribute('data-hour') || '');
-        let hours = [...this.values.hours];
-        if (hours.includes(hour)) {
-          hours = hours.filter(v => {
-            return v != hour;
-          });
-        } else {
-          hours.push(hour);
-        }
-        hours.sort();
-        this.values = { ...this.values, hours };
-      },
-    },
-  };
-
   private handleSubmitClick = async () => {
     await this.app.processLoading(async () => {
-      const hours = this.values.enable ? this.values.hours : [];
-      await this.app.setNotify(this.announceID, this.values.enable, hours);
+      await this.app.setNotify(this.announceID, this.values.enable);
       this.app.pushRoute(`/${this.announceID}`);
     });
   };
@@ -137,7 +91,7 @@ export class AppAnnounceConfig {
     );
   }
 
-  componentWillRender() {
+  render() {
     const a = this.app.getAnnounceState(this.announceID);
     if (!a) {
       return;
@@ -147,20 +101,11 @@ export class AppAnnounceConfig {
       return;
     }
     this.app.setTitle(this.app.msgs.announceConfig.pageTitle(a.value.name));
-  }
-
-  render() {
-    if (!this.follow) {
-      return;
-    }
 
     const msgs = this.app.msgs;
     const values = this.values;
-    const notify = this.notification;
 
-    const modified =
-      values.enable != !!notify ||
-      (values.enable && values.hours.join(':') != notify?.hours?.join(':'));
+    const modified = values.enable != this.notification;
 
     const canSubmit = modified;
 
@@ -181,18 +126,6 @@ export class AppAnnounceConfig {
               onClick={this.handleEnableChange}
             />
           </label>
-          {values.hours.length > 0 && (
-            <span class={{ disabled: !values.enable }}>
-              {msgs.announceConfig.hours(values.hours)}
-            </span>
-          )}
-          <button
-            disabled={!values.enable}
-            class="slim hours"
-            onClick={this.hoursModal.handlers.show}
-          >
-            {msgs.announceConfig.hoursBtn}
-          </button>
           <button class="submit" disabled={!canSubmit} onClick={this.handleSubmitClick}>
             {msgs.announceConfig.submitBtn}
           </button>
@@ -220,21 +153,6 @@ export class AppAnnounceConfig {
                 <button onClick={this.unfollow.handlers.close}>{msgs.common.cancel}</button>
                 <button onClick={this.unfollow.handlers.unfollow}>{msgs.common.ok}</button>
               </div>
-            </div>
-          </ap-modal>
-        )}
-
-        {this.showHoursModal && (
-          <ap-modal onClose={this.hoursModal.handlers.close}>
-            <div class="hours-modal">
-              <ap-clock-select
-                msgs={{ am: msgs.common.am, pm: msgs.common.pm }}
-                selected={values.hours}
-                onHourClick={this.hoursModal.handlers.hourClick}
-              />
-              <button class="anchor close" onClick={this.hoursModal.handlers.close}>
-                {msgs.common.close}
-              </button>
             </div>
           </ap-modal>
         )}

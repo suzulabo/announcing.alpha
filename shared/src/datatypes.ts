@@ -103,10 +103,9 @@ export interface DeletePostParams {
 }
 
 export interface RegisterNotificationParams {
-  fcmToken: string;
+  token: string;
   signKey: string;
   sign: string;
   lang: Lang;
-  tz: string;
-  follows: { [id: string]: { hours?: number[] } };
+  announces: string[];
 }

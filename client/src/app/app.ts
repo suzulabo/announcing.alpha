@@ -295,7 +295,7 @@ export class App {
     return this.appFirebase.checkNotifyPermission(ask);
   }
 
-  async setNotify(announceID: string, enable: boolean, hours?: number[]) {
+  async setNotify(announceID: string, enable: boolean) {
     if (!enable) {
       const permission = await this.appFirebase.checkNotifyPermission(false);
       if (permission != 'granted') {
@@ -304,23 +304,15 @@ export class App {
       }
     }
 
-    const follows = {} as { [id: string]: { hours?: number[] } };
-
-    const notifications = await this.appStorage.notifications.entries();
-    for (const [k, v] of notifications) {
-      if (k != announceID) {
-        follows[k] = v;
-      }
+    const announces = await this.appStorage.notifications.keys();
+    if (enable && !announces.includes(announceID)) {
+      announces.push(announceID);
     }
-    if (enable) {
-      follows[announceID] = { hours };
-    }
-
     const signKey = await this.getSignKey();
-    await this.appFirebase.registerMessaging(signKey, this.appMsg.lang, follows);
+    await this.appFirebase.registerMessaging(signKey, this.appMsg.lang, announces);
 
     if (enable) {
-      await this.appStorage.notifications.set(announceID, { hours });
+      await this.appStorage.notifications.set(announceID, {});
     } else {
       await this.appStorage.notifications.remove(announceID);
     }

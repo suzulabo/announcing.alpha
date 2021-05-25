@@ -11,8 +11,8 @@ const ARCHIVE_COUNT = 5000;
 
 const shouldArchive = (data: ImmediateNotification) => {
   return (
-    (data.followers ? Object.keys(data.followers).length : 0) +
-      (data.unfollows ? data.unfollows.length : 0) >=
+    (data.devices ? Object.keys(data.devices).length : 0) +
+      (data.cancels ? data.cancels.length : 0) >=
     SHOULD_ARCHIVE_COUNT
   );
 };
@@ -27,14 +27,14 @@ const archiveImmediateNotification = async (
     if (!immediate) {
       return;
     }
-    const followers = immediate.followers || {};
-    const unfollows = immediate.unfollows || [];
+    const devices = immediate.devices || {};
+    const cancels = immediate.cancels || [];
     const archives = immediate.archives || [];
     if (!shouldArchive(immediate)) {
       return;
     }
 
-    const archiveFollowers = [] as [string, [lang: Lang]][];
+    const archiveDevices = [] as [string, [lang: Lang]][];
     const reuses = [] as string[];
     const deletions = [] as string[];
     const archivesRef = immediateRef.collection('archives');
@@ -47,26 +47,26 @@ const archiveImmediateNotification = async (
         continue;
       }
 
-      const entries = Object.entries(archive.followers);
+      const entries = Object.entries(archive.devices);
       const filtered = entries.filter(([token]) => {
-        return !(token in followers) && !unfollows.includes(token);
+        return !(token in devices) && !cancels.includes(token);
       });
       if (entries.length == filtered.length) {
         reuses.push(archiveID);
       } else {
         deletions.push(archiveID);
-        archiveFollowers.push(...filtered);
+        archiveDevices.push(...filtered);
       }
     }
 
-    archiveFollowers.push(...Object.entries(followers));
+    archiveDevices.push(...Object.entries(devices));
 
     const newArchives = [...reuses];
     {
       let aID = incString.next(incString.max(newArchives));
-      while (archiveFollowers.length > 0) {
+      while (archiveDevices.length > 0) {
         const data: ImmediateNotificationArchive = {
-          followers: Object.fromEntries(archiveFollowers.splice(0, ARCHIVE_COUNT)),
+          devices: Object.fromEntries(archiveDevices.splice(0, ARCHIVE_COUNT)),
         };
         const id = deletions.shift();
         if (id) {

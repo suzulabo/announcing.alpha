@@ -35,6 +35,7 @@ export interface Msgs {
   announce: {
     pageTitle: (s: string) => string;
     noPosts: string;
+    dataError: string;
     newPost: string;
     edit: string;
     showURL: string;

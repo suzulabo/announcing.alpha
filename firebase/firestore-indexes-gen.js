@@ -5,7 +5,6 @@ const disables = {
   'images': ['data'],
   'notif-devices': ['signKey', 'lang', 'tz', 'follows', 'uT'],
   'notif-imm': ['announceID', 'followers', 'unfollows', 'archives', 'uT'],
-  'notif-timed': ['time', 'followers', 'unfollows', 'archives', 'uT'],
   'archives': ['followers'],
 };
 

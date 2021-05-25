@@ -50,6 +50,7 @@ export const msgs: Msgs = {
       return `${s} - ${titleSuffix}`;
     },
     noPosts: 'お知らせが投稿されていません',
+    dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     newPost: '新しいお知らせを投稿する',
     edit: '編集する',
     showURL: 'URLを表示',

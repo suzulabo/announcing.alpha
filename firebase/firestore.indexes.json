@@ -122,31 +122,6 @@
       "indexes": []
     },
     {
-      "collectionGroup": "notif-timed",
-      "fieldPath": "time",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "notif-timed",
-      "fieldPath": "followers",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "notif-timed",
-      "fieldPath": "unfollows",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "notif-timed",
-      "fieldPath": "archives",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "notif-timed",
-      "fieldPath": "uT",
-      "indexes": []
-    },
-    {
       "collectionGroup": "archives",
       "fieldPath": "followers",
       "indexes": []

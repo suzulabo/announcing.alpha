@@ -6,7 +6,7 @@ import { Announce, AnnounceMeta, Lang, Post } from '../shared';
 import { ImmediateNotification, ImmediateNotificationArchive } from '../utils/datatypes';
 import { logger } from '../utils/logger';
 
-const getImmediateNotificationFollowers = async (
+const getImmediateNotificationDevices = async (
   firestore: admin.firestore.Firestore,
   announceID: string,
 ) => {
@@ -16,7 +16,7 @@ const getImmediateNotificationFollowers = async (
     return;
   }
 
-  const followers = [] as [string, [lang: Lang]][];
+  const devices = [] as [string, [lang: Lang]][];
   if (immediate.archives) {
     const archivesRef = immediateRef.collection('archives');
     for (const archiveID of immediate.archives) {
@@ -24,20 +24,21 @@ const getImmediateNotificationFollowers = async (
         await archivesRef.doc(archiveID).get()
       ).data() as ImmediateNotificationArchive;
       if (archive) {
-        followers.push(...Object.entries(archive.followers));
+        devices.push(...Object.entries(archive.devices));
       }
     }
   }
 
-  if (immediate.followers) {
-    followers.push(...Object.entries(immediate.followers));
+  if (immediate.devices) {
+    devices.push(...Object.entries(immediate.devices));
   }
 
-  if (!immediate.unfollows) {
-    return new Map(followers);
+  const cancels = immediate.cancels;
+  if (!cancels || cancels.length == 0) {
+    return new Map(devices);
   } else {
-    const filtered = followers.filter(([token]) => {
-      return immediate.unfollows && !immediate.unfollows.includes(token);
+    const filtered = devices.filter(([token]) => {
+      return !cancels.includes(token);
     });
     return new Map(filtered);
   }
@@ -59,12 +60,12 @@ export const firestoreCreatePost = async (
   const postID = qds.id;
 
   const firestore = adminApp.firestore();
-  const followers = await getImmediateNotificationFollowers(firestore, announceID);
-  if (!followers || followers.size == 0) {
+  const devices = await getImmediateNotificationDevices(firestore, announceID);
+  if (!devices || devices.size == 0) {
     return;
   }
 
-  const tokensSet = new Set<string>(followers.keys());
+  const tokensSet = new Set<string>(devices.keys());
 
   const announceMeta = await (async () => {
     const announceRef = firestore.doc(`announces/${announceID}`);

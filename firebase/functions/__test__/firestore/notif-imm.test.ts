@@ -5,7 +5,7 @@ describe('firestoreImmediateNotificationWrite', () => {
   it('no archives', async () => {
     const tokenSuffix = 'x'.repeat(160);
 
-    const followers = Object.fromEntries(
+    const devices = Object.fromEntries(
       [...Array(4999)].map((_, i) => {
         return [`token${i}-${tokenSuffix}`, ['ja']];
       }),
@@ -15,7 +15,7 @@ describe('firestoreImmediateNotificationWrite', () => {
       'notif-imm': {
         '111111111111': {
           announceID: '111111111111',
-          followers: followers,
+          devices,
         },
       },
     });
@@ -31,7 +31,7 @@ describe('firestoreImmediateNotificationWrite', () => {
   it('do archives', async () => {
     const tokenSuffix = 'x'.repeat(160);
 
-    const followers = Object.fromEntries(
+    const devices = Object.fromEntries(
       [...Array(5000)].map((_, i) => {
         return [`token${i}-${tokenSuffix}`, ['ja']];
       }),
@@ -41,7 +41,7 @@ describe('firestoreImmediateNotificationWrite', () => {
       'notif-imm': {
         '111111111111': {
           announceID: '111111111111',
-          followers: followers,
+          devices,
         },
       },
     });
@@ -59,13 +59,13 @@ describe('firestoreImmediateNotificationWrite', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const archives1 = firestore.doc('notif-imm/111111111111/archives/1').get().data()!;
-    expect(archives1.followers).toEqual(followers);
+    expect(archives1.devices).toEqual(devices);
   });
 
-  it('unfollows', async () => {
+  it('cancels', async () => {
     const tokenSuffix = 'x'.repeat(160);
 
-    const followers = Object.fromEntries(
+    const devices = Object.fromEntries(
       [...Array(5000)].map((_, i) => {
         return [`token${i}-${tokenSuffix}`, ['ja']];
       }),
@@ -75,7 +75,7 @@ describe('firestoreImmediateNotificationWrite', () => {
       'notif-imm': {
         '111111111111': {
           announceID: '111111111111',
-          followers: followers,
+          devices,
         },
       },
     });
@@ -86,8 +86,8 @@ describe('firestoreImmediateNotificationWrite', () => {
       firestore.adminApp(),
     );
 
-    const unfollows = Object.keys(followers);
-    firestore.doc('notif-imm/111111111111').update({ unfollows });
+    const cancels = Object.keys(devices);
+    firestore.doc('notif-imm/111111111111').update({ cancels });
 
     await firestoreImmediateNotificationWrite(
       { after: firestore.doc('notif-imm/111111111111').get() } as any,

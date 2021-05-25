@@ -280,32 +280,23 @@ export class AppFirebase {
     }
   }
 
-  async registerMessaging(
-    signSecKey: string,
-    lang: Lang,
-    follows: { [id: string]: { hours?: number[] } },
-  ) {
-    const fcmToken = await this.messageToken();
-    if (!fcmToken) {
-      throw new Error("can't get fcmToken");
+  async registerMessaging(signSecKey: string, lang: Lang, announces: string[]) {
+    const token = await this.messageToken();
+    if (!token) {
+      throw new Error("can't get token");
     }
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const ids = Object.keys(follows);
-    ids.sort();
-
-    const signBody = [new Date().toISOString(), fcmToken, ...ids].join('\0');
+    const signBody = [new Date().toISOString(), token, ...announces].join('\0');
     const secKey = bs62.decode(signSecKey);
     const sign = bs62.encode(nacl.sign(new TextEncoder().encode(signBody), secKey));
     const signKey = bs62.encode(nacl.sign.keyPair.fromSecretKey(secKey).publicKey);
 
     const params: RegisterNotificationParams = {
-      fcmToken,
+      token,
       signKey,
       sign,
       lang,
-      tz,
-      follows,
+      announces,
     };
 
     await this.callFunc<void>('registerNotification', params);

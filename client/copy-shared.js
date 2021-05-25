@@ -13,7 +13,6 @@ const components = [
   'textview',
   'checkbox',
   'image',
-  'clock-select',
   'loading',
   'modal',
   'announce',

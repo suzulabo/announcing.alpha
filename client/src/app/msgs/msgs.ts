@@ -5,10 +5,7 @@ export interface Msgs {
     cancel: string;
     close: string;
     ok: string;
-    am: string;
-    pm: string;
     datetime: (d: number) => string;
-    hour: (v: number) => string;
   };
   error: {
     main: string;
@@ -40,8 +37,6 @@ export interface Msgs {
     unfollowBtn: string;
     unfollowConfirm: string;
     enable: string;
-    hours: (hours: number[]) => string;
-    hoursBtn: string;
     submitBtn: string;
     unsupported: string;
     notPermitted: string;

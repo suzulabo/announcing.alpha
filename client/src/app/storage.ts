@@ -72,5 +72,7 @@ export class AppStorage {
   readonly fcmToken = kvGetSet('fcmToken');
   readonly signKey = kvGetSet('signKey');
   readonly follows = objectMulti<Follow>('follows.');
-  readonly notifications = objectMulti<{ hours?: number[] }>('notifications.');
+  readonly notifications = objectMulti<{
+    x?: never; // no props now
+  }>('notifications.');
 }
