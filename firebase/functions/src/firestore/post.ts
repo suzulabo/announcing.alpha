@@ -48,7 +48,6 @@ export const firestoreCreatePost = async (
   qds: QueryDocumentSnapshot,
   context: EventContext,
   adminApp: admin.app.App,
-  clientSite: string,
 ): Promise<void> => {
   const postData = qds.data() as Post;
 
@@ -87,7 +86,6 @@ export const firestoreCreatePost = async (
   const notification: admin.messaging.Notification = {
     title: announceMeta.name,
     body: postData.title || postData.body,
-    ...(announceMeta.icon && { imageUrl: `${clientSite}/data/images/${announceMeta.icon}` }),
   };
   const data = { announceID, postID, ...(announceMeta.icon && { icon: announceMeta.icon }) };
 
