@@ -57,12 +57,14 @@ ap-announce {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      margin: auto 0;
     }
     .body {
       color: var(--light-color);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      margin: auto 0;
     }
 
     &.skeleton {
