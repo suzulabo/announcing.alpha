@@ -1,4 +1,5 @@
 import { Capacitor } from '@capacitor/core';
+import { LocalNotifications } from '@capacitor/local-notifications';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Build } from '@stencil/core';
 import firebase from 'firebase/app';
@@ -17,12 +18,26 @@ class CapNotification {
     void PushNotifications.addListener('pushNotificationReceived', notification => {
       console.debug('pushNotificationReceived', JSON.stringify(notification, null, 2));
 
-      this.dispatchPostNotificationRecieved(notification.data);
+      void LocalNotifications.schedule({
+        notifications: [
+          {
+            id: Date.now(),
+            title: notification.title || '',
+            body: notification.body || '',
+            extra: notification.data,
+          },
+        ],
+      });
     });
     void PushNotifications.addListener('pushNotificationActionPerformed', notification => {
       console.debug('pushNotificationActionPerformed', JSON.stringify(notification, null, 2));
 
       this.dispatchPostNotificationRecieved(notification.notification.data);
+    });
+    void LocalNotifications.addListener('localNotificationActionPerformed', notification => {
+      console.debug('localNotificationActionPerformed', JSON.stringify(notification, null, 2));
+
+      this.dispatchPostNotificationRecieved(notification.notification.extra);
     });
   }
 
