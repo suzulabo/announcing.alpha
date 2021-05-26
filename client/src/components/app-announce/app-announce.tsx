@@ -101,6 +101,8 @@ export class AppAnnounce {
           </Host>
         );
       }
+      default:
+        return <ap-spinner />;
     }
   }
 }

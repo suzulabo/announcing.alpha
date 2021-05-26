@@ -14,6 +14,7 @@ const components = [
   'checkbox',
   'image',
   'loading',
+  'spinner',
   'modal',
   'announce',
   'post',

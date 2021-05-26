@@ -93,7 +93,7 @@ export class AppAnnounceConfig {
   render() {
     const a = this.app.getAnnounceState(this.announceID);
     if (!a) {
-      return;
+      return <ap-spinner />;
     }
     if (a.state != 'SUCCESS') {
       this.app.redirectRoute(`/${this.announceID}`);

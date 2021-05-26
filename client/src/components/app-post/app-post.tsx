@@ -57,7 +57,7 @@ export class AppPost {
     const a = this.app.getAnnounceState(this.announceID);
 
     if (!a || !this.post) {
-      return;
+      return <ap-spinner />;
     }
 
     if (a.state != 'SUCCESS' || this.post.state != 'SUCCESS') {

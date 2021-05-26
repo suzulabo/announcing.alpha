@@ -97,7 +97,11 @@ export class AppHome {
           );
         }
         default:
-          return <div class="announce-box"></div>;
+          return (
+            <div class="announce-box">
+              <ap-spinner />
+            </div>
+          );
       }
     });
   }
