@@ -83,8 +83,9 @@ export const onFirestoreImmediateNotificationWrite = region.firestore
     return firestoreImmediateNotificationWrite(change, context, adminApp);
   });
 
-export const onPubsubSendNotification = region.pubsub
-  .topic('send-notification')
+export const onPubsubSendNotification = region
+  .runWith({ failurePolicy: true })
+  .pubsub.topic('send-notification')
   .onPublish(async (msg, context) => {
     await pubsubSendNotification(msg, context, adminApp);
     return 0;
