@@ -17,16 +17,16 @@ class CapNotification {
     void PushNotifications.addListener('pushNotificationReceived', notification => {
       console.debug('pushNotificationReceived', JSON.stringify(notification, null, 2));
 
-      this.dispatchNotifyPost(notification.data);
+      this.dispatchPostNotificationRecieved(notification.data);
     });
     void PushNotifications.addListener('pushNotificationActionPerformed', notification => {
       console.debug('pushNotificationActionPerformed', JSON.stringify(notification, null, 2));
 
-      this.dispatchNotifyPost(notification.notification.data);
+      this.dispatchPostNotificationRecieved(notification.notification.data);
     });
   }
 
-  private dispatchNotifyPost(data?: any) {
+  private dispatchPostNotificationRecieved(data?: any) {
     const announceID = data?.announceID;
     if (!announceID || typeof announceID != 'string') {
       return;
