@@ -115,6 +115,11 @@ export class AppRoot {
     if (!r) {
       return;
     }
+
+    if (r.match.tag == 'app-image') {
+      r.params['backPath'] = `/${r.params.announceID}/${r.params.postID}`;
+    }
+
     return {
       tag: r.match.tag,
       params: r.params,

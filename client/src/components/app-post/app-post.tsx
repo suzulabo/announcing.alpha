@@ -18,7 +18,9 @@ export class AppPost {
   postID!: string;
 
   @State()
-  post?: DataResult<PostJSON & { imgLoader?: () => Promise<string> }>;
+  post?: DataResult<
+    PostJSON & { imgLoader?: () => Promise<string>; imgAnchorAttrs?: { [k: string]: any } }
+  >;
 
   componentWillLoad() {
     this.app.loadAnnounce(this.announceID);
@@ -36,6 +38,9 @@ export class AppPost {
               }
               return v.value;
             };
+            this.post.value.imgAnchorAttrs = this.app.href(
+              `/${this.announceID}/${this.postID}/image/${img}`,
+            );
           }
         }
       })

@@ -2,17 +2,26 @@ ap-post {
   display: flex;
   flex-direction: column;
 
-  ap-image {
-    min-width: 0;
-    max-width: 100%;
-    max-height: 300px;
+  div.image {
     align-self: center;
-    margin-bottom: 20px;
+    min-height: 100px;
 
-    font-size: 2em;
+    & > * {
+      display: block;
+      margin: auto;
+    }
 
-    &.loading {
-      min-height: 100px;
+    img {
+      min-width: 0;
+      max-width: 100%;
+      max-height: 300px;
+      align-self: center;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+
+    ap-icon {
+      font-size: 2em;
     }
   }
 

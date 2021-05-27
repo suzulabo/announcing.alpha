@@ -248,7 +248,7 @@ export class App {
     return this.fetchData<PostJSON>(`announces/${id}/posts/${postID}`);
   }
 
-  async fetchImage(id: string) {
+  async fetchImage(id: string): Promise<DataResult<string>> {
     const v = await this.fetchData<string>(`images/${id}`, 'blob');
     if (v.state != 'SUCCESS') {
       return v;
