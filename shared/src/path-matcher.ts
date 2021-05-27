@@ -18,7 +18,6 @@ const _match = <T extends Match>(
   }
   const pattern = m.pattern;
   const ok = typeof pattern == 'string' ? v == pattern : pattern.test(v);
-  console.log({ ok, pattern, v });
   if (!ok) {
     return;
   }
