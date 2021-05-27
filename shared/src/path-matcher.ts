@@ -13,11 +13,12 @@ const _match = <T extends Match>(
 
   const v = p.shift();
 
-  if (!v) {
+  if (v == null) {
     return;
   }
   const pattern = m.pattern;
   const ok = typeof pattern == 'string' ? v == pattern : pattern.test(v);
+  console.log({ ok, pattern, v });
   if (!ok) {
     return;
   }
@@ -39,15 +40,17 @@ const _match = <T extends Match>(
 };
 
 export const pathMatcher = <T extends Match>(
-  matches: T,
+  matches: T[],
   path: string,
 ): { match: T; params: { [k: string]: string } } | undefined => {
-  const params = {} as { [k: string]: string };
-  const pathes = path.split('/');
+  const pathes = path == '/' ? ['/', ''] : path.split('/');
   pathes.shift(); // remove first slash
-  const match = _match(matches, pathes, params);
-  if (match) {
-    return { match: match, params };
+  for (const root of matches) {
+    const params = {} as { [k: string]: string };
+    const match = _match(root, pathes, params);
+    if (match) {
+      return { match: match, params };
+    }
   }
   return;
 };

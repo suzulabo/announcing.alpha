@@ -2,34 +2,40 @@ import { Match, pathMatcher } from 'src/path-matcher';
 
 describe('path-matcher', () => {
   describe('tags', () => {
-    const matches: Match & { tag: string } = {
-      pattern: /^[0-9A-Z]{12}$/,
-      name: 'announceID',
-      tag: 'app-announce',
-      nexts: [
-        {
-          pattern: 'config',
-          tag: 'app-announce-config',
-        },
-        {
-          pattern: /^[0-9a-zA-Z]{8}$/,
-          name: 'postID',
-          tag: 'app-post',
-          nexts: [
-            {
-              pattern: 'image',
-              nexts: [
-                {
-                  pattern: /^[0-9a-zA-Z]{15,25}$/,
-                  name: 'imageID',
-                  tag: 'app-image',
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    };
+    const matches: (Match & { tag: string })[] = [
+      {
+        pattern: '',
+        tag: 'app-home',
+      },
+      {
+        pattern: /^[0-9A-Z]{12}$/,
+        name: 'announceID',
+        tag: 'app-announce',
+        nexts: [
+          {
+            pattern: 'config',
+            tag: 'app-announce-config',
+          },
+          {
+            pattern: /^[0-9a-zA-Z]{8}$/,
+            name: 'postID',
+            tag: 'app-post',
+            nexts: [
+              {
+                pattern: 'image',
+                nexts: [
+                  {
+                    pattern: /^[0-9a-zA-Z]{15,25}$/,
+                    name: 'imageID',
+                    tag: 'app-image',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
 
     const tests: {
       path: string;
@@ -37,6 +43,7 @@ describe('path-matcher', () => {
       tag?: string;
       params?: { [k: string]: string };
     }[][] = [
+      [{ path: '/', tag: 'app-home' }],
       [{ path: '/1234567890AB', tag: 'app-announce', params: { announceID: '1234567890AB' } }],
       [
         {
