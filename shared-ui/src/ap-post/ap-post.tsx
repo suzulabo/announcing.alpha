@@ -1,4 +1,6 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+
+const tweetIDPattern = new RegExp('^https://twitter\\.com/.+/status/([0-9]+)$');
 
 @Component({
   tag: 'ap-post',
@@ -57,6 +59,17 @@ export class ApTextView {
     );
   }
 
+  private renderTweet(link: string) {
+    //
+    const m = link.match(tweetIDPattern);
+    if (!m) {
+      return;
+    }
+
+    const [, tweetID] = m;
+    return <ap-twitter tweetID={tweetID} />;
+  }
+
   render() {
     const post = this.post;
 
@@ -67,9 +80,12 @@ export class ApTextView {
         {post.title && <span class="title">{post.title}</span>}
         {post.body && <ap-textview class="body" text={post.body} />}
         {post.link && (
-          <a class="link" href={post.link}>
-            {post.link}
-          </a>
+          <Fragment>
+            {this.renderTweet(post.link)}
+            <a class="link" href={post.link}>
+              {post.link}
+            </a>
+          </Fragment>
         )}
       </Host>
     );

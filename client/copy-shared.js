@@ -18,6 +18,7 @@ const components = [
   'modal',
   'announce',
   'post',
+  'twitter',
 ];
 for (const v of components) {
   copy(`../shared-ui/src/ap-${v}`, `src/shared-ui/ap-${v}`);
