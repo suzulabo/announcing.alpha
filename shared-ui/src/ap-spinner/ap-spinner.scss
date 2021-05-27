@@ -1,4 +1,11 @@
 ap-spinner {
+  &.hydrated {
+    visibility: hidden;
+    &.show {
+      visibility: visible;
+    }
+  }
+
   & > div {
     width: 10px;
     height: 10px;
