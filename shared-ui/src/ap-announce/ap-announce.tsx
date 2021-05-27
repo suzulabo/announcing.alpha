@@ -1,7 +1,5 @@
 import { Component, h, Host, Listen, Prop, readTask, State } from '@stencil/core';
 
-const scrollPosMap = new Map<string, number>();
-
 @Component({
   tag: 'ap-announce',
   styleUrl: 'ap-announce.scss',
@@ -9,12 +7,13 @@ const scrollPosMap = new Map<string, number>();
 export class ApAnnounce {
   @Listen('scroll', { target: 'window' })
   handleWindowScroll() {
-    scrollPosMap.set(location.href, window.scrollY);
+    const state = { ...(history.state || {}), scrollY: window.scrollY };
+    history.replaceState(state, '');
   }
 
   componentDidLoad() {
-    const v = scrollPosMap.get(location.href);
-    if (v) {
+    const v = history.state.scrollY as number | undefined;
+    if (v != null) {
       readTask(() => {
         window.scroll(0, v);
       });
