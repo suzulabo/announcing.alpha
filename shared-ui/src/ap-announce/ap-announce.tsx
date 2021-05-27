@@ -5,10 +5,21 @@ import { Component, h, Host, Listen, Prop, readTask, State } from '@stencil/core
   styleUrl: 'ap-announce.scss',
 })
 export class ApAnnounce {
+  private scrollTimer?: number;
+
   @Listen('scroll', { target: 'window' })
   handleWindowScroll() {
-    const state = { ...(history.state || {}), scrollY: window.scrollY };
-    history.replaceState(state, '');
+    if (this.scrollTimer) {
+      clearTimeout(this.scrollTimer);
+    }
+
+    const href = location.href;
+    this.scrollTimer = window.setTimeout(() => {
+      if (href == location.href) {
+        const state = { ...(history.state || {}), scrollY: window.scrollY };
+        history.replaceState(state, '');
+      }
+    }, 100);
   }
 
   componentDidLoad() {
