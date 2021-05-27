@@ -7,6 +7,42 @@ import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
 import { AppStorage } from 'src/app/storage';
 import { AppEnv } from 'src/shared';
+import { Match, pathMatcher } from 'src/shared/path-matcher';
+
+const matches: (Match & { tag: string })[] = [
+  {
+    pattern: '',
+    tag: 'app-home',
+  },
+  {
+    pattern: /^[0-9A-Z]{12}$/,
+    name: 'announceID',
+    tag: 'app-announce',
+    nexts: [
+      {
+        pattern: 'config',
+        tag: 'app-announce-config',
+      },
+      {
+        pattern: /^[0-9a-zA-Z]{8}$/,
+        name: 'postID',
+        tag: 'app-post',
+        nexts: [
+          {
+            pattern: 'image',
+            nexts: [
+              {
+                pattern: /^[0-9a-zA-Z]{15,25}$/,
+                name: 'imageID',
+                tag: 'app-image',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];
 
 interface MatchPathResult {
   tag: string;
@@ -72,43 +108,17 @@ export class AppRoot {
     return;
   }
 
-  private staticRouteMap = new Map([['/', 'app-home']]);
-  private announceIDPattern = /^[A-Z0-9]{12}$/;
-  private postIDPattern = /^[a-zA-Z0-9]{8}$/;
-
   private getRoute(): MatchPathResult | undefined {
     const p = location.pathname;
 
-    {
-      const t = this.staticRouteMap.get(p);
-      if (t) {
-        return { tag: t };
-      }
+    const r = pathMatcher(matches, p);
+    if (!r) {
+      return;
     }
-
-    b: {
-      const l = p.split('/');
-      l.shift();
-      if (l.length > 2) {
-        break b;
-      }
-
-      const [announceID, postID] = l;
-      if (!this.announceIDPattern.test(announceID)) {
-        break b;
-      }
-
-      if (postID) {
-        if (postID == 'config_') {
-          return { tag: 'app-announce-config', params: { announceID } };
-        } else if (this.postIDPattern.test(postID)) {
-          return { tag: 'app-post', params: { announceID, postID } };
-        }
-      } else {
-        return { tag: 'app-announce', params: { announceID } };
-      }
-    }
-    return;
+    return {
+      tag: r.match.tag,
+      params: r.params,
+    };
   }
 
   render() {
