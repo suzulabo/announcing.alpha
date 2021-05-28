@@ -52,7 +52,7 @@ export class AppPost {
 
   private shareClick = async () => {
     try {
-      await this.app.share(location.href);
+      await this.app.share(`${this.app.clientSite}/${this.announceID}/${this.postID}`);
     } catch {
       //
     }

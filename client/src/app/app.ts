@@ -22,6 +22,7 @@ export class App {
   readonly buildInfo = BUILD_INFO;
 
   private dataURLPrefix: string;
+  readonly clientSite: string;
 
   constructor(
     private appEnv: AppEnv,
@@ -33,8 +34,10 @@ export class App {
   ) {
     if (Build.isDev || Capacitor.getPlatform() == 'web') {
       this.dataURLPrefix = '/data';
+      this.clientSite = location.origin;
     } else {
       this.dataURLPrefix = `${this.appEnv.env.sites.client}/data`;
+      this.clientSite = this.appEnv.env.sites.client;
     }
   }
 
