@@ -29,7 +29,7 @@ export class ApImage {
   }
 
   @State()
-  src?: string;
+  src = '';
 
   @State()
   loaderError = false;
