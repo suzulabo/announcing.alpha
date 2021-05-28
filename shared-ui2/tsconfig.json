@@ -16,12 +16,7 @@
     "jsx": "react",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
-    "baseUrl": ".",
-    "paths": {
-      "@announcing-shared/path-matcher": ["../shared/src/path-matcher.ts"],
-      "@announcing-shared": ["../shared/src"],
-      "@announcing-shared-ui/ap-root": ["../shared-ui2/src/ap-root/ap-root.tsx"]
-    }
+    "baseUrl": "."
   },
   "include": ["src"],
   "exclude": ["node_modules"]

@@ -6,8 +6,8 @@ import { AppIdbCache } from 'src/app/idbcache';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
 import { AppStorage } from 'src/app/storage';
-import { AppEnv } from 'src/shared';
-import { Match, pathMatcher } from 'src/shared/path-matcher';
+import { AppEnv } from '@announcing-shared';
+import { Match, pathMatcher } from '@announcing-shared/path-matcher';
 
 const matches: (Match & { tag: string })[] = [
   {
@@ -60,7 +60,7 @@ export class AppRoot {
     const appMsg = new AppMsg();
     const apError = document.querySelector('ap-error');
     if (apError) {
-      apError.msgs = appMsg.msgs.error;
+      //apError.msgs = appMsg.msgs.error;
     }
     const appEnv = new AppEnv();
     const appFirebase = new AppFirebase(appEnv);
@@ -145,6 +145,7 @@ export class AppRoot {
               <ap-icon icon="github" />
             </a>
           </div>
+          <ap-root />
         </footer>
       </Host>
     );

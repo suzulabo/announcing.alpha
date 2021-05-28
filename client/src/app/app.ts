@@ -3,7 +3,7 @@ import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Build, readTask } from '@stencil/core';
-import { AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
+import { AnnounceMetaJSON, AppEnv, PostJSON } from '@announcing-shared';
 import nacl from 'tweetnacl';
 import { DataResult, DATA_ERROR, Follow, NOT_FOUND } from './datatypes';
 import { AppFirebase } from './firebase';

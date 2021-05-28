@@ -3,6 +3,4 @@ cap/
 assetlinks.json
 **/google-services.json
 
-src/shared
-src/shared-ui
 src/components.d.ts

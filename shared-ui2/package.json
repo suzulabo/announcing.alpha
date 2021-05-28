@@ -1,0 +1,13 @@
+{
+  "name": "announcing-shared-ui",
+  "private": true,
+  "scripts": {
+    "build": "stencil build",
+    "start": "stencil build --dev --watch --serve"
+  },
+  "devDependencies": {
+    "@ionic/core": "^5.6.8",
+    "@stencil/core": "^2.5.2",
+    "@stencil/sass": "^1.4.1"
+  }
+}
