@@ -4,6 +4,7 @@ import { sass } from '@stencil/sass';
 // https://stenciljs.com/docs/config
 
 export const config: Config = {
+  globalScript: 'src/global/app.ts',
   taskQueue: 'async',
   outputTargets: [
     {

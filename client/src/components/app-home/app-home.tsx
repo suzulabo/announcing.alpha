@@ -84,7 +84,11 @@ export class AppHome {
           });
 
           return (
-            <a class="announce-box" {...this.app.href(`/${a.value.id}`)}>
+            <ion-router-link
+              class="announce-box"
+              href={`/${a.value.id}`}
+              data-href={`/${a.value.id}`}
+            >
               <div class="head">
                 <div class="name-box">
                   {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
@@ -93,7 +97,7 @@ export class AppHome {
                 {a.value.iconLoader && <ap-image loader={a.value.iconLoader} />}
               </div>
               <span class="desc">{a.value.desc}</span>
-            </a>
+            </ion-router-link>
           );
         }
         default:

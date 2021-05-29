@@ -20,7 +20,7 @@
     "paths": {
       "@announcing-shared/path-matcher": ["../shared/src/path-matcher.ts"],
       "@announcing-shared": ["../shared/src"],
-      "@announcing-shared-ui/ap-root": ["../shared-ui2/src/ap-root/ap-root.tsx"]
+      "@announcing-shared-ui": ["../shared-ui2/src"]
     }
   },
   "include": ["src"],

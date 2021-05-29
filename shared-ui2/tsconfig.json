@@ -16,7 +16,10 @@
     "jsx": "react",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "@announcing-shared/path-matcher": ["../shared/src/path-matcher.ts"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules"]
