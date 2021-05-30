@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
 
@@ -38,7 +38,7 @@ export class AppHome {
   private renderAnnounces() {
     const msgs = this.app.msgs;
 
-    return this.follows?.map(([id, follow]) => {
+    const renderContent = (id: string, follow: Follow) => {
       const a = this.app.getAnnounceState(id);
 
       switch (a?.state) {
@@ -84,20 +84,12 @@ export class AppHome {
           });
 
           return (
-            <ion-router-link
-              class="announce-box"
-              href={`/${a.value.id}`}
-              data-href={`/${a.value.id}`}
-            >
-              <div class="head">
-                <div class="name-box">
-                  {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
-                  <span class="name">{a.value.name}</span>
-                </div>
-                {a.value.iconLoader && <ap-image loader={a.value.iconLoader} />}
-              </div>
+            <Fragment>
+              {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
+              <span class="name">{a.value.name}</span>
+              {a.value.iconLoader && <ap-image loader={a.value.iconLoader} />}
               <span class="desc">{a.value.desc}</span>
-            </ion-router-link>
+            </Fragment>
           );
         }
         default:
@@ -107,6 +99,14 @@ export class AppHome {
             </div>
           );
       }
+    };
+
+    return this.follows?.map(([id, follow]) => {
+      return (
+        <ion-card href={`/${id}`}>
+          <div class="announce-box">{renderContent(id, follow)}</div>
+        </ion-card>
+      );
     });
   }
 
@@ -117,7 +117,11 @@ export class AppHome {
 
     return (
       <Host>
-        <div class="announces-grid">{this.renderAnnounces()}</div>
+        <ion-content>
+          <div class="content">
+            <div class="announces-grid">{this.renderAnnounces()}</div>
+          </div>
+        </ion-content>
       </Host>
     );
   }

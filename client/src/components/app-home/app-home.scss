@@ -1,11 +1,9 @@
 app-home {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  div.content {
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
 
   .announces-grid {
     display: grid;
@@ -17,59 +15,16 @@ app-home {
     grid-template-columns: repeat(auto-fit, minmax(300px, 400px));
   }
 
-  .announce-box {
-    min-height: 100px;
-    border-radius: 5px;
-    padding: 10px;
-    border: 1px solid var(--border-color);
+  ion-card {
+    --ion-card-color: var(--ion-text-color);
+  }
 
-    text-decoration: none;
-
+  div.announce-box {
     display: flex;
     flex-direction: column;
 
-    button.unfollow {
-      align-self: flex-end;
-      margin-top: 20px;
-    }
-
-    .head {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      .name-box {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        font-weight: bolder;
-
-        .badge {
-          align-self: flex-start;
-          border-radius: 5px;
-          padding: 2px 5px;
-          color: var(--bk-color);
-          background-color: var(--light-color);
-        }
-        .name {
-          font-size: 1.2rem;
-        }
-      }
-      ap-image {
-        width: 80px;
-        height: 80px;
-      }
-    }
-    .desc {
-      padding: 20px 5px 10px;
-      flex-grow: 1;
-      white-space: pre-line;
-      max-height: 150px;
-      overflow: scroll;
-    }
-
-    ap-spinner {
-      margin: auto;
-    }
+    padding: 10px;
+    min-height: 100px;
   }
 
   .deleted,

@@ -1,6 +1,6 @@
-import { Match, pathMatcher } from '@announcing-shared/path-matcher';
 import { RouterEventDetail } from '@ionic/core';
 import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Match, pathMatcher } from 'src/shared/path-matcher';
 
 export type RouteMatch = Match & { url: string; tag?: string };
 

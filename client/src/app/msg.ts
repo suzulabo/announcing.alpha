@@ -1,4 +1,4 @@
-import { Lang } from '@announcing-shared';
+import { Lang } from 'src/shared';
 import { Msgs } from './msgs/msgs';
 import { msgs as jaMsgs } from './msgs/msgs.ja';
 

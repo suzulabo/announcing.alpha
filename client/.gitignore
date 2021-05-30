@@ -4,3 +4,5 @@ assetlinks.json
 **/google-services.json
 
 src/components.d.ts
+src/shared
+src/shared-ui

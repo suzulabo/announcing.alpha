@@ -1,0 +1,11 @@
+@import '~@ionic/core/css/core.css';
+
+/** Basic CSS for apps built with Ionic */
+@import '~@ionic/core/css/normalize.css';
+@import '~@ionic/core/css/structure.css';
+@import '~@ionic/core/css/typography.css';
+
+html {
+  --ion-font-family: sans-serif;
+  --ion-text-color: #333333;
+}

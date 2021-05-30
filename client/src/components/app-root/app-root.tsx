@@ -1,5 +1,3 @@
-import { AppEnv } from '@announcing-shared';
-import { RouteMatch } from '@announcing-shared-ui';
 import { Component, h, Host, Listen } from '@stencil/core';
 import { App } from 'src/app/app';
 import { PostNotificationRecievedEvent } from 'src/app/datatypes';
@@ -8,6 +6,8 @@ import { AppIdbCache } from 'src/app/idbcache';
 import { AppMsg } from 'src/app/msg';
 import { AppState } from 'src/app/state';
 import { AppStorage } from 'src/app/storage';
+import { AppEnv } from 'src/shared';
+import { RouteMatch } from 'src/shared-ui/ap-root/ap-root';
 
 const matches: RouteMatch[] = [
   {
