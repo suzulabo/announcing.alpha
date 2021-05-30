@@ -10,6 +10,9 @@ html {
   --ap-light-color: #666666;
   --ap-border-color: #888888;
 
+  --ap-bk-color: #ffffff;
+  --ap-margin-bk-color: #f2f2f2;
+
   --ion-font-family: sans-serif;
 
   --ion-color-primary: #333333;
@@ -20,10 +23,25 @@ html {
   --ion-color-primary-tint: #474747;
 }
 
+ion-content {
+  --background: var(--ap-margin-bk-color);
+}
+
 .ap-content {
+  background-color: var(--ap-bk-color);
+  padding: 10px;
   color: var(--ap-color);
   font-size: 16px;
   min-height: 100%;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (min-width: 500px) {
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
 }
 
 .ap-card-content {
