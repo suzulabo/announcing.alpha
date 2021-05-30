@@ -1,36 +1,10 @@
-import { Component, h, Host, Listen, Prop, readTask, State } from '@stencil/core';
+import { Component, h, Host, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'ap-announce',
   styleUrl: 'ap-announce.scss',
 })
 export class ApAnnounce {
-  private scrollTimer?: number;
-
-  @Listen('scroll', { target: 'window' })
-  handleWindowScroll() {
-    if (this.scrollTimer) {
-      clearTimeout(this.scrollTimer);
-    }
-
-    const href = location.href;
-    this.scrollTimer = window.setTimeout(() => {
-      if (href == location.href) {
-        const state = { ...(history.state || {}), scrollY: window.scrollY };
-        history.replaceState(state, '');
-      }
-    }, 100);
-  }
-
-  componentDidLoad() {
-    const v = history.state.scrollY as number | undefined;
-    if (v != null) {
-      readTask(() => {
-        window.scroll(0, v);
-      });
-    }
-  }
-
   @Prop()
   announce!: {
     name: string;

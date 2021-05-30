@@ -135,9 +135,9 @@ export class AppAnnounceConfig {
           {msgs.announceConfig.unfollowBtn}
         </button>
 
-        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
+        <ion-router-link class="back" href={`/${this.announceID}`} routerDirection="back">
           {msgs.common.back}
-        </a>
+        </ion-router-link>
 
         {this.showUnfollowConfirm && (
           <ap-modal onClose={this.unfollow.handlers.close}>
