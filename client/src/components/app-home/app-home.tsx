@@ -118,7 +118,7 @@ export class AppHome {
     return (
       <Host>
         <ion-content>
-          <div class="content">
+          <div class="ap-content">
             <div class="announces-grid">{this.renderAnnounces()}</div>
           </div>
         </ion-content>

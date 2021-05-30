@@ -11,7 +11,7 @@ html {
   --ap-border-color: #888888;
 
   --ap-bk-color: #ffffff;
-  --ap-margin-bk-color: #f2f2f2;
+  --ap-margin-bk-color: #444444;
 
   --ion-font-family: sans-serif;
 
@@ -38,9 +38,10 @@ ion-content {
   margin-right: auto;
 
   @media (min-width: 500px) {
-    border-radius: 5px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    border-radius: 15px;
+    border: 10px solid var(--ap-margin-bk-color);
+    //margin-top: 10px;
+    //margin-bottom: 10px;
   }
 }
 
