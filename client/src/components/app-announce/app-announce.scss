@@ -1,4 +1,25 @@
 app-announce {
+  .ap-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  ap-announce {
+    align-self: normal;
+  }
+
+  .back {
+    display: block;
+    text-align: center;
+    margin: 20px 0;
+  }
+}
+
+/*
+app-announce {
+  
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -24,3 +45,4 @@ app-announce {
     text-align: center;
   }
 }
+  */

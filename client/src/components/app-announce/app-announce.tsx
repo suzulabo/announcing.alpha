@@ -1,6 +1,7 @@
-import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
+import { ApButton } from 'src/shared-ui/functionals/button';
 
 @Component({
   tag: 'app-announce',
@@ -44,7 +45,7 @@ export class AppAnnounce {
 
     await this.app.setReadTime(this.announceID, post.value.pT);
 
-    return { ...post.value, anchorAttrs: this.app.href(`/${this.announceID}/${postID}`) };
+    return { ...post.value, href: `/${this.announceID}/${postID}` };
   };
 
   render() {
@@ -52,57 +53,65 @@ export class AppAnnounce {
 
     const announce = this.app.getAnnounceState(this.announceID);
 
-    switch (announce?.state) {
-      case 'NOT_FOUND':
-        return (
-          <Host>
-            <div class="deleted">{msgs.announce.deleted}</div>
-            <a {...this.app.href('/', true)}>{msgs.common.back}</a>
-          </Host>
-        );
-      case 'DATA_ERROR':
-        return (
-          <Host>
-            <div class="data-error">{msgs.announce.dataError}</div>
-            <a {...this.app.href('/', true)}>{msgs.common.back}</a>
-          </Host>
-        );
-      case 'SUCCESS': {
-        this.app.setTitle(this.app.msgs.announce.pageTitle(announce.value.name));
-        const follow = this.follow;
+    const renderContent = () => {
+      switch (announce?.state) {
+        case 'NOT_FOUND':
+          return (
+            <Fragment>
+              <div class="deleted">{msgs.announce.deleted}</div>
+            </Fragment>
+          );
+        case 'DATA_ERROR':
+          return (
+            <Fragment>
+              <div class="data-error">{msgs.announce.dataError}</div>
+            </Fragment>
+          );
+        case 'SUCCESS': {
+          this.app.setTitle(this.app.msgs.announce.pageTitle(announce.value.name));
+          const follow = this.follow;
 
-        return (
-          <Host>
-            <ap-announce
-              announce={announce.value}
-              postLoader={this.postLoader}
-              msgs={{
-                datetime: msgs.common.datetime,
-                noPosts: msgs.announce.noPosts,
-                postDataError: msgs.announce.dataError,
-              }}
-            >
-              <div class="buttons" slot="bottomAnnounce">
-                {!follow && (
-                  <button class="slim" onClick={this.handleFollowClick}>
-                    {msgs.announce.followBtn}
-                  </button>
-                )}
-                {follow && (
-                  <Fragment>
-                    <a class="button slim" {...this.app.href(`/${this.announceID}/config`)}>
-                      {msgs.announce.configBtn}
-                    </a>
-                  </Fragment>
-                )}
-              </div>
-            </ap-announce>
-            <a {...this.app.href('/', true)}>{msgs.common.back}</a>
-          </Host>
-        );
+          return (
+            <Fragment>
+              <ap-announce
+                announce={announce.value}
+                postLoader={this.postLoader}
+                msgs={{
+                  datetime: msgs.common.datetime,
+                  noPosts: msgs.announce.noPosts,
+                  postDataError: msgs.announce.dataError,
+                }}
+              >
+                <div class="buttons" slot="bottomAnnounce">
+                  {!follow && (
+                    <ApButton onClick={this.handleFollowClick}>{msgs.announce.followBtn}</ApButton>
+                  )}
+                  {follow && (
+                    <Fragment>
+                      <ApButton href={`/${this.announceID}/config`}>
+                        {msgs.announce.configBtn}
+                      </ApButton>
+                    </Fragment>
+                  )}
+                </div>
+              </ap-announce>
+            </Fragment>
+          );
+        }
+        default:
+          return <ap-spinner />;
       }
-      default:
-        return <ap-spinner />;
-    }
+    };
+
+    return (
+      <ion-content>
+        <div class="ap-content">
+          {renderContent()}
+          <ion-router-link class="back" href="/" routerDirection="back">
+            {msgs.common.back}
+          </ion-router-link>
+        </div>
+      </ion-content>
+    );
   }
 }
