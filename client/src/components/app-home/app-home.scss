@@ -15,11 +15,9 @@ app-home {
     grid-template-columns: repeat(auto-fit, minmax(300px, 400px));
   }
 
-  ion-card {
-    --ion-card-color: var(--ion-text-color);
-  }
-
   div.announce-box {
+    color: var(--color);
+
     display: flex;
     flex-direction: column;
 
