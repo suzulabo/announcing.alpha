@@ -20,7 +20,7 @@ export interface Msgs {
     pageTitle: string;
     noFollows: string;
     newBadge: string;
-    deleted: string;
+    notFound: string;
     dataError: string;
     unfollowBtn: string;
   };

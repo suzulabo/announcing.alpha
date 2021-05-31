@@ -1,6 +1,6 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { Follow } from 'src/app/datatypes';
+import { AnnounceState, DataResult, Follow } from 'src/app/datatypes';
 
 @Component({
   tag: 'app-home',
@@ -30,52 +30,34 @@ export class AppHome {
   private handleUnfollowClick = async (event: Event) => {
     const id = (event.target as HTMLElement).getAttribute('data-announce-id');
     if (id) {
-      await this.app.deleteFollow(id);
-      this.follows = await this.app.getFollows();
+      await this.app.processLoading(async () => {
+        await this.app.deleteFollow(id);
+        this.follows = await this.app.getFollows();
+      });
     }
   };
 
   private renderAnnounces() {
     const msgs = this.app.msgs;
 
-    const renderContent = (id: string, follow: Follow) => {
-      const a = this.app.getAnnounceState(id);
-
+    const renderContent = (id: string, follow: Follow, a?: DataResult<AnnounceState>) => {
       switch (a?.state) {
+        case 'NOT_FOUND':
         case 'DATA_ERROR':
           return (
-            <div class="announce-box">
-              <div class="head">
-                <div class="name-box">
-                  <span class="name">{follow.name}</span>
-                </div>
-              </div>
-              <span class="data-error">{msgs.home.dataError}</span>
-              <button
-                class="small unfollow"
+            <div class="main">
+              <span class="name">{follow.name}</span>
+              <span class="data-error">
+                {a.state == 'DATA_ERROR' ? msgs.home.dataError : msgs.home.notFound}
+              </span>
+              <ion-button
+                size="small"
+                fill="outline"
                 data-announce-id={id}
                 onClick={this.handleUnfollowClick}
               >
                 {msgs.home.unfollowBtn}
-              </button>
-            </div>
-          );
-        case 'NOT_FOUND':
-          return (
-            <div class="announce-box">
-              <div class="head">
-                <div class="name-box">
-                  <span class="name">{follow.name}</span>
-                </div>
-              </div>
-              <span class="deleted">{msgs.home.deleted}</span>
-              <button
-                class="small unfollow"
-                data-announce-id={id}
-                onClick={this.handleUnfollowClick}
-              >
-                {msgs.home.unfollowBtn}
-              </button>
+              </ion-button>
             </div>
           );
         case 'SUCCESS': {
@@ -85,41 +67,40 @@ export class AppHome {
 
           return (
             <Fragment>
-              {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
-              <span class="name">{a.value.name}</span>
+              <div class="main">
+                {hasNew && <ion-badge>{msgs.home.newBadge}</ion-badge>}
+                <span class="name">{a.value.name}</span>
+                <span class="desc">{a.value.desc}</span>
+              </div>
               {a.value.iconLoader && <ap-image loader={a.value.iconLoader} />}
-              <span class="desc">{a.value.desc}</span>
             </Fragment>
           );
         }
         default:
-          return (
-            <div class="announce-box">
-              <ap-spinner />
-            </div>
-          );
+          return <ion-spinner name="dots" />;
       }
     };
 
     return this.follows?.map(([id, follow]) => {
+      const a = this.app.getAnnounceState(id);
       return (
-        <ion-card href={`/${id}`}>
-          <div class="announce-box">{renderContent(id, follow)}</div>
+        <ion-card href={a?.state == 'SUCCESS' ? `/${id}` : undefined}>
+          <div class="ap-card-content">{renderContent(id, follow, a)}</div>
         </ion-card>
       );
     });
   }
 
-  render() {
-    if (this.follows.length == 0) {
-      return <Host>{this.app.msgs.home.noFollows}</Host>;
-    }
+  private renderNofollows() {
+    return <div class="no-follows">{this.app.msgs.home.noFollows}</div>;
+  }
 
+  render() {
     return (
       <Host>
         <ion-content>
           <div class="ap-content">
-            <div class="announces-grid">{this.renderAnnounces()}</div>
+            {this.follows.length == 0 ? this.renderNofollows() : this.renderAnnounces()}
           </div>
         </ion-content>
       </Host>

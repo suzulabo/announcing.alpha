@@ -35,7 +35,7 @@ export const msgs: Msgs = {
     pageTitle: titleSuffix,
     noFollows: 'フォローしているアナウンスはありません',
     newBadge: '新着',
-    deleted: 'このアナウンスは削除されました',
+    notFound: 'アナウンスのデータが見つかりませんでした',
     dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     unfollowBtn: 'フォローを解除する',
   },
