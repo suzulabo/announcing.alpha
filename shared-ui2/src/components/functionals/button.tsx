@@ -1,6 +1,7 @@
 import { FunctionalComponent, h } from '@stencil/core';
 
 export const ApButton: FunctionalComponent<{
+  class?: string;
   fill?: HTMLIonButtonElement['fill'];
   href?: string;
   onClick?: (event: MouseEvent) => void;

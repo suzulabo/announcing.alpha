@@ -2,6 +2,7 @@ import { Http } from '@capacitor-community/http';
 import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
+import { loadingController } from '@ionic/core';
 import { Build, readTask } from '@stencil/core';
 import { AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
 import nacl from 'tweetnacl';
@@ -57,7 +58,7 @@ export class App {
     await CapApp.addListener('appUrlOpen', data => {
       console.log('App opened with URL:', data);
       const url = new URL(data.url);
-      this.pushRoute(url.pathname);
+      void this.pushRoute(url.pathname);
     });
   }
 
@@ -69,68 +70,28 @@ export class App {
     });
   }
 
-  href(p: string, back?: boolean) {
-    return {
-      href: p,
-      onClick: (ev: MouseEvent) => {
-        // https://github.com/ionic-team/stencil-router-v2/blob/master/src/router.ts
-        if (!ev.metaKey && !ev.ctrlKey && ev.which != 2 && ev.button != 1) {
-          ev.preventDefault();
-          this.pushRoute(p, back);
-        }
-      },
-    };
+  private getRouter() {
+    const router = document.querySelector('ion-router');
+    if (!router) {
+      throw new Error('missing ion-router');
+    }
+    return router;
   }
 
   redirectRoute(path: string) {
-    const url = new URL(path, location.href);
-    if (location.href == url.href) {
-      return;
-    }
-
-    history.replaceState(history.state, '', url.pathname);
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    void this.getRouter().push(path, 'root');
   }
 
   pushRoute(path: string, back?: boolean) {
-    const url = new URL(path, location.href);
-    if (location.href == url.href) {
-      return;
-    }
-
-    if (back && history.state?.beforeRoute == url.pathname) {
-      history.back();
-    } else {
-      history.pushState({ beforeRoute: location.pathname }, '', url.pathname);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    }
+    void this.getRouter().push(path, back ? 'back' : 'forward');
   }
-
-  private _loading = false;
-  set loading(v: boolean) {
-    this._loading = v;
-    this.setLoadingClass();
-  }
-
-  private setLoadingClass = () => {
-    readTask(() => {
-      const apLoading = document.querySelector('ap-loading');
-      if (apLoading) {
-        if (this._loading) {
-          apLoading.classList.add('show');
-        } else {
-          apLoading.classList.remove('show');
-        }
-      }
-    });
-  };
 
   async processLoading(f: () => Promise<void>) {
-    this.loading = true;
+    const loading = await loadingController.create({ spinner: 'dots' });
     try {
-      await f();
+      await Promise.all([loading.present(), f()]);
     } finally {
-      this.loading = false;
+      await loading.dismiss();
     }
   }
 

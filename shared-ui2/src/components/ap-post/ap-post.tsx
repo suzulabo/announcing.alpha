@@ -13,7 +13,7 @@ export class ApTextView {
     body?: string;
     link?: string;
     imgLoader?: () => Promise<string>;
-    imgAnchorAttrs?: { [k: string]: any };
+    imgHref?: string;
     pT: number;
   };
 
@@ -53,9 +53,9 @@ export class ApTextView {
     }
 
     return (
-      <a {...this.post.imgAnchorAttrs}>
+      <ion-router-link href={this.post.imgHref}>
         <img src={this.imageSrc} />
-      </a>
+      </ion-router-link>
     );
   }
 

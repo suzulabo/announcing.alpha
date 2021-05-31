@@ -1,5 +1,7 @@
-import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import { alertController } from '@ionic/core';
+import { Component, Fragment, h, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
+import { ApButton } from 'src/shared-ui/functionals/button';
 import { PromiseValue } from 'type-fest';
 
 @Component({
@@ -15,9 +17,6 @@ export class AppAnnounceConfig {
 
   @State()
   private enableNotification!: boolean;
-
-  @State()
-  showUnfollowConfirm = false;
 
   private permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
 
@@ -38,24 +37,6 @@ export class AppAnnounceConfig {
     });
   }
 
-  private unfollow = {
-    handlers: {
-      confirm: () => {
-        this.showUnfollowConfirm = true;
-      },
-      close: () => {
-        this.showUnfollowConfirm = false;
-      },
-      unfollow: async () => {
-        this.showUnfollowConfirm = false;
-        await this.app.processLoading(async () => {
-          await this.app.deleteFollow(this.announceID);
-          this.app.pushRoute(`/${this.announceID}`);
-        });
-      },
-    },
-  };
-
   private handleEnableNotifyClick = async () => {
     await this.app.processLoading(async () => {
       await this.app.setNotify(this.announceID, true);
@@ -68,6 +49,32 @@ export class AppAnnounceConfig {
       await this.app.setNotify(this.announceID, false);
       this.enableNotification = false;
     });
+  };
+
+  private handleUnfollowClick = async () => {
+    const unfollow = async () => {
+      await this.app.processLoading(async () => {
+        await this.app.deleteFollow(this.announceID);
+        this.app.pushRoute(`/${this.announceID}`, true);
+      });
+    };
+
+    const msgs = this.app.msgs;
+
+    const alert = await alertController.create({
+      message: msgs.announceConfig.unfollowConfirm,
+      buttons: [
+        {
+          text: msgs.common.cancel,
+          role: 'cancel',
+        },
+        {
+          text: msgs.common.ok,
+          handler: unfollow,
+        },
+      ],
+    });
+    await alert.present();
   };
 
   private renderUnsupported() {
@@ -114,43 +121,31 @@ export class AppAnnounceConfig {
       return (
         <Fragment>
           {!this.enableNotification && (
-            <button class="submit" onClick={this.handleEnableNotifyClick}>
+            <ApButton class="submit" onClick={this.handleEnableNotifyClick}>
               {msgs.announceConfig.enableNotifyBtn}
-            </button>
+            </ApButton>
           )}
           {this.enableNotification && (
-            <button class="submit" onClick={this.handleDisableNotifyClick}>
+            <ApButton class="submit" onClick={this.handleDisableNotifyClick}>
               {msgs.announceConfig.disableNotifyBtn}
-            </button>
+            </ApButton>
           )}
         </Fragment>
       );
     };
 
     return (
-      <Host>
-        {renderNotify()}
-        <hr />
-        <button class="anchor unfollow" onClick={this.unfollow.handlers.confirm}>
-          {msgs.announceConfig.unfollowBtn}
-        </button>
+      <ion-content>
+        <div class="ap-content">
+          {renderNotify()}
+          <hr />
+          <ApButton onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</ApButton>
 
-        <ion-router-link class="back" href={`/${this.announceID}`} routerDirection="back">
-          {msgs.common.back}
-        </ion-router-link>
-
-        {this.showUnfollowConfirm && (
-          <ap-modal onClose={this.unfollow.handlers.close}>
-            <div class="unfollow-modal">
-              <div>{msgs.announceConfig.unfollowConfirm}</div>
-              <div class="buttons">
-                <button onClick={this.unfollow.handlers.close}>{msgs.common.cancel}</button>
-                <button onClick={this.unfollow.handlers.unfollow}>{msgs.common.ok}</button>
-              </div>
-            </div>
-          </ap-modal>
-        )}
-      </Host>
+          <ion-router-link class="back" href={`/${this.announceID}`} routerDirection="back">
+            {msgs.common.back}
+          </ion-router-link>
+        </div>
+      </ion-content>
     );
   }
 }

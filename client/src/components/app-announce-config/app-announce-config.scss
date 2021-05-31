@@ -1,51 +1,45 @@
 app-announce-config {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  .ap-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-  hr {
-    border-top: 1px solid var(--light-border-color);
-    align-self: stretch;
-  }
-
-  > * {
-    margin-top: 30px;
-  }
-  button.submit {
-    margin-top: 40px;
-  }
-  a.back {
-    margin-top: 40px;
-  }
-
-  .unfollow-modal {
-    background-color: var(--bk-color);
-    border-radius: 5px;
-    padding: 20px 10px;
-
-    width: 100%;
-    max-width: 400px;
-
-    text-align: center;
-    .buttons {
-      margin-top: 40px;
-      display: flex;
-      justify-content: space-around;
-    }
-  }
-
-  .notif-warn {
-    text-align: center;
-    ap-icon {
-      font-size: 20px;
-    }
-    div {
-      white-space: pre-line;
+    > * {
       margin-top: 30px;
+    }
+    button.submit {
+      margin-top: 40px;
+    }
+    a.back {
+      margin-top: 40px;
+    }
+
+    .unfollow-modal {
+      background-color: var(--bk-color);
+      border-radius: 5px;
+      padding: 20px 10px;
+
+      width: 100%;
+      max-width: 400px;
+
+      text-align: center;
+      .buttons {
+        margin-top: 40px;
+        display: flex;
+        justify-content: space-around;
+      }
+    }
+
+    .notif-warn {
+      text-align: center;
+      ap-icon {
+        font-size: 20px;
+      }
+      div {
+        white-space: pre-line;
+        margin-top: 30px;
+      }
     }
   }
 }
