@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, h, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { DataResult, DATA_ERROR } from 'src/app/datatypes';
 import { PostJSON } from 'src/shared';
@@ -78,17 +78,19 @@ export class AppPost {
     );
 
     return (
-      <Host>
-        <ap-post post={this.post.value} msgs={{ datetime: this.app.msgs.common.datetime }} />
-        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
-          {this.app.msgs.common.back}
-        </a>
-        {this.app.checkShareSupport() && (
-          <button class="anchor share" onClick={this.shareClick}>
-            {this.app.msgs.post.share}
-          </button>
-        )}
-      </Host>
+      <ion-content>
+        <div class="ap-content">
+          <ap-post post={this.post.value} msgs={{ datetime: this.app.msgs.common.datetime }} />
+          <ion-router-link class="back" href={`/${this.announceID}`} routerDirection="back">
+            {this.app.msgs.common.back}
+          </ion-router-link>
+          {this.app.checkShareSupport() && (
+            <button class="anchor share" onClick={this.shareClick}>
+              {this.app.msgs.post.share}
+            </button>
+          )}
+        </div>
+      </ion-content>
     );
   }
 }

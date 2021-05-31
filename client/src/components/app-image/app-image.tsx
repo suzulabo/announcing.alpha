@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { DataResult } from 'src/app/datatypes';
 
@@ -11,15 +11,22 @@ export class AppImage {
   app!: App;
 
   @Prop()
-  imageID!: string;
+  announceID!: string;
 
   @Prop()
-  backPath!: string;
+  postID!: string;
+
+  @Prop()
+  imageID!: string;
+
+  private backPath!: string;
 
   @State()
   image?: DataResult<string>;
 
   componentWillLoad() {
+    this.backPath = `/${this.announceID}/${this.postID}`;
+
     this.app
       .fetchImage(this.imageID)
       .then(result => {
@@ -35,20 +42,29 @@ export class AppImage {
   }
 
   render() {
-    switch (this.image?.state) {
-      case 'SUCCESS':
-        return (
-          <Host>
-            <pinch-zoom>
-              <img src={this.image.value} />
-            </pinch-zoom>
-            <a class="icon" {...this.app.href(this.backPath, true)}>
-              <ap-icon icon="xCircle" />
-            </a>
-          </Host>
-        );
-      default:
-        return <ap-spinner />;
-    }
+    const renderContent = () => {
+      switch (this.image?.state) {
+        case 'SUCCESS':
+          return (
+            <Fragment>
+              <pinch-zoom>
+                <img src={this.image.value} />
+              </pinch-zoom>
+
+              <ion-router-link class="back" href={this.backPath} routerDirection="back">
+                <ap-icon icon="xCircle" />
+              </ion-router-link>
+            </Fragment>
+          );
+        default:
+          return <ap-spinner />;
+      }
+    };
+
+    return (
+      <ion-content>
+        <div class="x-content">{renderContent()}</div>
+      </ion-content>
+    );
   }
 }
