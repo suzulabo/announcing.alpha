@@ -1,13 +1,8 @@
 app-announce {
-  .ap-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  ap-announce {
-    align-self: normal;
+  .buttons {
+    text-align: end;
+    margin-top: auto 0 0;
+    padding: 0 10px;
   }
 
   .back {
@@ -16,33 +11,3 @@ app-announce {
     margin: 20px 0;
   }
 }
-
-/*
-app-announce {
-  
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  ap-announce {
-    margin-bottom: 20px;
-    div.buttons {
-      margin-top: 20px;
-      display: flex;
-      justify-content: flex-end;
-      > * {
-        margin-right: 10px;
-      }
-    }
-  }
-
-  .deleted,
-  .data-error {
-    margin-bottom: 50px;
-    white-space: pre-line;
-    text-align: center;
-  }
-}
-  */

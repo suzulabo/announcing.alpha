@@ -82,7 +82,7 @@ export class AppAnnounce {
                   postDataError: msgs.announce.dataError,
                 }}
               >
-                <div class="buttons" slot="bottomAnnounce">
+                <div class="buttons" slot="botom-announce">
                   {!follow && (
                     <ApButton onClick={this.handleFollowClick}>{msgs.announce.followBtn}</ApButton>
                   )}

@@ -140,18 +140,19 @@ export class ApAnnounce {
 
     return (
       <Host>
-        <div class="head">
-          <span class="name">{announce.name}</span>
-          {announce.iconLoader && <ap-image loader={announce.iconLoader} />}
+        <div class="announce">
+          <div class="head">
+            <span class="name">{announce.name}</span>
+            {announce.iconLoader && <ap-image loader={announce.iconLoader} />}
+          </div>
+          {announce.desc && <ap-textview class="desc" text={announce.desc} />}
+          {announce.link && (
+            <a class="link" href={announce.link}>
+              {announce.link}
+            </a>
+          )}
+          <slot name="botom-announce" />
         </div>
-        {announce.desc && <ap-textview class="desc" text={announce.desc} />}
-        {announce.link && (
-          <a class="link" href={announce.link}>
-            {announce.link}
-          </a>
-        )}
-        <slot name="bottomAnnounce" />
-        <hr />
         {noPosts && <span class="no-posts">{this.msgs.noPosts}</span>}
         <slot name="beforePosts" />
         {!noPosts && this.renderPosts()}

@@ -1,6 +1,24 @@
 ap-announce {
-  display: flex;
-  flex-direction: column;
+  .announce {
+    padding: 10px;
+    border-bottom: 1px solid var(--ap-border-color);
+
+    .head {
+      display: flex;
+      justify-content: center;
+      ap-image {
+        width: 80px;
+        height: 80px;
+      }
+    }
+    .desc {
+      display: block;
+      white-space: pre-line;
+    }
+    .link {
+      display: block;
+    }
+  }
 
   div.head {
     display: flex;
