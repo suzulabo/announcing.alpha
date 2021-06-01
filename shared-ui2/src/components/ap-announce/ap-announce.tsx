@@ -153,7 +153,7 @@ export class ApAnnounce {
           )}
           <slot name="botom-announce" />
         </div>
-        {noPosts && <span class="no-posts">{this.msgs.noPosts}</span>}
+        {noPosts && <div class="no-posts">{this.msgs.noPosts}</div>}
         <slot name="beforePosts" />
         {!noPosts && this.renderPosts()}
       </Host>
