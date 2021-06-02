@@ -1,28 +1,26 @@
 app-post {
-  .ap-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5px;
 
-    .share {
-      margin-top: 50px;
-      align-self: flex-end;
-      font-size: 0.9em;
-      color: var(--light-color);
-    }
+  .share {
+    margin-top: 50px;
+    align-self: flex-end;
+    font-size: 0.9em;
+    color: var(--light-color);
+  }
 
-    .deleted {
-      align-self: center;
-    }
+  .deleted {
+    align-self: center;
+  }
 
-    .back {
-      margin-top: 50px;
-      align-self: center;
-    }
+  .back {
+    margin-top: 50px;
+    align-self: center;
+  }
 
-    ap-spinner {
-      align-self: center;
-    }
+  ap-spinner {
+    align-self: center;
   }
 }

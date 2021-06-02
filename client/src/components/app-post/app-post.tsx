@@ -1,4 +1,4 @@
-import { Component, h, Prop, State } from '@stencil/core';
+import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
 import { DataResult, DATA_ERROR } from 'src/app/datatypes';
 import { PostJSON } from 'src/shared';
@@ -13,14 +13,25 @@ export class AppPost {
 
   @Prop()
   announceID!: string;
+  @Watch('announceID')
+  watchAnnounceID() {
+    this.loadData();
+  }
 
   @Prop()
   postID!: string;
+  @Watch('postID')
+  watchPostID() {
+    this.loadData();
+  }
 
   @State()
-  post?: DataResult<PostJSON & { imgLoader?: () => Promise<string>; imgHref?: string }>;
+  post?: DataResult<
+    PostJSON & { imgLoader?: () => Promise<string>; imgHrefAttrs?: Record<string, any> }
+  >;
 
-  componentWillLoad() {
+  private loadData() {
+    this.post = undefined;
     this.app.loadAnnounce(this.announceID);
     this.app
       .fetchPost(this.announceID, this.postID)
@@ -36,7 +47,9 @@ export class AppPost {
               }
               return v.value;
             };
-            this.post.value.imgHref = `/${this.announceID}/${this.postID}/image/${img}`;
+            this.post.value.imgHrefAttrs = this.app.href(
+              `/${this.announceID}/${this.postID}/image/${img}`,
+            );
           }
         }
       })
@@ -44,6 +57,10 @@ export class AppPost {
         this.post = DATA_ERROR;
         throw err;
       });
+  }
+
+  componentWillLoad() {
+    this.loadData();
   }
 
   private shareClick = async () => {
@@ -74,19 +91,17 @@ export class AppPost {
     );
 
     return (
-      <ion-content>
-        <div class="ap-content">
-          <ap-post post={this.post.value} msgs={{ datetime: this.app.msgs.common.datetime }} />
-          <ion-router-link class="back" href={`/${this.announceID}`} routerDirection="back">
-            {this.app.msgs.common.back}
-          </ion-router-link>
-          {this.app.checkShareSupport() && (
-            <button class="anchor share" onClick={this.shareClick}>
-              {this.app.msgs.post.share}
-            </button>
-          )}
-        </div>
-      </ion-content>
+      <Host>
+        <ap-post post={this.post.value} msgs={{ datetime: this.app.msgs.common.datetime }} />
+        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
+          {this.app.msgs.common.back}
+        </a>
+        {this.app.checkShareSupport() && (
+          <button class="anchor share" onClick={this.shareClick}>
+            {this.app.msgs.post.share}
+          </button>
+        )}
+      </Host>
     );
   }
 }
