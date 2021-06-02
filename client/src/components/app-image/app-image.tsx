@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
 import { DataResult } from 'src/app/datatypes';
 
@@ -19,26 +19,33 @@ export class AppImage {
   @Prop()
   imageID!: string;
 
-  private backPath!: string;
+  @Watch('imageID')
+  watchImageID() {
+    this.loadImage();
+  }
 
   @State()
   image?: DataResult<string>;
 
-  componentWillLoad() {
-    this.backPath = `/${this.announceID}/${this.postID}`;
+  private loadImage() {
+    this.image = undefined;
 
     this.app
       .fetchImage(this.imageID)
       .then(result => {
         if (result?.state != 'SUCCESS') {
-          this.app.pushRoute(this.backPath, true);
+          this.app.pushRoute(`/${this.announceID}/${this.postID}`, true);
         }
         this.image = result;
       })
       .catch(err => {
         console.error(err);
-        this.app.pushRoute(this.backPath, true);
+        this.app.pushRoute(`/${this.announceID}/${this.postID}`, true);
       });
+  }
+
+  componentWillLoad() {
+    this.loadImage();
   }
 
   render() {
@@ -51,9 +58,9 @@ export class AppImage {
                 <img src={this.image.value} />
               </pinch-zoom>
 
-              <ion-router-link class="back" href={this.backPath} routerDirection="back">
+              <a class="back" {...this.app.href(`/${this.announceID}/${this.postID}`, true)}>
                 <ap-icon icon="xCircle" />
-              </ion-router-link>
+              </a>
             </Fragment>
           );
         default:
@@ -61,10 +68,6 @@ export class AppImage {
       }
     };
 
-    return (
-      <ion-content>
-        <div class="x-content">{renderContent()}</div>
-      </ion-content>
-    );
+    return <Host>{renderContent()}</Host>;
   }
 }

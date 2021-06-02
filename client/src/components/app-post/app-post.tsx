@@ -15,14 +15,14 @@ export class AppPost {
   announceID!: string;
   @Watch('announceID')
   watchAnnounceID() {
-    this.loadData();
+    this.loadAnnounce();
   }
 
   @Prop()
   postID!: string;
   @Watch('postID')
   watchPostID() {
-    this.loadData();
+    this.loadPost();
   }
 
   @State()
@@ -30,9 +30,12 @@ export class AppPost {
     PostJSON & { imgLoader?: () => Promise<string>; imgHrefAttrs?: Record<string, any> }
   >;
 
-  private loadData() {
-    this.post = undefined;
+  private loadAnnounce() {
     this.app.loadAnnounce(this.announceID);
+  }
+
+  private loadPost() {
+    this.post = undefined;
     this.app
       .fetchPost(this.announceID, this.postID)
       .then(result => {
@@ -60,7 +63,8 @@ export class AppPost {
   }
 
   componentWillLoad() {
-    this.loadData();
+    this.loadAnnounce();
+    this.loadPost();
   }
 
   private shareClick = async () => {
