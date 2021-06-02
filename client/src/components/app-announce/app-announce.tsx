@@ -89,7 +89,7 @@ export class AppAnnounce {
                   )}
                   {follow && (
                     <Fragment>
-                      <a class="button" href={`/${this.announceID}/config`}>
+                      <a class="button" {...this.app.href(`/${this.announceID}/config`)}>
                         {msgs.announce.configBtn}
                       </a>
                     </Fragment>

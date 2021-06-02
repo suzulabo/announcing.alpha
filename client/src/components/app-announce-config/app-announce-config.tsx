@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { PromiseValue } from 'type-fest';
 
@@ -137,17 +137,15 @@ export class AppAnnounceConfig {
     };
 
     return (
-      <ion-content>
-        <div class="ap-content">
-          {renderNotify()}
-          <hr />
-          <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
+      <Host>
+        {renderNotify()}
+        <hr />
+        <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
 
-          <ion-router-link class="back" href={`/${this.announceID}`} routerDirection="back">
-            {msgs.common.back}
-          </ion-router-link>
-        </div>
-      </ion-content>
+        <a class="back" {...this.app.href(`/${this.announceID}`)}>
+          {msgs.common.back}
+        </a>
+      </Host>
     );
   }
 }
