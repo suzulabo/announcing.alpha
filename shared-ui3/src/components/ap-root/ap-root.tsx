@@ -2,7 +2,7 @@ import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
 import { Match, pathMatcher } from 'src/shared/path-matcher';
 import { redirectRoute } from '../utils/route';
 
-export type RouteMatch = Match & { url: string; tag?: string };
+export type RouteMatch = Match & { tag?: string };
 
 @Component({
   tag: 'ap-root',

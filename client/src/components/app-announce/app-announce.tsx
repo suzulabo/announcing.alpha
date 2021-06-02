@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
 
@@ -44,13 +44,15 @@ export class AppAnnounce {
 
     await this.app.setReadTime(this.announceID, post.value.pT);
 
-    return { ...post.value, href: `/${this.announceID}/${postID}` };
+    return { ...post.value, hrefAttrs: this.app.href(`/${this.announceID}/${postID}`) };
   };
 
   render() {
     const msgs = this.app.msgs;
 
     const announce = this.app.getAnnounceState(this.announceID);
+
+    console.log(this.announceID, announce);
 
     const renderContent = () => {
       switch (announce?.state) {
@@ -103,14 +105,12 @@ export class AppAnnounce {
     };
 
     return (
-      <ion-content>
-        <div class="ap-content">
-          {renderContent()}
-          <ion-router-link class="back" href="/" routerDirection="back">
-            {msgs.common.back}
-          </ion-router-link>
-        </div>
-      </ion-content>
+      <Host>
+        {renderContent()}
+        <a class="back" {...this.app.href('/', true)}>
+          {msgs.common.back}
+        </a>
+      </Host>
     );
   }
 }

@@ -11,32 +11,29 @@ import { RouteMatch } from 'src/shared-ui/ap-root/ap-root';
 
 const matches: RouteMatch[] = [
   {
-    url: '/',
     pattern: '',
     tag: 'app-home',
   },
   {
-    url: '/:announceID',
     pattern: /^[0-9A-Z]{12}$/,
+    name: 'announceID',
     tag: 'app-announce',
     nexts: [
       {
-        url: '/config',
         pattern: 'config',
         tag: 'app-announce-config',
       },
       {
-        url: '/:postID',
         pattern: /^[0-9a-zA-Z]{8}$/,
+        name: 'postID',
         tag: 'app-post',
         nexts: [
           {
-            url: '/image',
             pattern: 'image',
             nexts: [
               {
-                url: '/:imageID',
                 pattern: /^[0-9a-zA-Z]{15,25}$/,
+                name: 'imageID',
                 tag: 'app-image',
               },
             ],
