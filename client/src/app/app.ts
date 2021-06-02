@@ -2,9 +2,9 @@ import { Http } from '@capacitor-community/http';
 import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
-import { loadingController } from '@ionic/core';
 import { Build, readTask } from '@stencil/core';
 import { AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
+import { pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
 import nacl from 'tweetnacl';
 import { DataResult, DATA_ERROR, Follow, NOT_FOUND } from './datatypes';
 import { AppFirebase } from './firebase';
@@ -70,29 +70,36 @@ export class App {
     });
   }
 
-  private getRouter() {
-    const router = document.querySelector('ion-router');
-    if (!router) {
-      throw new Error('missing ion-router');
-    }
-    return router;
+  href(p: string, back?: boolean) {
+    return {
+      href: p,
+      onClick: (ev: MouseEvent) => {
+        // https://github.com/ionic-team/stencil-router-v2/blob/master/src/router.ts
+        if (!ev.metaKey && !ev.ctrlKey && ev.which != 2 && ev.button != 1) {
+          ev.preventDefault();
+          this.pushRoute(p, back);
+        }
+      },
+    };
   }
-
   redirectRoute(path: string) {
-    void this.getRouter().push(path, 'root');
+    redirectRoute(path);
   }
 
   pushRoute(path: string, back?: boolean) {
-    void this.getRouter().push(path, back ? 'back' : 'forward');
+    pushRoute(path, back);
   }
 
   async processLoading(f: () => Promise<void>) {
+    await f();
+    /* TODO
     const loading = await loadingController.create({ spinner: 'dots' });
     try {
       await Promise.all([loading.present(), f()]);
     } finally {
       await loading.dismiss();
     }
+    */
   }
 
   get msgs() {

@@ -1,0 +1,71 @@
+import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
+import { Match, pathMatcher } from 'src/shared/path-matcher';
+import { redirectRoute } from '../utils/route';
+
+export type RouteMatch = Match & { url: string; tag?: string };
+
+@Component({
+  tag: 'ap-root',
+  styleUrl: 'ap-root.scss',
+})
+export class ApRoot {
+  @Prop()
+  routeMatches!: RouteMatch[];
+
+  @Prop()
+  componentProps?: { [k: string]: any };
+
+  @Prop()
+  defaultPath = '/';
+
+  @Prop()
+  redirect?: (p: string) => string;
+
+  @State()
+  path?: string;
+
+  @Listen('popstate', { target: 'window' })
+  handlePopState() {
+    const p = location.pathname;
+    const m = pathMatcher(this.routeMatches, p);
+    if (!m) {
+      redirectRoute(this.defaultPath);
+      return;
+    }
+
+    if (this.redirect) {
+      const r = this.redirect(p);
+      if (r) {
+        redirectRoute(r);
+      }
+    }
+
+    this.path = p;
+  }
+
+  componentWillLoad() {
+    this.handlePopState();
+  }
+
+  private tags = new Map<string, Record<string, any>>();
+
+  render() {
+    const p = location.pathname;
+    const m = pathMatcher(this.routeMatches, p);
+    if (!m || !m.match.tag) {
+      console.warn('missing page', m);
+      return;
+    }
+
+    const curTag = m.match.tag;
+    this.tags.set(curTag, { ...m.params, ...this.componentProps });
+
+    return (
+      <Host>
+        {[...this.tags.entries()].map(([Tag, params]) => {
+          return <Tag key={Tag} class={{ page: true, hide: Tag != curTag }} {...params} />;
+        })}
+      </Host>
+    );
+  }
+}

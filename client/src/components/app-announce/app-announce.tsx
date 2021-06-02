@@ -1,7 +1,6 @@
 import { Component, Fragment, h, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
-import { ApButton } from 'src/shared-ui/functionals/button';
 
 @Component({
   tag: 'app-announce',
@@ -84,13 +83,13 @@ export class AppAnnounce {
               >
                 <div class="buttons" slot="botom-announce">
                   {!follow && (
-                    <ApButton onClick={this.handleFollowClick}>{msgs.announce.followBtn}</ApButton>
+                    <button onClick={this.handleFollowClick}>{msgs.announce.followBtn}</button>
                   )}
                   {follow && (
                     <Fragment>
-                      <ApButton href={`/${this.announceID}/config`}>
+                      <a class="button" href={`/${this.announceID}/config`}>
                         {msgs.announce.configBtn}
-                      </ApButton>
+                      </a>
                     </Fragment>
                   )}
                 </div>

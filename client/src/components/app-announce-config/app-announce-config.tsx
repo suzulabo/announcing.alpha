@@ -1,7 +1,5 @@
-import { alertController } from '@ionic/core';
 import { Component, Fragment, h, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { ApButton } from 'src/shared-ui/functionals/button';
 import { PromiseValue } from 'type-fest';
 
 @Component({
@@ -59,8 +57,11 @@ export class AppAnnounceConfig {
       });
     };
 
-    const msgs = this.app.msgs;
+    //const msgs = this.app.msgs;
 
+    // TODO
+    await unfollow();
+    /*
     const alert = await alertController.create({
       message: msgs.announceConfig.unfollowConfirm,
       buttons: [
@@ -75,6 +76,7 @@ export class AppAnnounceConfig {
       ],
     });
     await alert.present();
+    */
   };
 
   private renderUnsupported() {
@@ -121,14 +123,14 @@ export class AppAnnounceConfig {
       return (
         <Fragment>
           {!this.enableNotification && (
-            <ApButton class="submit" onClick={this.handleEnableNotifyClick}>
+            <button class="submit" onClick={this.handleEnableNotifyClick}>
               {msgs.announceConfig.enableNotifyBtn}
-            </ApButton>
+            </button>
           )}
           {this.enableNotification && (
-            <ApButton class="submit" onClick={this.handleDisableNotifyClick}>
+            <button class="submit" onClick={this.handleDisableNotifyClick}>
               {msgs.announceConfig.disableNotifyBtn}
-            </ApButton>
+            </button>
           )}
         </Fragment>
       );
@@ -139,7 +141,7 @@ export class AppAnnounceConfig {
         <div class="ap-content">
           {renderNotify()}
           <hr />
-          <ApButton onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</ApButton>
+          <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
 
           <ion-router-link class="back" href={`/${this.announceID}`} routerDirection="back">
             {msgs.common.back}

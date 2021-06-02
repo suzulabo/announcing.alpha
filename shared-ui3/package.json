@@ -13,6 +13,7 @@
     "@stencil/sass": "^1.4.1",
     "autolinker": "^3.14.3",
     "bootstrap-icons": "^1.5.0",
+    "destyle.css": "^2.0.2",
     "npm-run-all": "^4.1.5",
     "sync-directory": "^2.2.22"
   }

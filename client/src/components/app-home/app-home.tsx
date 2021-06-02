@@ -14,17 +14,15 @@ export class AppHome {
   follows!: [string, Follow][];
 
   async componentWillLoad() {
-    await this.app.processLoading(async () => {
-      this.app.setTitle(this.app.msgs.home.pageTitle);
+    this.app.setTitle(this.app.msgs.home.pageTitle);
 
-      const follows = await this.app.getFollows();
+    const follows = await this.app.getFollows();
 
-      for (const [id] of follows) {
-        this.app.loadAnnounce(id);
-      }
+    for (const [id] of follows) {
+      this.app.loadAnnounce(id);
+    }
 
-      this.follows = follows;
-    });
+    this.follows = follows;
   }
 
   private handleUnfollowClick = async (event: Event) => {
@@ -81,14 +79,18 @@ export class AppHome {
       }
     };
 
-    return this.follows?.map(([id, follow]) => {
-      const a = this.app.getAnnounceState(id);
-      return (
-        <ion-card href={a?.state == 'SUCCESS' ? `/${id}` : undefined}>
-          <div class="ap-card-content">{renderContent(id, follow, a)}</div>
-        </ion-card>
-      );
-    });
+    return (
+      <div class="announces">
+        {this.follows?.map(([id, follow]) => {
+          const a = this.app.getAnnounceState(id);
+          return (
+            <a class="card" {...{ ...(a?.state == 'SUCCESS' && this.app.href(`/${id}`)) }}>
+              {renderContent(id, follow, a)}
+            </a>
+          );
+        })}
+      </div>
+    );
   }
 
   private renderNofollows() {
@@ -97,13 +99,7 @@ export class AppHome {
 
   render() {
     return (
-      <Host>
-        <ion-content>
-          <div class="ap-content">
-            {this.follows.length == 0 ? this.renderNofollows() : this.renderAnnounces()}
-          </div>
-        </ion-content>
-      </Host>
+      <Host>{this.follows.length == 0 ? this.renderNofollows() : this.renderAnnounces()}</Host>
     );
   }
 }

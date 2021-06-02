@@ -1,61 +1,62 @@
 app-home {
-  .ap-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   .no-follows {
     align-self: center;
   }
 
-  .ap-card-content {
-    padding: 10px;
-    min-height: 100px;
+  .announces {
+    .card {
+      margin: 20px 10px;
+      padding: 10px;
+      min-height: 100px;
 
-    display: flex;
-    align-items: center;
+      display: flex;
+      align-items: center;
 
-    .main {
-      min-width: 0;
-      flex: 1 2;
-      .name {
-        display: block;
-        font-size: 1.1em;
-        font-weight: bold;
+      .main {
+        min-width: 0;
+        flex: 1 2;
+        .name {
+          display: block;
+          font-size: 1.1em;
+          font-weight: bold;
+        }
+        .desc {
+          display: block;
+          margin-top: 5px;
+          color: var(--ap-light-color);
+          font-size: 0.9em;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .deleted,
+        .data-error {
+          display: block;
+          white-space: pre-line;
+          padding: 10px;
+        }
+
+        ion-button {
+          width: fit-content;
+          display: block;
+          margin: 10px auto 0;
+          --border-width: 1px;
+        }
       }
-      .desc {
-        display: block;
-        margin-top: 5px;
-        color: var(--ap-light-color);
-        font-size: 0.9em;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+
+      ap-image {
+        width: 50px;
+        height: 50px;
       }
 
-      .deleted,
-      .data-error {
-        display: block;
-        white-space: pre-line;
-        padding: 10px;
+      ion-spinner {
+        margin: auto;
       }
-
-      ion-button {
-        width: fit-content;
-        display: block;
-        margin: 10px auto 0;
-        --border-width: 1px;
-      }
-    }
-
-    ap-image {
-      width: 50px;
-      height: 50px;
-    }
-
-    ion-spinner {
-      margin: auto;
     }
   }
 }
