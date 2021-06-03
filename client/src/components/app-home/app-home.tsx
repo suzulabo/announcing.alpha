@@ -59,16 +59,20 @@ export class AppHome {
             </div>
           );
         case 'SUCCESS': {
-          const hasNew = Object.values(a.value.posts).find(v => {
-            return v.pT.toMillis() > follow.readTime;
-          });
+          const latestPost = a.value.latestPost;
+          const hasNew = (latestPost?.pT || 0) > follow.readTime;
 
           return (
             <Fragment>
               <div class="main">
-                {hasNew && <ion-badge>{msgs.home.newBadge}</ion-badge>}
                 <span class="name">{a.value.name}</span>
-                <span class="desc">{a.value.desc}</span>
+                {latestPost && (
+                  <div class="latest">
+                    {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
+                    <span class="pT">{msgs.common.datetime(latestPost?.pT)}</span>
+                    <span class="title">{latestPost.title || latestPost.body}</span>
+                  </div>
+                )}
               </div>
               {a.value.iconLoader && <ap-image loader={a.value.iconLoader} />}
             </Fragment>

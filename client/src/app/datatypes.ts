@@ -1,4 +1,4 @@
-import { Announce, AnnounceMetaJSON } from 'src/shared';
+import { Announce, AnnounceMetaJSON, PostJSON } from 'src/shared';
 
 export interface Follow {
   name: string; // Needed after deleted
@@ -24,6 +24,7 @@ export const DATA_ERROR: DataError = { state: 'DATA_ERROR' };
 
 export interface AnnounceState extends Announce, AnnounceMetaJSON {
   id: string;
+  latestPost?: PostJSON;
   iconLoader?: () => Promise<string>;
 }
 

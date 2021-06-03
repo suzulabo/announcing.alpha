@@ -142,3 +142,10 @@ a.card {
   display: block;
   text-decoration: none;
 }
+
+.badge {
+  padding: 4px 6px;
+  color: var(--bk-color);
+  background-color: var(--color);
+  border-radius: 999em;
+}

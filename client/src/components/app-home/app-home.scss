@@ -24,6 +24,27 @@ app-home {
           font-size: 1.1em;
           font-weight: bold;
         }
+
+        .latest {
+          margin-top: 5px;
+          .badge {
+            margin-right: 5px;
+          }
+          .pT {
+            color: var(--light-color);
+          }
+          .title {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: var(--light-color);
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+
         .desc {
           display: block;
           margin-top: 5px;

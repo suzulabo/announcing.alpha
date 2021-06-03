@@ -6,7 +6,7 @@ import { Build, readTask } from '@stencil/core';
 import { AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
 import { pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
 import nacl from 'tweetnacl';
-import { DataResult, DATA_ERROR, Follow, NOT_FOUND } from './datatypes';
+import { AnnounceState, DataResult, DATA_ERROR, Follow, NOT_FOUND } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppIdbCache } from './idbcache';
 import { AppMsg } from './msg';
@@ -135,12 +135,31 @@ export class App {
             announceState.set(id, DATA_ERROR);
             return;
           }
+          let latestPost: AnnounceState['latestPost'];
+          {
+            const latest = Object.entries(a.value.posts)
+              .sort((v1, v2) => {
+                return v2[1].pT.toMillis() - v1[1].pT.toMillis();
+              })
+              .shift();
+            if (latest) {
+              const post = await this.fetchPost(id, latest[0]);
+              if (post.state != 'SUCCESS') {
+                console.warn('missing post', id, post);
+                announceState.set(id, DATA_ERROR);
+                return;
+              }
+              latestPost = post.value;
+            }
+          }
+
           announceState.set(id, {
             state: 'SUCCESS',
             value: {
-              id,
               ...a.value,
               ...meta.value,
+              id,
+              latestPost,
               iconLoader: !meta.value.icon
                 ? undefined
                 : async () => {
