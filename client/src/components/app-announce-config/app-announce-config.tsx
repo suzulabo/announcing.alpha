@@ -23,7 +23,7 @@ export class AppAnnounceConfig {
       const id = this.announceID;
       this.app.loadAnnounce(id);
 
-      const follow = await this.app.getFollow(id);
+      const follow = this.app.getFollow(id);
       if (!follow) {
         this.app.redirectRoute(`/${id}`);
         return;

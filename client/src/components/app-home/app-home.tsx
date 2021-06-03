@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState, Follow } from 'src/app/datatypes';
 import { DataResult } from 'src/shared';
@@ -11,19 +11,14 @@ export class AppHome {
   @Prop()
   app!: App;
 
-  @State()
-  follows!: [string, Follow][];
-
-  async componentWillLoad() {
+  componentWillLoad() {
     this.app.setTitle(this.app.msgs.home.pageTitle);
 
-    const follows = await this.app.getFollows();
+    const follows = this.app.getFollows();
 
     for (const [id] of follows) {
       this.app.loadAnnounce(id);
     }
-
-    this.follows = follows;
   }
 
   private handleUnfollowClick = async (event: Event) => {
@@ -31,12 +26,17 @@ export class AppHome {
     if (id) {
       await this.app.processLoading(async () => {
         await this.app.deleteFollow(id);
-        this.follows = await this.app.getFollows();
       });
     }
   };
 
   private renderAnnounces() {
+    const follows = [...this.app.getFollows()];
+
+    if (follows.length == 0) {
+      return this.renderNofollows();
+    }
+
     const msgs = this.app.msgs;
 
     const renderContent = (id: string, follow: Follow, a?: DataResult<AnnounceState>) => {
@@ -86,7 +86,7 @@ export class AppHome {
 
     return (
       <div class="announces">
-        {this.follows?.map(([id, follow]) => {
+        {follows?.map(([id, follow]) => {
           const a = this.app.getAnnounceState(id);
           return (
             <a class="card" {...{ ...(a?.state == 'SUCCESS' && this.app.href(`/${id}`)) }}>
@@ -103,8 +103,6 @@ export class AppHome {
   }
 
   render() {
-    return (
-      <Host>{this.follows.length == 0 ? this.renderNofollows() : this.renderAnnounces()}</Host>
-    );
+    return <Host>{this.renderAnnounces()}</Host>;
   }
 }

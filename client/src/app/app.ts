@@ -24,6 +24,11 @@ export class App {
 
   private dataURLPrefix: string;
   readonly clientSite: string;
+  private follows!: Map<string, Follow>;
+
+  private async loadFollows() {
+    this.follows = new Map(await this.appStorage.follows.entries());
+  }
 
   constructor(
     private appEnv: AppEnv,
@@ -43,7 +48,7 @@ export class App {
   }
 
   async init() {
-    await Promise.all([this.appFirebase.init(), this.appIdbCache.init()]);
+    await Promise.all([this.appFirebase.init(), this.appIdbCache.init(), this.loadFollows()]);
 
     // Check permission of notification
     // if not granted, clear local settings. Server settings will delete automatically.
@@ -251,30 +256,31 @@ export class App {
   }
 
   getFollows() {
-    return this.appStorage.follows.entries();
+    return this.follows.entries();
   }
 
   getFollow(id: string) {
-    return this.appStorage.follows.get(id);
+    return this.follows.get(id);
   }
 
   async setFollow(id: string, follow: Follow) {
-    if (!(await this.getFollow(id))) {
-      return this.appStorage.follows.set(id, follow);
-    }
+    await this.appStorage.follows.set(id, follow);
+    await this.loadFollows();
   }
 
   async setReadTime(id: string, pT: number) {
-    const follow = await this.getFollow(id);
+    const follow = this.getFollow(id);
     if (follow && follow.readTime < pT) {
       follow.readTime = pT;
-      return this.appStorage.follows.set(id, follow);
+      await this.appStorage.follows.set(id, follow);
+      await this.loadFollows();
     }
   }
 
   async deleteFollow(id: string) {
     await this.setNotify(id, false);
     await this.appStorage.follows.remove(id);
+    await this.loadFollows();
   }
 
   async getNotification(id: string) {

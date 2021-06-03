@@ -16,9 +16,9 @@ export class AppAnnounce {
   @State()
   follow?: Follow;
 
-  async componentWillLoad() {
+  componentWillLoad() {
     this.app.loadAnnounce(this.announceID);
-    this.follow = await this.app.getFollow(this.announceID);
+    this.follow = this.app.getFollow(this.announceID);
   }
 
   private postLoader = async (postID: string) => {
