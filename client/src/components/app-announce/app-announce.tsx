@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
 
@@ -12,13 +12,25 @@ export class AppAnnounce {
 
   @Prop()
   announceID!: string;
+  @Watch('announceID')
+  watchAnnounceID() {
+    return this.loadData();
+  }
 
   @State()
   follow?: Follow;
 
-  componentWillLoad() {
+  @State()
+  enableNotification!: boolean;
+
+  private async loadData() {
     this.app.loadAnnounce(this.announceID);
+    this.enableNotification = (await this.app.getNotification(this.announceID)) != null;
     this.follow = this.app.getFollow(this.announceID);
+  }
+
+  componentWillLoad() {
+    return this.loadData();
   }
 
   private postLoader = async (postID: string) => {
@@ -60,6 +72,8 @@ export class AppAnnounce {
                 announce={{
                   ...announce.value,
                   hrefAttrs: this.app.href(`/${this.announceID}/config`),
+                  isFollow: this.follow != null,
+                  enableNotification: this.enableNotification,
                 }}
                 postLoader={this.postLoader}
                 msgs={{

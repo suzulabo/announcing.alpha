@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
 import { PromiseValue } from 'type-fest';
 
@@ -12,6 +12,10 @@ export class AppAnnounceConfig {
 
   @Prop()
   announceID!: string;
+  @Watch('announceID')
+  watchAnnounceID() {
+    return this.loadData();
+  }
 
   @State()
   enableNotification!: boolean;

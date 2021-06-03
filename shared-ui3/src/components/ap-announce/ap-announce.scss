@@ -12,8 +12,20 @@ ap-announce {
 
       .name {
         flex-grow: 1;
-        font-size: 1.2rem;
-        font-weight: bolder;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .icons {
+          font-size: 1.2em;
+          ap-icon {
+            margin-right: 5px;
+          }
+        }
+        span {
+          font-weight: bold;
+          font-size: 1.2em;
+        }
       }
       ap-image {
         background-color: var(--bk-color);

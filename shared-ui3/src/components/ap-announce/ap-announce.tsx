@@ -23,6 +23,8 @@ export class ApAnnounce {
       }
     >;
     hrefAttrs: Record<string, any>;
+    isFollow: boolean;
+    enableNotification: boolean;
   };
 
   @Prop()
@@ -144,7 +146,13 @@ export class ApAnnounce {
       <Host>
         <div class="announce">
           <a class="head" {...announce.hrefAttrs}>
-            <span class="name">{announce.name}</span>
+            <div class="name">
+              <div class="icons">
+                {announce.isFollow && <ap-icon icon="heart" />}
+                {announce.enableNotification && <ap-icon icon="bell" />}
+              </div>
+              <span>{announce.name}</span>
+            </div>
             {announce.iconLoader && <ap-image loader={announce.iconLoader} />}
           </a>
           <slot name="botom-announce" />
