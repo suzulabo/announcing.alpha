@@ -53,6 +53,7 @@ export const msgs: Msgs = {
     pageTitle: (announceName: string) => {
       return `${announceName} - 設定 - ${titleSuffix}`;
     },
+    followBtn: 'フォローする',
     unfollowBtn: 'フォローを解除',
     unfollowConfirm: 'フォローを解除します。よろしいですか？',
     enableNotifyBtn: '通知を有効にする',

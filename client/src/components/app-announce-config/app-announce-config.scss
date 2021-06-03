@@ -1,43 +1,64 @@
 app-announce-config {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  .announce {
+    padding: 10px;
+    border-bottom: 1px solid var(--light-border-color);
 
-  > * {
-    margin-top: 30px;
-  }
-  button.submit {
-    margin-top: 40px;
-  }
-  a.back {
-    margin-top: 40px;
-  }
-
-  .unfollow-modal {
-    background-color: var(--bk-color);
-    border-radius: 5px;
-    padding: 20px 10px;
-
-    width: 100%;
-    max-width: 400px;
-
-    text-align: center;
-    .buttons {
-      margin-top: 40px;
+    .head {
+      text-decoration: none;
       display: flex;
-      justify-content: space-around;
+      flex-direction: row;
+      min-height: 80px;
+
+      .name {
+        flex-grow: 1;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .icons {
+          font-size: 1.2em;
+          ap-icon {
+            margin-right: 5px;
+          }
+        }
+        span {
+          font-weight: bold;
+          font-size: 1.2em;
+        }
+      }
+      ap-image {
+        background-color: var(--bk-color);
+        width: 80px;
+        height: 80px;
+      }
+    }
+    .desc {
+      white-space: pre-line;
     }
   }
 
-  .notif-warn {
+  .follow {
+    padding: 30px 0;
+    border-bottom: 1px solid var(--light-border-color);
     text-align: center;
-    ap-icon {
-      font-size: 20px;
-    }
-    div {
+  }
+  .notify {
+    text-align: center;
+    padding: 30px 0;
+    border-bottom: 1px solid var(--light-border-color);
+
+    .warn {
+      ap-icon {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
       white-space: pre-line;
-      margin-top: 30px;
     }
+  }
+
+  a.back {
+    display: block;
+    margin: 40px auto;
+    width: fit-content;
   }
 }

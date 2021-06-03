@@ -14,75 +14,64 @@ export class AppAnnounceConfig {
   announceID!: string;
 
   @State()
-  private enableNotification!: boolean;
+  enableNotification!: boolean;
 
-  private permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
+  @State()
+  isFollow!: boolean;
+
+  @State()
+  permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
+
+  private async loadData() {
+    this.app.loadAnnounce(this.announceID);
+    this.enableNotification = (await this.app.getNotification(this.announceID)) != null;
+    this.isFollow = this.app.getFollow(this.announceID) != null;
+    this.permission = await this.app.checkNotifyPermission(false);
+  }
 
   async componentWillLoad() {
-    await this.app.processLoading(async () => {
-      const id = this.announceID;
-      this.app.loadAnnounce(id);
-
-      const follow = this.app.getFollow(id);
-      if (!follow) {
-        this.app.redirectRoute(`/${id}`);
-        return;
-      }
-
-      this.enableNotification = (await this.app.getNotification(id)) != null;
-
-      this.permission = await this.app.checkNotifyPermission(true);
-    });
+    await this.loadData();
   }
 
   private handleEnableNotifyClick = async () => {
     await this.app.processLoading(async () => {
       await this.app.setNotify(this.announceID, true);
-      this.enableNotification = true;
+      await this.loadData();
     });
   };
 
   private handleDisableNotifyClick = async () => {
     await this.app.processLoading(async () => {
       await this.app.setNotify(this.announceID, false);
-      this.enableNotification = false;
+      await this.loadData();
     });
   };
 
   private handleUnfollowClick = async () => {
-    const unfollow = async () => {
-      await this.app.processLoading(async () => {
-        await this.app.deleteFollow(this.announceID);
-        this.app.pushRoute(`/${this.announceID}`, true);
-      });
-    };
-
-    //const msgs = this.app.msgs;
-
-    // TODO
-    await unfollow();
-    /*
-    const alert = await alertController.create({
-      message: msgs.announceConfig.unfollowConfirm,
-      buttons: [
-        {
-          text: msgs.common.cancel,
-          role: 'cancel',
-        },
-        {
-          text: msgs.common.ok,
-          handler: unfollow,
-        },
-      ],
+    await this.app.processLoading(async () => {
+      await this.app.deleteFollow(this.announceID);
+      await this.loadData();
     });
-    await alert.present();
-    */
+  };
+
+  private handleFollowClick = async () => {
+    await this.app.processLoading(async () => {
+      const a = this.app.getAnnounceState(this.announceID);
+      if (a?.state == 'SUCCESS') {
+        const name = a.value.name;
+        const readTime = a.value.latestPost?.pT || 0;
+        await this.app.setFollow(this.announceID, { name, readTime });
+        await this.loadData();
+      } else {
+        console.warn('getAnnounceState error', a);
+      }
+    });
   };
 
   private renderUnsupported() {
     // TODO
     return (
-      <div class="notif-warn">
+      <div class="warn">
         <ap-icon icon="frown" />
         <div>{this.app.msgs.announceConfig.unsupported}</div>
       </div>
@@ -92,7 +81,7 @@ export class AppAnnounceConfig {
   private renderDenied() {
     // TODO
     return (
-      <div class="notif-warn">
+      <div class="warn">
         <ap-icon icon="dizzy" />
         <div>{this.app.msgs.announceConfig.notPermitted}</div>
       </div>
@@ -111,6 +100,7 @@ export class AppAnnounceConfig {
     this.app.setTitle(this.app.msgs.announceConfig.pageTitle(a.value.name));
 
     const msgs = this.app.msgs;
+    const announce = a.value;
 
     const renderNotify = () => {
       if (this.permission == 'unsupported') {
@@ -138,10 +128,28 @@ export class AppAnnounceConfig {
 
     return (
       <Host>
-        {renderNotify()}
-        <hr />
-        <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
-
+        <div class="announce">
+          <div class="head">
+            <div class="name">
+              <div class="icons">
+                {this.isFollow && <ap-icon icon="heart" />}
+                {this.enableNotification && <ap-icon icon="bell" />}
+              </div>
+              <span>{announce.name}</span>
+            </div>
+            {announce.iconLoader && <ap-image loader={announce.iconLoader} />}
+          </div>
+          {announce.desc && <div class="desc">{announce.desc}</div>}
+          {announce.link && <div class="link">{announce.link}</div>}
+        </div>
+        <div class="follow">
+          {this.isFollow ? (
+            <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
+          ) : (
+            <button onClick={this.handleFollowClick}>{msgs.announceConfig.followBtn}</button>
+          )}
+        </div>
+        <div class="notify">{renderNotify()}</div>
         <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
           {msgs.common.back}
         </a>

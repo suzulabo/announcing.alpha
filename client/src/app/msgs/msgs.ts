@@ -34,6 +34,7 @@ export interface Msgs {
   };
   announceConfig: {
     pageTitle: (announceName: string) => string;
+    followBtn: string;
     unfollowBtn: string;
     unfollowConfirm: string;
     enableNotifyBtn: string;
