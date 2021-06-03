@@ -1,6 +1,6 @@
 import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
-import { DataResult } from 'src/app/datatypes';
+import { DataResult } from 'src/shared';
 
 @Component({
   tag: 'app-image',

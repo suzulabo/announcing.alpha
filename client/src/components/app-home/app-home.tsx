@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { AnnounceState, DataResult, Follow } from 'src/app/datatypes';
+import { AnnounceState, Follow } from 'src/app/datatypes';
+import { DataResult } from 'src/shared';
 
 @Component({
   tag: 'app-home',

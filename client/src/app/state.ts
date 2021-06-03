@@ -1,5 +1,6 @@
 import { createStore } from '@stencil/store';
-import { AnnounceState, DataResult } from './datatypes';
+import { DataResult } from 'src/shared';
+import { AnnounceState } from './datatypes';
 
 const store = createStore<{ [k: string]: unknown }>({});
 

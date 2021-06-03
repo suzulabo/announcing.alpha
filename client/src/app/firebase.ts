@@ -6,9 +6,16 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/functions';
 import 'firebase/messaging';
-import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
+import {
+  Announce,
+  AppEnv,
+  DataResult,
+  Lang,
+  NOT_FOUND,
+  RegisterNotificationParams,
+} from 'src/shared';
 import nacl from 'tweetnacl';
-import { DataResult, NOT_FOUND, PostNotificationRecievedEvent } from './datatypes';
+import { PostNotificationRecievedEvent } from './datatypes';
 import { bs62 } from './utils';
 
 class CapNotification {

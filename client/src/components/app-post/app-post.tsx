@@ -1,7 +1,6 @@
 import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
-import { DataResult, DATA_ERROR } from 'src/app/datatypes';
-import { PostJSON } from 'src/shared';
+import { DataResult, DATA_ERROR, PostJSON } from 'src/shared';
 
 @Component({
   tag: 'app-post',

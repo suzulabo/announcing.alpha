@@ -12,6 +12,23 @@ export const isLang = (s: any): s is Lang => {
   return languages.includes(s);
 };
 
+export type DataResult<T> =
+  | { state: 'NOT_FOUND' | 'DATA_ERROR' }
+  | {
+      state: 'SUCCESS';
+      value: T;
+    };
+
+export interface NotFound {
+  state: 'NOT_FOUND';
+}
+export const NOT_FOUND: NotFound = { state: 'NOT_FOUND' };
+
+export interface DataError {
+  state: 'DATA_ERROR';
+}
+export const DATA_ERROR: DataError = { state: 'DATA_ERROR' };
+
 export interface Announce {
   mid: string; // meta id
   posts: { [postID: string]: { pT: Timestamp } };
