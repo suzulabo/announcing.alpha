@@ -37,14 +37,12 @@ export class AppAnnounce {
   };
 
   private postLoader = async (postID: string) => {
-    const post = await this.app.fetchPost(this.announceID, postID);
-    if (post.state != 'SUCCESS') {
-      return;
+    const postResult = await this.app.fetchPost(this.announceID, postID);
+    if (postResult.state == 'SUCCESS') {
+      await this.app.setReadTime(this.announceID, postResult.value.pT);
     }
 
-    await this.app.setReadTime(this.announceID, post.value.pT);
-
-    return { ...post.value, hrefAttrs: this.app.href(`/${this.announceID}/${postID}`) };
+    return { ...postResult, hrefAttrs: this.app.href(`/${this.announceID}/${postID}`) };
   };
 
   render() {

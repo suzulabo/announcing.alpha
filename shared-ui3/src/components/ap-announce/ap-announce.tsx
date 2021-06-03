@@ -1,4 +1,7 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
+import { DataResult, DATA_ERROR, PostJSON } from 'src/shared';
+
+export type PostLaoderResult = DataResult<PostJSON> & { hrefAttrs?: Record<string, any> };
 
 @Component({
   tag: 'ap-announce',
@@ -22,19 +25,7 @@ export class ApAnnounce {
   };
 
   @Prop()
-  postLoader?: (
-    id: string,
-  ) => Promise<
-    | {
-        title?: string;
-        body?: string;
-        imgData?: string;
-        link?: string;
-        pT: number;
-        hrefAttrs: Record<string, any>;
-      }
-    | undefined
-  >;
+  postLoader!: (id: string) => Promise<PostLaoderResult>;
 
   @Prop()
   msgs!: {
@@ -44,11 +35,11 @@ export class ApAnnounce {
   };
 
   @State()
-  loadedPosts = new Map<string, any>();
+  loadedPosts = new Map<string, PostLaoderResult | undefined>();
 
   private iob: IntersectionObserver;
 
-  private iobCallback = async (entries: IntersectionObserverEntry[]) => {
+  private iobCallback = (entries: IntersectionObserverEntry[]) => {
     let updated = false;
 
     for (const entry of entries) {
@@ -62,9 +53,17 @@ export class ApAnnounce {
       if (this.loadedPosts.has(postID)) {
         continue;
       }
+      this.loadedPosts.set(postID, undefined);
 
-      const el = await this.renderPost(postID);
-      this.loadedPosts.set(postID, el);
+      this.postLoader(postID)
+        .then(result => {
+          this.loadedPosts.set(postID, result);
+        })
+        .catch(err => {
+          console.error('postLoader Error', err);
+          this.loadedPosts.set(postID, DATA_ERROR);
+        });
+
       updated = true;
     }
 
@@ -103,17 +102,19 @@ export class ApAnnounce {
     );
   }
 
-  private async renderPost(postID: string) {
-    if (!this.postLoader) {
-      return;
-    }
-    const post = await this.postLoader(postID);
-    if (!post) {
-      return <div class="post post-data-error">{this.msgs.postDataError}</div>;
+  private renderPost(postID: string, postResult: PostLaoderResult) {
+    if (postResult.state != 'SUCCESS') {
+      return <div class="card post post-data-error">{this.msgs.postDataError}</div>;
     }
 
+    const post = postResult.value;
     return (
-      <a key={`post-${postID}`} class="card post" ref={this.handleRef.observe} {...post.hrefAttrs}>
+      <a
+        key={`post-${postID}`}
+        class="card post"
+        ref={this.handleRef.observe}
+        {...postResult.hrefAttrs}
+      >
         <span class="date">{this.msgs.datetime(post.pT)}</span>
         {post.title && <span class="title">{post.title}</span>}
         {post.body && <div class="body">{post.body}</div>}
@@ -126,7 +127,8 @@ export class ApAnnounce {
       return v2.pT.toMillis() - v1.pT.toMillis();
     });
     return posts.map(([id]) => {
-      return this.loadedPosts.has(id) ? this.loadedPosts.get(id) : this.renderSkeletonPost(id);
+      const postResult = this.loadedPosts.get(id);
+      return postResult ? this.renderPost(id, postResult) : this.renderSkeletonPost(id);
     });
   }
 
