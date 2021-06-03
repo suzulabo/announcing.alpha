@@ -22,6 +22,7 @@ export class ApAnnounce {
         };
       }
     >;
+    hrefAttrs: Record<string, any>;
   };
 
   @Prop()
@@ -142,16 +143,10 @@ export class ApAnnounce {
     return (
       <Host>
         <div class="announce">
-          <div class="head">
+          <a class="head" {...announce.hrefAttrs}>
             <span class="name">{announce.name}</span>
             {announce.iconLoader && <ap-image loader={announce.iconLoader} />}
-          </div>
-          {announce.desc && <ap-textview class="desc" text={announce.desc} />}
-          {announce.link && (
-            <a class="link" href={announce.link}>
-              {announce.link}
-            </a>
-          )}
+          </a>
           <slot name="botom-announce" />
         </div>
         {noPosts && <div class="no-posts">{this.msgs.noPosts}</div>}

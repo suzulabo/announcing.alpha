@@ -1,40 +1,25 @@
 ap-announce {
   .announce {
     padding: 10px;
-    border-bottom: 1px solid var(--ap-border-color);
+    border-bottom: 2px solid var(--light-border-color);
 
     .head {
+      text-decoration: none;
       display: flex;
-      justify-content: center;
+      flex-direction: row;
+      align-items: center;
+      min-height: 80px;
+
+      .name {
+        flex-grow: 1;
+        font-size: 1.2rem;
+        font-weight: bolder;
+      }
       ap-image {
+        background-color: var(--bk-color);
         width: 80px;
         height: 80px;
       }
-    }
-    .desc {
-      display: block;
-      white-space: pre-line;
-    }
-    .link {
-      display: block;
-    }
-  }
-
-  div.head {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    min-height: 80px;
-
-    .name {
-      flex-grow: 1;
-      font-size: 1.2rem;
-      font-weight: bolder;
-    }
-    ap-image {
-      background-color: var(--bk-color);
-      width: 80px;
-      height: 80px;
     }
   }
 
