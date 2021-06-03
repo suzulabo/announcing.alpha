@@ -142,7 +142,7 @@ export class AppAnnounceConfig {
         <hr />
         <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
 
-        <a class="back" {...this.app.href(`/${this.announceID}`)}>
+        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
           {msgs.common.back}
         </a>
       </Host>
