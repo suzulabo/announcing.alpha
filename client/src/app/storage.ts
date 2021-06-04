@@ -1,4 +1,5 @@
 import { Storage } from '@capacitor/storage';
+import { createStore } from '@stencil/store';
 import { Follow } from './datatypes';
 
 const kvGetSet = (key: string) => {
@@ -68,11 +69,46 @@ const objectMulti = <T>(prefix: string) => {
   return x;
 };
 
+const objectMultiState = <T>(prefix: string) => {
+  const om = objectMulti<T>(prefix);
+  const store = createStore<Record<string, T | undefined>>({});
+
+  const x = {
+    init: async () => {
+      (await om.entries()).map(([k, v]) => {
+        store.set(k, v);
+      });
+    },
+    get: (key: string) => {
+      return store.get(key);
+    },
+    set: async (key: string, value: T) => {
+      await om.set(key, value);
+      store.set(key, value);
+    },
+    remove: async (key: string) => {
+      await om.remove(key);
+      store.set(key, undefined);
+    },
+    keys: () => {
+      return x.entries().map(([k]) => k);
+    },
+    entries: () => {
+      return Object.entries(store.state).filter(([, v]) => v != undefined) as [string, T][];
+    },
+  };
+  return x;
+};
+
 export class AppStorage {
   readonly fcmToken = kvGetSet('fcmToken');
   readonly signKey = kvGetSet('signKey');
-  readonly follows = objectMulti<Follow>('follows.');
-  readonly notifications = objectMulti<{
+  readonly follows = objectMultiState<Follow>('follows.');
+  readonly notifications = objectMultiState<{
     x?: never; // no props now
   }>('notifications.');
+
+  init() {
+    return Promise.all([this.follows.init(), this.notifications.init()]);
+  }
 }

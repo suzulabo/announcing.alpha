@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
 import { PromiseValue } from 'type-fest';
 
@@ -14,47 +14,37 @@ export class AppAnnounceConfig {
   announceID!: string;
   @Watch('announceID')
   watchAnnounceID() {
-    return this.loadData();
+    this.loadData();
   }
 
-  @State()
-  enableNotification!: boolean;
+  componentWillLoad() {
+    this.loadData();
+  }
 
-  @State()
-  isFollow!: boolean;
-
-  @State()
-  permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
-
-  private async loadData() {
+  private loadData() {
     this.app.loadAnnounce(this.announceID);
-    this.enableNotification = (await this.app.getNotification(this.announceID)) != null;
-    this.isFollow = this.app.getFollow(this.announceID) != null;
-    this.permission = await this.app.checkNotifyPermission(false);
   }
 
-  async componentWillLoad() {
-    await this.loadData();
+  private permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
+  async componentWillRender() {
+    this.permission = await this.app.checkNotifyPermission(false);
   }
 
   private handleEnableNotifyClick = async () => {
     await this.app.processLoading(async () => {
       await this.app.setNotify(this.announceID, true);
-      await this.loadData();
     });
   };
 
   private handleDisableNotifyClick = async () => {
     await this.app.processLoading(async () => {
       await this.app.setNotify(this.announceID, false);
-      await this.loadData();
     });
   };
 
   private handleUnfollowClick = async () => {
     await this.app.processLoading(async () => {
       await this.app.deleteFollow(this.announceID);
-      await this.loadData();
     });
   };
 
@@ -65,7 +55,6 @@ export class AppAnnounceConfig {
         const name = a.value.name;
         const readTime = a.value.latestPost?.pT || 0;
         await this.app.setFollow(this.announceID, { name, readTime });
-        await this.loadData();
       } else {
         console.warn('getAnnounceState error', a);
       }
@@ -105,6 +94,8 @@ export class AppAnnounceConfig {
 
     const msgs = this.app.msgs;
     const announce = a.value;
+    const enableNotification = this.app.getNotification(this.announceID) != null;
+    const isFollow = this.app.getFollow(this.announceID) != null;
 
     const renderNotify = () => {
       if (this.permission == 'unsupported') {
@@ -116,12 +107,12 @@ export class AppAnnounceConfig {
 
       return (
         <Fragment>
-          {!this.enableNotification && (
+          {!enableNotification && (
             <button class="submit" onClick={this.handleEnableNotifyClick}>
               {msgs.announceConfig.enableNotifyBtn}
             </button>
           )}
-          {this.enableNotification && (
+          {enableNotification && (
             <button class="submit" onClick={this.handleDisableNotifyClick}>
               {msgs.announceConfig.disableNotifyBtn}
             </button>
@@ -136,8 +127,8 @@ export class AppAnnounceConfig {
           <div class="head">
             <div class="name">
               <div class="icons">
-                {this.isFollow && <ap-icon icon="heart" />}
-                {this.enableNotification && <ap-icon icon="bell" />}
+                {isFollow && <ap-icon icon="heart" />}
+                {enableNotification && <ap-icon icon="bell" />}
               </div>
               <span>{announce.name}</span>
             </div>
@@ -147,7 +138,7 @@ export class AppAnnounceConfig {
           {announce.link && <div class="link">{announce.link}</div>}
         </div>
         <div class="follow">
-          {this.isFollow ? (
+          {isFollow ? (
             <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
           ) : (
             <button onClick={this.handleFollowClick}>{msgs.announceConfig.followBtn}</button>

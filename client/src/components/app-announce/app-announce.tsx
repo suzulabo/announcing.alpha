@@ -1,6 +1,5 @@
-import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
-import { Follow } from 'src/app/datatypes';
 
 @Component({
   tag: 'app-announce',
@@ -14,22 +13,14 @@ export class AppAnnounce {
   announceID!: string;
   @Watch('announceID')
   watchAnnounceID() {
-    return this.loadData();
+    this.loadData();
   }
 
-  @State()
-  follow?: Follow;
-
-  @State()
-  enableNotification!: boolean;
-
-  private async loadData() {
+  private loadData() {
     this.app.loadAnnounce(this.announceID);
-    this.enableNotification = (await this.app.getNotification(this.announceID)) != null;
-    this.follow = this.app.getFollow(this.announceID);
   }
 
-  componentWillLoad() {
+  componentWillRender() {
     return this.loadData();
   }
 
@@ -44,6 +35,8 @@ export class AppAnnounce {
 
   render() {
     const msgs = this.app.msgs;
+    const enableNotification = this.app.getNotification(this.announceID) != null;
+    const follow = this.app.getFollow(this.announceID);
 
     const announce = this.app.getAnnounceState(this.announceID);
 
@@ -63,8 +56,6 @@ export class AppAnnounce {
           );
         case 'SUCCESS': {
           this.app.setTitle(this.app.msgs.announce.pageTitle(announce.value.name));
-          const follow = this.follow;
-          console.log(follow);
 
           return (
             <Fragment>
@@ -72,8 +63,8 @@ export class AppAnnounce {
                 announce={{
                   ...announce.value,
                   hrefAttrs: this.app.href(`/${this.announceID}/config`),
-                  isFollow: this.follow != null,
-                  enableNotification: this.enableNotification,
+                  isFollow: follow != null,
+                  enableNotification,
                 }}
                 postLoader={this.postLoader}
                 msgs={{
