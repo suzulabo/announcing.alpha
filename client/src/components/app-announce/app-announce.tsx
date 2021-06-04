@@ -59,6 +59,12 @@ export class AppAnnounce {
 
           return (
             <Fragment>
+              <a class="back" {...this.app.href('/', true)}>
+                {msgs.common.back}
+              </a>
+              <a class="detail" {...this.app.href(`/${this.announceID}/config`)}>
+                {msgs.announce.detail}
+              </a>
               <ap-announce
                 announce={{
                   ...announce.value,
@@ -81,13 +87,6 @@ export class AppAnnounce {
       }
     };
 
-    return (
-      <Host>
-        {renderContent()}
-        <a class="back" {...this.app.href('/', true)}>
-          {msgs.common.back}
-        </a>
-      </Host>
-    );
+    return <Host>{renderContent()}</Host>;
   }
 }

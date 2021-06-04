@@ -1,7 +1,6 @@
 ap-announce {
   .announce {
     padding: 10px;
-    border-bottom: 2px solid var(--light-border-color);
 
     .head {
       text-decoration: none;
@@ -49,7 +48,7 @@ ap-announce {
     height: 100px;
 
     .date {
-      color: var(--light-color);
+      //color: var(--light-color);
       font-size: 0.9em;
     }
     .title {
@@ -59,7 +58,7 @@ ap-announce {
     }
     .body {
       font-size: 0.95em;
-      color: var(--light-color);
+      //color: var(--light-color);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;

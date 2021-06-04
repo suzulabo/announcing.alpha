@@ -1,7 +1,18 @@
 app-announce {
-  .back {
-    display: block;
-    text-align: center;
-    margin: 20px 0;
+  a.back,
+  a.detail {
+    padding: 15px;
+    text-decoration: none;
+    position: fixed;
+    bottom: 0;
+    background-color: var(--light-bk-color);
+  }
+  a.back {
+    left: 0;
+    border-top-right-radius: 10px;
+  }
+  a.detail {
+    right: 0;
+    border-top-left-radius: 10px;
   }
 }

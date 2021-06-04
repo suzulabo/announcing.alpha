@@ -29,8 +29,7 @@ export interface Msgs {
     deleted: string;
     dataError: string;
     noPosts: string;
-    followBtn: string;
-    configBtn: string;
+    detail: string;
   };
   announceConfig: {
     pageTitle: (announceName: string) => string;

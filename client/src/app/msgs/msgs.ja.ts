@@ -46,8 +46,7 @@ export const msgs: Msgs = {
     deleted: 'このアナウンスは削除されました',
     dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     noPosts: 'お知らせはまだありません',
-    followBtn: 'フォローする',
-    configBtn: '設定',
+    detail: '詳細をみる',
   },
   announceConfig: {
     pageTitle: (announceName: string) => {
