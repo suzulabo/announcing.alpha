@@ -83,9 +83,13 @@ button,
   &:disabled {
     opacity: 0.3;
   }
-  &:hover:not(:disabled):not(.anchor) {
-    background-color: var(--button-hover-bk-color);
+
+  @media (hover: hover) {
+    &:hover:not(:disabled):not(.anchor) {
+      background-color: var(--button-hover-bk-color);
+    }
   }
+
   &:active {
     position: relative;
     top: 1px;
