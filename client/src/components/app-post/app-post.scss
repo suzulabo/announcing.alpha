@@ -1,8 +1,8 @@
 app-post {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 5px;
+  ap-post {
+    margin-top: 20px;
+    min-height: 300px;
+  }
 
   .share {
     margin-top: 50px;
@@ -16,8 +16,9 @@ app-post {
   }
 
   .back {
-    margin-top: 50px;
-    align-self: center;
+    display: block;
+    width: fit-content;
+    margin: 30px auto;
     padding: 20px;
   }
 

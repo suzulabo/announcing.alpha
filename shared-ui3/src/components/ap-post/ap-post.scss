@@ -1,41 +1,38 @@
 ap-post {
-  display: flex;
-  flex-direction: column;
+  display: block;
+  padding: 10px;
+  width: fit-content;
+  min-width: 250px;
+  margin: 0 auto;
 
   div.image {
-    align-self: center;
     min-height: 100px;
-
-    & > * {
-      display: block;
-      margin: auto;
-    }
+    margin-bottom: 30px;
 
     img {
+      display: block;
       min-width: 0;
       max-width: 100%;
       max-height: 300px;
-      align-self: center;
-      margin-bottom: 20px;
+      margin: auto;
       border-radius: 5px;
-    }
-
-    ap-icon {
-      font-size: 2em;
     }
   }
 
   .date {
+    display: block;
     color: var(--light-color);
-    font-size: 0.9rem;
   }
   .title {
+    display: block;
     font-size: 1.2rem;
     font-weight: bolder;
     margin: 10px 0 0;
   }
   .body {
-    margin: 30px 10px 0;
+    display: block;
+    margin: 30px 0;
+    line-height: 1.7;
   }
   ap-twitter {
     margin: 30px 0 0;

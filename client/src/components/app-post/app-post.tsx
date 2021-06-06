@@ -93,8 +93,15 @@ export class AppPost {
       ),
     );
 
+    const announce = a.value;
+    const enableNotification = this.app.getNotification(this.announceID) != null;
+    const isFollow = this.app.getFollow(this.announceID) != null;
+
     return (
       <Host>
+        <ap-announce
+          announce={{ ...announce, isFollow, enableNotification, href: `/${this.announceID}` }}
+        />
         <ap-post post={this.post.value} msgs={{ datetime: this.app.msgs.common.datetime }} />
         <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
           {this.app.msgs.common.back}
