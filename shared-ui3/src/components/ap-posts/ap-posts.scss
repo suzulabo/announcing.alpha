@@ -1,0 +1,26 @@
+ap-posts {
+  .post {
+    margin: 15px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.8;
+    padding: 5px 10px;
+    height: 100px;
+
+    .date {
+      font-size: 0.9em;
+    }
+    .title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .body {
+      font-size: 0.95em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}

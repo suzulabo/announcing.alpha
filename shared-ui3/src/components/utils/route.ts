@@ -21,3 +21,16 @@ export const pushRoute = (path: string, back?: boolean) => {
     window.dispatchEvent(new PopStateEvent('popstate'));
   }
 };
+
+export const href = (p: string, back?: boolean) => {
+  return {
+    href: p,
+    onClick: (ev: MouseEvent) => {
+      // https://github.com/ionic-team/stencil-router-v2/blob/master/src/router.ts
+      if (!ev.metaKey && !ev.ctrlKey && ev.which != 2 && ev.button != 1) {
+        ev.preventDefault();
+        pushRoute(p, back);
+      }
+    },
+  };
+};

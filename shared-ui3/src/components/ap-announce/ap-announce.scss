@@ -1,152 +1,35 @@
 ap-announce {
-  .announce {
-    padding: 10px;
+  display: block;
+  padding: 10px;
 
-    .head {
-      text-decoration: none;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      min-height: 80px;
-
-      .name {
-        flex-grow: 1;
-
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        .icons {
-          font-size: 1.2em;
-          ap-icon {
-            margin-right: 5px;
-          }
-        }
-        span {
-          font-weight: bold;
-          font-size: 1.2em;
-        }
-      }
-      ap-image {
-        background-color: var(--bk-color);
-        width: 80px;
-        height: 80px;
-      }
-    }
-  }
-
-  .desc {
-    padding: 10px 5px;
-  }
-
-  .post {
-    margin: 15px 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    line-height: 1.8;
-    padding: 5px 10px;
-    height: 100px;
-
-    .date {
-      //color: var(--light-color);
-      font-size: 0.9em;
-    }
-    .title {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .body {
-      font-size: 0.95em;
-      //color: var(--light-color);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  }
-
-  ._post {
-    border: 1px solid var(--post-border-color);
-    border-radius: 5px;
-    width: 100%;
-    height: 110px;
-    margin-bottom: 10px;
-
-    display: flex;
-    flex-direction: column;
-    padding: 5px 10px;
-
+  .head {
     text-decoration: none;
-
-    > * {
-      margin: 5px 0;
-    }
-
-    .date {
-      color: var(--ap-light-color);
-      font-size: 0.9em;
-    }
-    .title {
-      font-size: 1.05em;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex-grow: 1;
-    }
-    .body {
-      color: var(--light-color);
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      flex-grow: 1;
-    }
-
-    &.skeleton {
-      @keyframes blink {
-        0% {
-          opacity: 0;
-        }
-        33% {
-          opacity: 0;
-        }
-        66% {
-          opacity: 1;
-        }
-      }
-
-      > * {
-        opacity: 0;
-        animation: blink 3s linear infinite;
-      }
-
-      .date {
-        background-color: var(--skeleton-bk-color);
-        height: 1em;
-        width: 10em;
-      }
-      .title {
-        background-color: var(--skeleton-bk-color);
-        height: 1em;
-        width: 20em;
-      }
-      .body {
-        background-color: var(--skeleton-bk-color);
-        height: 1em;
-        width: 95%;
-      }
-    }
-  }
-
-  .no-posts {
-    text-align: center;
-    margin: 20px 0;
-  }
-
-  .post-data-error {
-    white-space: pre-line;
-    text-align: center;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
+    min-height: 80px;
+
+    .name {
+      flex-grow: 1;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      .icons {
+        font-size: 1.2em;
+        ap-icon {
+          margin-right: 5px;
+        }
+      }
+      span {
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+    }
+    ap-image {
+      background-color: var(--bk-color);
+      width: 80px;
+      height: 80px;
+    }
   }
 }

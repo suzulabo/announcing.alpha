@@ -30,7 +30,11 @@ export class AppAnnounce {
       await this.app.setReadTime(this.announceID, postResult.value.pT);
     }
 
-    return { ...postResult, hrefAttrs: this.app.href(`/${this.announceID}/${postID}`) };
+    return {
+      ...postResult,
+      href: `/${this.announceID}/${postID}`,
+      hrefAttrs: this.app.href(`/${this.announceID}/${postID}`),
+    };
   };
 
   render() {
@@ -68,17 +72,19 @@ export class AppAnnounce {
               <ap-announce
                 announce={{
                   ...announce.value,
-                  hrefAttrs: this.app.href(`/${this.announceID}/config`),
+                  href: `/${this.announceID}/config`,
                   isFollow: follow != null,
                   enableNotification,
                 }}
+              ></ap-announce>
+              <ap-posts
+                posts={announce.value.posts}
                 postLoader={this.postLoader}
                 msgs={{
                   datetime: msgs.common.datetime,
-                  noPosts: msgs.announce.noPosts,
-                  postDataError: msgs.announce.dataError,
+                  dataError: msgs.announce.dataError,
                 }}
-              ></ap-announce>
+              />
             </Fragment>
           );
         }
