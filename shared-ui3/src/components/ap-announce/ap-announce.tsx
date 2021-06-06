@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop } from '@stencil/core';
 import { DataResult, PostJSON } from 'src/shared';
 import { href } from '../utils/route';
 
@@ -23,9 +23,10 @@ export class ApAnnounce {
         };
       }
     >;
-    href: string;
+    href?: string;
     isFollow: boolean;
     enableNotification: boolean;
+    showDetails?: boolean;
   };
 
   render() {
@@ -34,9 +35,11 @@ export class ApAnnounce {
       return;
     }
 
+    const Tag = announce.href ? 'a' : 'div';
+
     return (
       <Host>
-        <a class="head" {...href(announce.href)}>
+        <Tag class="head" {...(announce.href && href(announce.href))}>
           <div class="name">
             <div class="icons">
               {announce.isFollow && <ap-icon icon="heart" />}
@@ -45,7 +48,17 @@ export class ApAnnounce {
             <span>{announce.name}</span>
           </div>
           {announce.iconLoader && <ap-image loader={announce.iconLoader} />}
-        </a>
+        </Tag>
+        {announce.showDetails && (
+          <Fragment>
+            {announce.desc && <div class="desc">{announce.desc}</div>}
+            {announce.link && (
+              <a class="link" href={announce.link}>
+                {announce.link}
+              </a>
+            )}
+          </Fragment>
+        )}
       </Host>
     );
   }

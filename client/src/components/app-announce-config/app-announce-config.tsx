@@ -123,20 +123,7 @@ export class AppAnnounceConfig {
 
     return (
       <Host>
-        <div class="announce">
-          <div class="head">
-            <div class="name">
-              <div class="icons">
-                {isFollow && <ap-icon icon="heart" />}
-                {enableNotification && <ap-icon icon="bell" />}
-              </div>
-              <span>{announce.name}</span>
-            </div>
-            {announce.iconLoader && <ap-image loader={announce.iconLoader} />}
-          </div>
-          {announce.desc && <div class="desc">{announce.desc}</div>}
-          {announce.link && <div class="link">{announce.link}</div>}
-        </div>
+        <ap-announce announce={{ ...announce, isFollow, enableNotification, showDetails: true }} />
         <div class="follow">
           {isFollow ? (
             <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
