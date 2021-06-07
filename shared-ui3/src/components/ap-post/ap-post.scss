@@ -8,14 +8,24 @@ ap-post {
   div.image {
     min-height: 100px;
     margin-bottom: 30px;
+    display: flex;
+
+    a {
+      margin: auto;
+    }
 
     img {
-      display: block;
-      min-width: 0;
       max-width: 100%;
       max-height: 300px;
-      margin: auto;
       border-radius: 5px;
+    }
+
+    ap-spinner {
+      margin: auto;
+    }
+    ap-icon {
+      font-size: 24px;
+      margin: auto;
     }
   }
 

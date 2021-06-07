@@ -46,6 +46,6 @@ export class ApImage {
     if (this.src) {
       return <img src={this.src} />;
     }
-    return <ion-spinner name="dots" />;
+    return <ap-spinner />;
   }
 }
