@@ -5,6 +5,7 @@ ap-navi {
     position: fixed;
     bottom: 0;
     background-color: var(--light-bk-color);
+    z-index: 99;
 
     &:nth-of-type(1) {
       left: 0;

@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
 import { DataResult } from 'src/shared';
+import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 
 @Component({
   tag: 'app-image',
@@ -27,7 +28,17 @@ export class AppImage {
   @State()
   image?: DataResult<string>;
 
+  private naviLinks!: ApNaviLinks;
+
   private loadImage() {
+    this.naviLinks = [
+      {
+        label: this.app.msgs.common.back,
+        href: `/${this.announceID}/${this.postID}`,
+        back: true,
+      },
+    ];
+
     this.image = undefined;
 
     this.app
@@ -57,10 +68,6 @@ export class AppImage {
               <pinch-zoom>
                 <img src={this.image.value} />
               </pinch-zoom>
-
-              <a class="back" {...this.app.href(`/${this.announceID}/${this.postID}`, true)}>
-                <ap-icon icon="xCircle" />
-              </a>
             </Fragment>
           );
         default:
@@ -68,6 +75,11 @@ export class AppImage {
       }
     };
 
-    return <Host>{renderContent()}</Host>;
+    return (
+      <Host>
+        <ap-navi links={this.naviLinks} />
+        {renderContent()}
+      </Host>
+    );
   }
 }

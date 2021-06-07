@@ -1,4 +1,6 @@
 app-image {
+  --page-margin-bottom: 0;
+
   position: fixed;
   top: 0;
   bottom: 0;
@@ -6,7 +8,6 @@ app-image {
   right: 0;
   margin: 0;
   background-color: black;
-  z-index: 99;
 
   display: flex;
 
@@ -24,16 +25,5 @@ app-image {
       max-height: 100%;
       object-fit: contain;
     }
-  }
-
-  ap-icon {
-    position: absolute;
-    bottom: 30px;
-    left: 0;
-    right: 0;
-    margin: auto;
-    cursor: pointer;
-    color: white;
-    font-size: 30px;
   }
 }
