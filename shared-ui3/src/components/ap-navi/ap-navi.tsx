@@ -3,7 +3,8 @@ import { href } from '../utils/route';
 
 export type ApNaviLinks = {
   label: string;
-  href: string;
+  href?: string;
+  handler?: () => void;
   back?: boolean;
 }[];
 
@@ -19,11 +20,20 @@ export class ApNavi {
     return (
       <Host>
         {this.links.map(v => {
-          return (
-            <a class="link" {...href(v.href, v.back)}>
-              {v.label}
-            </a>
-          );
+          if (v.href) {
+            return (
+              <a class="navi" {...href(v.href, v.back)}>
+                {v.label}
+              </a>
+            );
+          }
+          if (v.handler) {
+            return (
+              <a class="navi" onClick={v.handler}>
+                {v.label}
+              </a>
+            );
+          }
         })}
       </Host>
     );

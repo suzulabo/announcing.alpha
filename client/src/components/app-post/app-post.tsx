@@ -31,17 +31,25 @@ export class AppPost {
   >;
 
   private naviLinks!: ApNaviLinks;
+  private naviLinksLoading!: ApNaviLinks;
 
   private loadAnnounce() {
     this.app.loadAnnounce(this.announceID);
 
-    this.naviLinks = [
+    this.naviLinksLoading = [
       {
         label: this.app.msgs.common.back,
         href: `/${this.announceID}`,
         back: true,
       },
     ];
+    this.naviLinks = [...this.naviLinksLoading];
+    if (this.app.checkShareSupport()) {
+      this.naviLinks.push({
+        label: this.app.msgs.post.share,
+        handler: this.shareClick,
+      });
+    }
   }
 
   private loadPost() {
@@ -86,12 +94,10 @@ export class AppPost {
   }
 
   render() {
-    console.log('render');
-    const renderContent = () => {
-      const a = this.app.getAnnounceState(this.announceID);
+    const a = this.app.getAnnounceState(this.announceID);
 
+    const renderContent = () => {
       if (!a) {
-        console.log('return1');
         return <ap-spinner />;
       }
 
@@ -144,9 +150,11 @@ export class AppPost {
       );
     };
 
+    const loaded = a?.state == 'SUCCESS' && this.post?.state == 'SUCCESS';
+
     return (
       <Host>
-        <ap-navi links={this.naviLinks} />
+        <ap-navi links={loaded ? this.naviLinks : this.naviLinksLoading} />
         {renderContent()}
       </Host>
     );
