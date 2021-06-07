@@ -62,11 +62,10 @@ app-home {
           padding: 10px;
         }
 
-        ion-button {
+        button {
           width: fit-content;
           display: block;
           margin: 10px auto 0;
-          --border-width: 1px;
         }
       }
 
@@ -75,7 +74,7 @@ app-home {
         height: 65px;
       }
 
-      ion-spinner {
+      ap-spinner {
         margin: auto;
       }
     }

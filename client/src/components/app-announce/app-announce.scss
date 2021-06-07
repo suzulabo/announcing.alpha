@@ -1,4 +1,7 @@
 app-announce {
+  display: flex;
+  flex-direction: column;
+
   a.back,
   a.detail {
     padding: 15px;
@@ -14,5 +17,12 @@ app-announce {
   a.detail {
     right: 0;
     border-top-left-radius: 10px;
+  }
+
+  ap-spinner,
+  .deleted,
+  .data-error {
+    margin: auto;
+    white-space: pre-line;
   }
 }

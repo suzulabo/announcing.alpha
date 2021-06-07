@@ -49,14 +49,9 @@ export class AppHome {
               <span class="data-error">
                 {a.state == 'DATA_ERROR' ? msgs.home.dataError : msgs.home.notFound}
               </span>
-              <ion-button
-                size="small"
-                fill="outline"
-                data-announce-id={id}
-                onClick={this.handleUnfollowClick}
-              >
+              <button class="anchor" data-announce-id={id} onClick={this.handleUnfollowClick}>
                 {msgs.home.unfollowBtn}
-              </ion-button>
+              </button>
             </div>
           );
         case 'SUCCESS': {
@@ -80,7 +75,7 @@ export class AppHome {
           );
         }
         default:
-          return <ion-spinner name="dots" />;
+          return <ap-spinner />;
       }
     };
 

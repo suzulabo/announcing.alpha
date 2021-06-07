@@ -1,5 +1,6 @@
 import { Component, Fragment, h, Host, Prop, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
+import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 
 @Component({
   tag: 'app-announce',
@@ -16,8 +17,30 @@ export class AppAnnounce {
     this.loadData();
   }
 
+  private naviLinks!: ApNaviLinks;
+  private naviLinksLoading!: ApNaviLinks;
+
   private loadData() {
     this.app.loadAnnounce(this.announceID);
+
+    this.naviLinks = [
+      {
+        label: this.app.msgs.common.back,
+        href: '/',
+        back: true,
+      },
+      {
+        label: this.app.msgs.announce.detail,
+        href: `/${this.announceID}/config`,
+      },
+    ];
+    this.naviLinksLoading = [
+      {
+        label: this.app.msgs.common.back,
+        href: '/',
+        back: true,
+      },
+    ];
   }
 
   componentWillRender() {
@@ -63,12 +86,6 @@ export class AppAnnounce {
 
           return (
             <Fragment>
-              <a class="back" {...this.app.href('/', true)}>
-                {msgs.common.back}
-              </a>
-              <a class="detail" {...this.app.href(`/${this.announceID}/config`)}>
-                {msgs.announce.detail}
-              </a>
               <ap-announce
                 announce={{
                   ...announce.value,
@@ -93,6 +110,11 @@ export class AppAnnounce {
       }
     };
 
-    return <Host>{renderContent()}</Host>;
+    return (
+      <Host>
+        <ap-navi links={announce?.state == 'SUCCESS' ? this.naviLinks : this.naviLinksLoading} />
+        {renderContent()}
+      </Host>
+    );
   }
 }

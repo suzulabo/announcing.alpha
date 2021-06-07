@@ -43,7 +43,7 @@ export const msgs: Msgs = {
     pageTitle: (announceName: string) => {
       return `${announceName} - ${titleSuffix}`;
     },
-    deleted: 'このアナウンスは削除されました',
+    deleted: 'アナウンスのデータが見つかりませんでした',
     dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     noPosts: 'お知らせはまだありません',
     detail: '詳細をみる',
