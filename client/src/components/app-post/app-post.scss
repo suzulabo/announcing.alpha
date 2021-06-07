@@ -1,4 +1,7 @@
 app-post {
+  display: flex;
+  flex-direction: column;
+
   ap-post {
     margin-top: 20px;
     min-height: 300px;
@@ -23,6 +26,6 @@ app-post {
   }
 
   ap-spinner {
-    align-self: center;
+    margin: auto;
   }
 }

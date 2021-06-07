@@ -1,6 +1,7 @@
-import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
 import { DataResult, DATA_ERROR, PostJSON } from 'src/shared';
+import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 
 @Component({
   tag: 'app-post',
@@ -29,8 +30,18 @@ export class AppPost {
     PostJSON & { imgLoader?: () => Promise<string>; imgHrefAttrs?: Record<string, any> }
   >;
 
+  private naviLinks!: ApNaviLinks;
+
   private loadAnnounce() {
     this.app.loadAnnounce(this.announceID);
+
+    this.naviLinks = [
+      {
+        label: this.app.msgs.common.back,
+        href: `/${this.announceID}`,
+        back: true,
+      },
+    ];
   }
 
   private loadPost() {
@@ -61,11 +72,6 @@ export class AppPost {
       });
   }
 
-  componentWillLoad() {
-    this.loadAnnounce();
-    this.loadPost();
-  }
-
   private shareClick = async () => {
     try {
       await this.app.share(`${this.app.clientSite}/${this.announceID}/${this.postID}`);
@@ -74,43 +80,74 @@ export class AppPost {
     }
   };
 
+  componentWillLoad() {
+    this.loadAnnounce();
+    this.loadPost();
+  }
+
   render() {
-    const a = this.app.getAnnounceState(this.announceID);
+    console.log('render');
+    const renderContent = () => {
+      const a = this.app.getAnnounceState(this.announceID);
 
-    if (!a || !this.post) {
-      return <ap-spinner />;
-    }
+      if (!a) {
+        console.log('return1');
+        return <ap-spinner />;
+      }
 
-    if (a.state != 'SUCCESS' || this.post.state != 'SUCCESS') {
-      this.app.pushRoute(`/${this.announceID}`, true);
-      return;
-    }
+      if (a.state != 'SUCCESS') {
+        this.app.pushRoute(`/${this.announceID}`, true);
+        return;
+      }
 
-    this.app.setTitle(
-      this.app.msgs.post.pageTitle(
-        a.value.name,
-        this.post.value.title || this.post.value.body?.substr(0, 20) || '',
-      ),
-    );
+      const announce = a.value;
+      const enableNotification = this.app.getNotification(this.announceID) != null;
+      const isFollow = this.app.getFollow(this.announceID) != null;
 
-    const announce = a.value;
-    const enableNotification = this.app.getNotification(this.announceID) != null;
-    const isFollow = this.app.getFollow(this.announceID) != null;
-
-    return (
-      <Host>
+      const apAnnounce = (
         <ap-announce
           announce={{ ...announce, isFollow, enableNotification, href: `/${this.announceID}` }}
         />
-        <ap-post post={this.post.value} msgs={{ datetime: this.app.msgs.common.datetime }} />
-        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
-          {this.app.msgs.common.back}
-        </a>
-        {this.app.checkShareSupport() && (
-          <button class="anchor share" onClick={this.shareClick}>
-            {this.app.msgs.post.share}
-          </button>
-        )}
+      );
+
+      if (!this.post) {
+        return (
+          <Fragment>
+            {apAnnounce}
+            <ap-spinner />
+          </Fragment>
+        );
+      }
+
+      if (this.post.state != 'SUCCESS') {
+        this.app.pushRoute(`/${this.announceID}`, true);
+        return;
+      }
+
+      this.app.setTitle(
+        this.app.msgs.post.pageTitle(
+          a.value.name,
+          this.post.value.title || this.post.value.body?.substr(0, 20) || '',
+        ),
+      );
+
+      return (
+        <Fragment>
+          {apAnnounce}
+          <ap-post post={this.post.value} msgs={{ datetime: this.app.msgs.common.datetime }} />
+          {this.app.checkShareSupport() && (
+            <button class="anchor share" onClick={this.shareClick}>
+              {this.app.msgs.post.share}
+            </button>
+          )}
+        </Fragment>
+      );
+    };
+
+    return (
+      <Host>
+        <ap-navi links={this.naviLinks} />
+        {renderContent()}
       </Host>
     );
   }
