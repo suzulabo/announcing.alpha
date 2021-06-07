@@ -2,15 +2,4 @@ ap-root {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-
-  .page {
-    flex-grow: 1;
-
-    header {
-      font-size: 1.2rem;
-    }
-  }
-  .page.hide {
-    display: none;
-  }
 }

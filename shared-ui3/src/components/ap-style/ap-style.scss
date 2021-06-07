@@ -24,6 +24,8 @@ html {
 
   --selected-color: #ffffff;
   --selected-bk-color: #999999;
+
+  --page-margin-bottom: 70px; // for ap-navi
 }
 
 html,
@@ -135,6 +137,14 @@ button,
 
 span.disabled {
   opacity: 0.3;
+}
+
+.page {
+  flex-grow: 1;
+  margin-bottom: var(--page-margin-bottom);
+}
+.page.hide {
+  display: none;
 }
 
 .card {
