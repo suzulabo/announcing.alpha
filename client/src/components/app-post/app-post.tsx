@@ -141,11 +141,6 @@ export class AppPost {
         <Fragment>
           {apAnnounce}
           <ap-post post={this.post.value} msgs={{ datetime: this.app.msgs.common.datetime }} />
-          {this.app.checkShareSupport() && (
-            <button class="anchor share" onClick={this.shareClick}>
-              {this.app.msgs.post.share}
-            </button>
-          )}
         </Fragment>
       );
     };
