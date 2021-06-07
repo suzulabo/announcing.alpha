@@ -1,5 +1,6 @@
 import { Component, Fragment, h, Host, Prop, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
+import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { PromiseValue } from 'type-fest';
 
 @Component({
@@ -21,8 +22,18 @@ export class AppAnnounceConfig {
     this.loadData();
   }
 
+  private naviLinks!: ApNaviLinks;
+
   private loadData() {
     this.app.loadAnnounce(this.announceID);
+
+    this.naviLinks = [
+      {
+        label: this.app.msgs.common.back,
+        href: `/${this.announceID}`,
+        back: true,
+      },
+    ];
   }
 
   private permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
@@ -82,59 +93,67 @@ export class AppAnnounceConfig {
   }
 
   render() {
-    const a = this.app.getAnnounceState(this.announceID);
-    if (!a) {
-      return <ap-spinner />;
-    }
-    if (a.state != 'SUCCESS') {
-      this.app.redirectRoute(`/${this.announceID}`);
-      return;
-    }
-    this.app.setTitle(this.app.msgs.announceConfig.pageTitle(a.value.name));
-
-    const msgs = this.app.msgs;
-    const announce = a.value;
-    const enableNotification = this.app.getNotification(this.announceID) != null;
-    const isFollow = this.app.getFollow(this.announceID) != null;
-
-    const renderNotify = () => {
-      if (this.permission == 'unsupported') {
-        return this.renderUnsupported();
+    const renderContent = () => {
+      const a = this.app.getAnnounceState(this.announceID);
+      if (!a) {
+        return <ap-spinner />;
       }
-      if (this.permission != 'granted') {
-        return this.renderDenied();
+      if (a.state != 'SUCCESS') {
+        this.app.redirectRoute(`/${this.announceID}`);
+        return;
       }
+      this.app.setTitle(this.app.msgs.announceConfig.pageTitle(a.value.name));
+
+      const msgs = this.app.msgs;
+      const announce = a.value;
+      const enableNotification = this.app.getNotification(this.announceID) != null;
+      const isFollow = this.app.getFollow(this.announceID) != null;
+
+      const renderNotify = () => {
+        if (this.permission == 'unsupported') {
+          return this.renderUnsupported();
+        }
+        if (this.permission != 'granted') {
+          return this.renderDenied();
+        }
+
+        return (
+          <Fragment>
+            {!enableNotification && (
+              <button class="submit" onClick={this.handleEnableNotifyClick}>
+                {msgs.announceConfig.enableNotifyBtn}
+              </button>
+            )}
+            {enableNotification && (
+              <button class="submit" onClick={this.handleDisableNotifyClick}>
+                {msgs.announceConfig.disableNotifyBtn}
+              </button>
+            )}
+          </Fragment>
+        );
+      };
 
       return (
         <Fragment>
-          {!enableNotification && (
-            <button class="submit" onClick={this.handleEnableNotifyClick}>
-              {msgs.announceConfig.enableNotifyBtn}
-            </button>
-          )}
-          {enableNotification && (
-            <button class="submit" onClick={this.handleDisableNotifyClick}>
-              {msgs.announceConfig.disableNotifyBtn}
-            </button>
-          )}
+          <ap-announce
+            announce={{ ...announce, isFollow, enableNotification, showDetails: true }}
+          />
+          <div class="follow">
+            {isFollow ? (
+              <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
+            ) : (
+              <button onClick={this.handleFollowClick}>{msgs.announceConfig.followBtn}</button>
+            )}
+          </div>
+          <div class="notify">{renderNotify()}</div>
         </Fragment>
       );
     };
 
     return (
       <Host>
-        <ap-announce announce={{ ...announce, isFollow, enableNotification, showDetails: true }} />
-        <div class="follow">
-          {isFollow ? (
-            <button onClick={this.handleUnfollowClick}>{msgs.announceConfig.unfollowBtn}</button>
-          ) : (
-            <button onClick={this.handleFollowClick}>{msgs.announceConfig.followBtn}</button>
-          )}
-        </div>
-        <div class="notify">{renderNotify()}</div>
-        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
-          {msgs.common.back}
-        </a>
+        <ap-navi links={this.naviLinks} />
+        {renderContent()}
       </Host>
     );
   }
