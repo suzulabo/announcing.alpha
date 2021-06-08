@@ -112,8 +112,8 @@ export class AppAnnounce {
 
     return (
       <Host>
-        <ap-navi links={announce?.state == 'SUCCESS' ? this.naviLinks : this.naviLinksLoading} />
         {renderContent()}
+        <ap-navi links={announce?.state == 'SUCCESS' ? this.naviLinks : this.naviLinksLoading} />
       </Host>
     );
   }

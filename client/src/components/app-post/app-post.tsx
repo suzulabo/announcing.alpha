@@ -149,8 +149,8 @@ export class AppPost {
 
     return (
       <Host>
-        <ap-navi links={loaded ? this.naviLinks : this.naviLinksLoading} />
         {renderContent()}
+        <ap-navi links={loaded ? this.naviLinks : this.naviLinksLoading} />
       </Host>
     );
   }

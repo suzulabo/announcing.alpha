@@ -76,9 +76,9 @@ export class AppImage {
     };
 
     return (
-      <Host>
-        <ap-navi links={this.naviLinks} />
+      <Host class="full">
         {renderContent()}
+        <ap-navi links={this.naviLinks} />
       </Host>
     );
   }

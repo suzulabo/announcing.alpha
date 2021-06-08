@@ -152,8 +152,8 @@ export class AppAnnounceConfig {
 
     return (
       <Host>
-        <ap-navi links={this.naviLinks} />
         {renderContent()}
+        <ap-navi links={this.naviLinks} />
       </Host>
     );
   }
