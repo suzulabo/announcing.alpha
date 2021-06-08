@@ -4,10 +4,7 @@ import { href } from '../utils/route';
 
 export type PostLaoderResult = DataResult<PostJSON> & { href?: string };
 
-type PostsMapValue =
-  | (PostLaoderResult & { hrefAttrs?: Record<string, any> })
-  | 'LOADING'
-  | undefined;
+type PostsMapValue = PostLaoderResult | 'LOADING' | undefined;
 
 @Component({
   tag: 'ap-posts',
@@ -84,7 +81,7 @@ export class ApPosts {
 
       this.postLoader(postID)
         .then(result => {
-          map.set(postID, { ...result, hrefAttrs: result.href ? href(result.href) : undefined });
+          map.set(postID, result);
           this.postsMap = { map };
         })
         .catch(err => {
@@ -111,10 +108,7 @@ export class ApPosts {
     }
   };
 
-  private renderPost(
-    postID: string,
-    postResult: PostsMapValue,
-  ): { hrefAttrs?: Record<string, any>; el: any } {
+  private renderPost(postID: string, postResult: PostsMapValue): { href?: string; el: any } {
     if (!postResult || !this.visibleMap.get(postID)) {
       return { el: <Fragment></Fragment> };
     }
@@ -131,7 +125,7 @@ export class ApPosts {
 
     const post = postResult.value;
     return {
-      hrefAttrs: postResult.hrefAttrs,
+      href: postResult.href,
       el: (
         <Fragment>
           <span class="date">{this.msgs.datetime(post.pT)}</span>
@@ -148,7 +142,7 @@ export class ApPosts {
         {[...this.postsMap.map.entries()].map(([id, result]) => {
           const r = this.renderPost(id, result);
           return (
-            <a key={id} data-postid={id} ref={this.handleRef} class="card post" {...r.hrefAttrs}>
+            <a key={id} data-postid={id} ref={this.handleRef} class="card post" {...href(r.href)}>
               {r.el}
             </a>
           );

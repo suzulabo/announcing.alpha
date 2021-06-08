@@ -1,4 +1,5 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import { href } from '../utils/route';
 
 const tweetIDPattern = new RegExp('^https://twitter\\.com/.+/status/([0-9]+)$');
 
@@ -6,15 +7,15 @@ const tweetIDPattern = new RegExp('^https://twitter\\.com/.+/status/([0-9]+)$');
   tag: 'ap-post',
   styleUrl: 'ap-post.scss',
 })
-export class ApTextView {
+export class ApPost {
   @Prop()
   post!: {
     title?: string;
     body?: string;
     link?: string;
-    imgLoader?: () => Promise<string>;
-    imgHrefAttrs?: Record<string, any>;
     pT: number;
+    imgLoader?: () => Promise<string>;
+    imgHref?: string;
   };
 
   @Prop()
@@ -53,7 +54,7 @@ export class ApTextView {
     }
 
     return (
-      <a {...this.post.imgHrefAttrs}>
+      <a {...href(this.post.imgHref)}>
         <img src={this.imageSrc} />
       </a>
     );

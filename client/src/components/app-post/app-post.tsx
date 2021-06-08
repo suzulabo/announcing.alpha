@@ -2,7 +2,7 @@ import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core'
 import { App } from 'src/app/app';
 import { DataResult, DATA_ERROR, PostJSON } from 'src/shared';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
-import { href, pushRoute } from 'src/shared-ui/utils/route';
+import { pushRoute } from 'src/shared-ui/utils/route';
 
 @Component({
   tag: 'app-post',
@@ -27,9 +27,7 @@ export class AppPost {
   }
 
   @State()
-  post?: DataResult<
-    PostJSON & { imgLoader?: () => Promise<string>; imgHrefAttrs?: Record<string, any> }
-  >;
+  post?: DataResult<PostJSON & { imgLoader?: () => Promise<string>; imgHref?: string }>;
 
   private naviLinks!: ApNaviLinks;
   private naviLinksLoading!: ApNaviLinks;
@@ -69,7 +67,7 @@ export class AppPost {
               }
               return v.value;
             };
-            this.post.value.imgHrefAttrs = href(`/${this.announceID}/${this.postID}/image/${img}`);
+            this.post.value.imgHref = `/${this.announceID}/${this.postID}/image/${img}`;
           }
         }
       })

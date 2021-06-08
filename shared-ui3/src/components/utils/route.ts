@@ -22,15 +22,32 @@ export const pushRoute = (path: string, back?: boolean) => {
   }
 };
 
-export const href = (p: string, back?: boolean) => {
-  return {
-    href: p,
-    onClick: (ev: MouseEvent) => {
-      // https://github.com/ionic-team/stencil-router-v2/blob/master/src/router.ts
-      if (!ev.metaKey && !ev.ctrlKey && ev.which != 2 && ev.button != 1) {
-        ev.preventDefault();
-        pushRoute(p, back);
-      }
-    },
-  };
+const hrefCache = new Map<string, { href: string; onClick: (ev: MouseEvent) => void }>();
+
+export const href = (p?: string, back?: boolean) => {
+  if (!p) {
+    return;
+  }
+
+  const k = `${p}\0${back ? 'back' : ''}`;
+
+  {
+    const v = hrefCache.get(k);
+    if (v) return v;
+  }
+  {
+    const v = {
+      href: p,
+      onClick: (ev: MouseEvent) => {
+        // https://github.com/ionic-team/stencil-router-v2/blob/master/src/router.ts
+        if (!ev.metaKey && !ev.ctrlKey && ev.which != 2 && ev.button != 1) {
+          ev.preventDefault();
+          pushRoute(p, back);
+        }
+      },
+    };
+
+    hrefCache.set(k, v);
+    return v;
+  }
 };

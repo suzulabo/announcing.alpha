@@ -1,8 +1,5 @@
 import { Component, Fragment, h, Host, Prop } from '@stencil/core';
-import { DataResult, PostJSON } from 'src/shared';
 import { href } from '../utils/route';
-
-export type PostLaoderResult = DataResult<PostJSON> & { hrefAttrs?: Record<string, any> };
 
 @Component({
   tag: 'ap-announce',
