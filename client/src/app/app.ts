@@ -71,15 +71,13 @@ export class App {
   }
 
   async processLoading(f: () => Promise<void>) {
-    await f();
-    /* TODO
-    const loading = await loadingController.create({ spinner: 'dots' });
+    const loading = document.querySelector('ap-loading');
+    loading?.classList.add('show');
     try {
-      await Promise.all([loading.present(), f()]);
+      await f();
     } finally {
-      await loading.dismiss();
+      loading?.classList.remove('show');
     }
-    */
   }
 
   get msgs() {
