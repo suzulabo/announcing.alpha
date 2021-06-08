@@ -2,6 +2,7 @@ import { Component, Fragment, h, Host, Prop } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState, Follow } from 'src/app/datatypes';
 import { DataResult } from 'src/shared';
+import { href } from 'src/shared-ui/utils/route';
 
 @Component({
   tag: 'app-home',
@@ -84,7 +85,7 @@ export class AppHome {
         {follows?.map(([id, follow]) => {
           const a = this.app.getAnnounceState(id);
           return (
-            <a class="card" {...{ ...(a?.state == 'SUCCESS' && this.app.href(`/${id}`)) }}>
+            <a class="card" {...{ ...(a?.state == 'SUCCESS' && href(`/${id}`)) }}>
               {renderContent(id, follow, a)}
             </a>
           );

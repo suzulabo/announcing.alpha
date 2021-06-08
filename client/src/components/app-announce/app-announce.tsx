@@ -56,7 +56,6 @@ export class AppAnnounce {
     return {
       ...postResult,
       href: `/${this.announceID}/${postID}`,
-      hrefAttrs: this.app.href(`/${this.announceID}/${postID}`),
     };
   };
 

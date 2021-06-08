@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
+import { redirectRoute } from 'src/shared-ui/utils/route';
 import { PromiseValue } from 'type-fest';
 
 @Component({
@@ -99,7 +100,7 @@ export class AppAnnounceConfig {
         return <ap-spinner />;
       }
       if (a.state != 'SUCCESS') {
-        this.app.redirectRoute(`/${this.announceID}`);
+        redirectRoute(`/${this.announceID}`);
         return;
       }
       this.app.setTitle(this.app.msgs.announceConfig.pageTitle(a.value.name));

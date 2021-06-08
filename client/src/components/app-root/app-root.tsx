@@ -8,6 +8,7 @@ import { AppState } from 'src/app/state';
 import { AppStorage } from 'src/app/storage';
 import { AppEnv } from 'src/shared';
 import { RouteMatch } from 'src/shared-ui/ap-root/ap-root';
+import { pushRoute } from 'src/shared-ui/utils/route';
 
 const matches: RouteMatch[] = [
   {
@@ -70,7 +71,7 @@ export class AppRoot {
     console.debug('PostNotificationRecieved', event.detail.announceID, event.detail.postID);
     const p = `/${event.detail.announceID}/${event.detail.postID}`;
     if (this.app) {
-      this.app.pushRoute(p);
+      pushRoute(p);
     } else {
       location.href = p;
     }

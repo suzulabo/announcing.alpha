@@ -4,7 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Build, readTask } from '@stencil/core';
 import { AnnounceMetaJSON, AppEnv, DataResult, DATA_ERROR, NOT_FOUND, PostJSON } from 'src/shared';
-import { pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
+import { pushRoute } from 'src/shared-ui/utils/route';
 import nacl from 'tweetnacl';
 import { AnnounceState, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
@@ -58,7 +58,7 @@ export class App {
     await CapApp.addListener('appUrlOpen', data => {
       console.log('App opened with URL:', data);
       const url = new URL(data.url);
-      void this.pushRoute(url.pathname);
+      pushRoute(url.pathname);
     });
   }
 
@@ -68,26 +68,6 @@ export class App {
     readTask(() => {
       document.title = this._title;
     });
-  }
-
-  href(p: string, back?: boolean) {
-    return {
-      href: p,
-      onClick: (ev: MouseEvent) => {
-        // https://github.com/ionic-team/stencil-router-v2/blob/master/src/router.ts
-        if (!ev.metaKey && !ev.ctrlKey && ev.which != 2 && ev.button != 1) {
-          ev.preventDefault();
-          this.pushRoute(p, back);
-        }
-      },
-    };
-  }
-  redirectRoute(path: string) {
-    redirectRoute(path);
-  }
-
-  pushRoute(path: string, back?: boolean) {
-    pushRoute(path, back);
   }
 
   async processLoading(f: () => Promise<void>) {
