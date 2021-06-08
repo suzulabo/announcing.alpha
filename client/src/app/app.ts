@@ -43,6 +43,10 @@ export class App {
   }
 
   async init() {
+    const apError = document.querySelector('ap-error');
+    if (apError) {
+      apError.msgs = this.appMsg.msgs.error;
+    }
     await Promise.all([this.appFirebase.init(), this.appIdbCache.init(), this.appStorage.init()]);
 
     // Check permission of notification
