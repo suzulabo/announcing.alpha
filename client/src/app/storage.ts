@@ -84,7 +84,7 @@ const objectMultiState = <T>(prefix: string) => {
     },
     set: async (key: string, value: T) => {
       await om.set(key, value);
-      store.set(key, value);
+      store.set(key, { ...value });
     },
     remove: async (key: string) => {
       await om.remove(key);
