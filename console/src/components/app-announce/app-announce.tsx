@@ -48,6 +48,7 @@ export class AppAnnounce {
     });
   }
 
+  /*
   private postLoader = async (postID: string) => {
     const post = await this.app.getPost(this.announceID, postID);
     if (!post) {
@@ -56,9 +57,10 @@ export class AppAnnounce {
     return {
       ...post,
       pT: post.pT.toMillis(),
-      anchorAttrs: this.app.href(`/${this.announceID}/${postID}`),
+      href: `/${this.announceID}/${postID}`,
     };
   };
+  */
 
   private get clientURL() {
     return `${this.app.clientSite}/${this.announceID}`;
@@ -124,15 +126,7 @@ export class AppAnnounce {
 
     return (
       <Host>
-        <ap-announce
-          announce={announce}
-          postLoader={this.postLoader}
-          msgs={{
-            datetime: msgs.common.datetime,
-            noPosts: msgs.announce.noPosts,
-            postDataError: msgs.announce.dataError,
-          }}
-        >
+        <ap-announce announce={announce}>
           <div class="buttons" slot="bottomAnnounce">
             <a class="button small" {...this.app.href(`${this.announceID}/edit_`)}>
               {msgs.announce.edit}

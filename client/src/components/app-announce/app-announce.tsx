@@ -89,8 +89,10 @@ export class AppAnnounce {
                 announce={{
                   ...announce.value,
                   href: `/${this.announceID}/config`,
-                  isFollow: follow != null,
-                  enableNotification,
+                  icons: {
+                    isFollow: follow != null,
+                    enableNotification,
+                  },
                 }}
               ></ap-announce>
               <ap-posts

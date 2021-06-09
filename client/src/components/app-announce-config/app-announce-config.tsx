@@ -137,7 +137,7 @@ export class AppAnnounceConfig {
       return (
         <Fragment>
           <ap-announce
-            announce={{ ...announce, isFollow, enableNotification, showDetails: true }}
+            announce={{ ...announce, icons: { isFollow, enableNotification }, showDetails: true }}
           />
           <div class="follow">
             {isFollow ? (

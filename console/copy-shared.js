@@ -1,25 +1,13 @@
-const fs = require('fs-extra');
+const path = require('path');
+const syncDirectory = require('sync-directory');
 
-const copy = (src, dest) => {
-  fs.copySync(src, dest, { preserveTimestamps: true });
+const watch = process.argv.includes('-w');
+
+const syncDir = (src, dst) => {
+  syncDirectory(path.resolve(src), path.resolve(dst), {
+    watch,
+  });
 };
 
-copy('../shared/src', 'src/shared');
-
-const components = [
-  'style',
-  'error',
-  'icon',
-  'input',
-  'image-input',
-  'checkbox',
-  'image',
-  'textview',
-  'loading',
-  'modal',
-  'announce',
-  'post',
-];
-for (const v of components) {
-  copy(`../shared-ui/src/ap-${v}`, `src/shared-ui/ap-${v}`);
-}
+syncDir('../shared/src', 'src/shared');
+syncDir('../shared-ui3/src/components', 'src/shared-ui');

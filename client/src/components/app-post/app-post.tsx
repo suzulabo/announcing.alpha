@@ -109,7 +109,11 @@ export class AppPost {
 
       const apAnnounce = (
         <ap-announce
-          announce={{ ...announce, isFollow, enableNotification, href: `/${this.announceID}` }}
+          announce={{
+            ...announce,
+            icons: { isFollow, enableNotification },
+            href: `/${this.announceID}`,
+          }}
         />
       );
 

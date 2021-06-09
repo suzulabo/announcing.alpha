@@ -21,8 +21,10 @@ export class ApAnnounce {
       }
     >;
     href?: string;
-    isFollow: boolean;
-    enableNotification: boolean;
+    icons?: {
+      isFollow: boolean;
+      enableNotification: boolean;
+    };
     showDetails?: boolean;
   };
 
@@ -39,8 +41,8 @@ export class ApAnnounce {
         <Tag class="head" {...(announce.href && href(announce.href))}>
           <div class="name">
             <div class="icons">
-              {announce.isFollow && <ap-icon icon="heart" />}
-              {announce.enableNotification && <ap-icon icon="bell" />}
+              {announce.icons && announce.icons.isFollow && <ap-icon icon="heart" />}
+              {announce.icons && announce.icons.enableNotification && <ap-icon icon="bell" />}
             </div>
             <span>{announce.name}</span>
           </div>
