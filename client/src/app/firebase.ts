@@ -2,10 +2,19 @@ import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Build } from '@stencil/core';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
-import 'firebase/functions';
-import 'firebase/messaging';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import {
+  doc,
+  DocumentReference,
+  enableMultiTabIndexedDbPersistence,
+  FirebaseFirestore,
+  getDocFromCache,
+  getFirestore,
+  onSnapshot,
+  useFirestoreEmulator,
+} from 'firebase/firestore';
+import { Functions, getFunctions, httpsCallable, useFunctionsEmulator } from 'firebase/functions';
+import { FirebaseMessaging, getMessaging, getToken } from 'firebase/messaging';
 import {
   Announce,
   AppEnv,
@@ -123,12 +132,10 @@ class CapNotification {
   }
 }
 
-const getCache = async <T>(
-  docRef: firebase.firestore.DocumentReference,
-): Promise<DataResult<T> | undefined> => {
+const getCache = async <T>(docRef: DocumentReference): Promise<DataResult<T> | undefined> => {
   try {
-    const doc = await docRef.get({ source: 'cache' });
-    if (doc.exists) {
+    const doc = await getDocFromCache(docRef);
+    if (doc.exists()) {
       return { state: 'SUCCESS', value: doc.data() as T };
     }
   } catch (err) {
@@ -141,18 +148,19 @@ const getCache = async <T>(
 };
 
 export class AppFirebase {
-  private functions: firebase.functions.Functions;
-  private firestore: firebase.firestore.Firestore;
+  private functions: Functions;
+  private firestore: FirebaseFirestore;
 
-  private messaging?: firebase.messaging.Messaging;
+  private messaging?: FirebaseMessaging;
   private capNotification?: CapNotification;
 
-  constructor(private appEnv: AppEnv, _firebaseApp?: firebase.app.App) {
+  constructor(private appEnv: AppEnv, _firebaseApp?: FirebaseApp) {
     if (!_firebaseApp) {
-      _firebaseApp = firebase.initializeApp(this.appEnv.env.firebaseConfig);
+      _firebaseApp = initializeApp(this.appEnv.env.firebaseConfig);
     }
-    this.functions = _firebaseApp.functions(this.appEnv.env.functionsRegion);
-    this.firestore = _firebaseApp.firestore();
+
+    this.functions = getFunctions(_firebaseApp, this.appEnv.env.functionsRegion);
+    this.firestore = getFirestore(_firebaseApp);
 
     if (Capacitor.getPlatform() != 'web') {
       this.capNotification = new CapNotification();
@@ -160,7 +168,7 @@ export class AppFirebase {
 
     if (!this.capNotification) {
       try {
-        this.messaging = _firebaseApp.messaging();
+        this.messaging = getMessaging(_firebaseApp);
       } catch (err) {
         console.warn('create messaging', err);
       }
@@ -173,22 +181,26 @@ export class AppFirebase {
       return;
     }
     console.log('useEmulator');
-    this.functions.useEmulator(location.hostname, parseInt(location.port));
-    this.firestore.settings({ ssl: location.protocol == 'https:', host: `${location.host}` });
+
+    useFunctionsEmulator(this.functions, location.hostname, parseInt(location.port));
+    useFirestoreEmulator(this.firestore, location.hostname, parseInt(location.port));
   }
 
   async init() {
     try {
-      await this.firestore.enablePersistence({ synchronizeTabs: true });
+      await enableMultiTabIndexedDbPersistence(this.firestore);
     } catch (err) {
       console.warn('enablePersistence', err);
     }
   }
 
-  private async callFunc<T>(name: string, params: any): Promise<T> {
-    const f = this.functions.httpsCallable(name);
+  private async callFunc<RequestData = unknown, ResponseData = unknown>(
+    name: string,
+    params: RequestData,
+  ): Promise<ResponseData> {
+    const f = httpsCallable<RequestData, ResponseData>(this.functions, name);
     const res = await f(params);
-    return res.data as T;
+    return res.data;
   }
 
   private listeners = (() => {
@@ -203,8 +215,8 @@ export class AppFirebase {
         return;
       }
 
-      const unsubscribe = this.firestore.doc(p).onSnapshot(
-        ds => {
+      const unsubscribe = onSnapshot(doc(this.firestore, p), {
+        next: ds => {
           if (!ds.exists) {
             notFounds.add(p);
             unsubscribe();
@@ -214,12 +226,12 @@ export class AppFirebase {
             cb();
           }
         },
-        err => {
+        error: err => {
           console.error('onSnapshot error', p, err);
           unsubscribe();
           listenMap.delete(p);
         },
-      );
+      });
       listenMap.set(p, unsubscribe);
     };
 
@@ -246,7 +258,7 @@ export class AppFirebase {
     if (this.listeners.notFounds.has(p)) {
       return Promise.resolve(NOT_FOUND);
     }
-    const docRef = this.firestore.doc(p);
+    const docRef = doc(this.firestore, p);
     return getCache<Announce>(docRef);
   }
 
@@ -255,10 +267,14 @@ export class AppFirebase {
       return this.capNotification.messageToken();
     }
 
-    const serviceWorkerRegistration = await navigator.serviceWorker.getRegistration();
-    const token = await this.messaging?.getToken({
+    if (!this.messaging) {
+      return;
+    }
+
+    const swReg = await navigator.serviceWorker.getRegistration();
+    const token = await getToken(this.messaging, {
       vapidKey: this.appEnv.env.vapidKey,
-      serviceWorkerRegistration,
+      swReg,
     });
     return token;
   }
@@ -321,6 +337,6 @@ export class AppFirebase {
       announces,
     };
 
-    await this.callFunc<void>('registerNotification', params);
+    await this.callFunc<RegisterNotificationParams, void>('registerNotification', params);
   }
 }
