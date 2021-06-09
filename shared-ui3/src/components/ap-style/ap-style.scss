@@ -10,7 +10,6 @@ html {
 
   --border-color: #333333;
   --light-border-color: #cccccc;
-  --post-border-color: #aaaaaa;
 
   --bk-color: white;
   --light-bk-color: #eeeeee;
@@ -24,6 +23,9 @@ html {
 
   --selected-color: #ffffff;
   --selected-bk-color: #999999;
+
+  --card-border-color: rgb(0 0 0 / 40%);
+  --card-shadow: 1px 1px 1px rgb(0 0 0 / 10%);
 
   --page-margin-bottom: 70px; // for ap-navi
   --page-max-width: 600px;
@@ -141,9 +143,9 @@ span.disabled {
 }
 
 .card {
-  border: 1px solid var(--light-border-color);
   border-radius: 5px;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--card-border-color);
+  box-shadow: var(--card-shadow);
 }
 a.card {
   display: block;
