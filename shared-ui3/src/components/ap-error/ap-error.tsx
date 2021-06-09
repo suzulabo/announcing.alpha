@@ -60,8 +60,6 @@ export class ApError {
   };
 
   render() {
-    console.log('ap-error render');
-
     return (
       <Host>
         {this.show && (
