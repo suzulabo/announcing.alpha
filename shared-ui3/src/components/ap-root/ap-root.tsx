@@ -37,6 +37,7 @@ export class ApRoot {
       const r = this.redirect(p);
       if (r) {
         redirectRoute(r);
+        return;
       }
     }
 
@@ -50,7 +51,10 @@ export class ApRoot {
   private tags = new Map<string, Record<string, any>>();
 
   render() {
-    const p = location.pathname;
+    const p = this.path;
+    if (!p) {
+      return;
+    }
     const m = pathMatcher(this.routeMatches, p);
     if (!m || !m.match.tag) {
       console.warn('missing page', m);
