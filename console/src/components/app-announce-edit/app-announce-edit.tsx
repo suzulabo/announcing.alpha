@@ -2,6 +2,7 @@ import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 import { AnnounceMetaRule } from 'src/shared';
+import { href, pushRoute } from 'src/shared-ui/utils/route';
 import { isURL } from 'src/utils/isurl';
 
 @Component({
@@ -57,7 +58,7 @@ export class AppAnnounceEdit {
         this.values.icon,
         this.values.icon ? undefined : this.values.iconData?.split(',')[1],
       );
-      this.app.pushRoute(`/${this.announceID}`);
+      pushRoute(`/${this.announceID}`);
     } finally {
       this.app.loading = false;
     }
@@ -80,7 +81,7 @@ export class AppAnnounceEdit {
     this.app.loading = true;
     try {
       await this.app.deleteAnnounce(this.announceID);
-      this.app.pushRoute('/');
+      pushRoute('/');
     } finally {
       this.app.loading = false;
     }
@@ -91,7 +92,7 @@ export class AppAnnounceEdit {
       await this.app.loadAnnounce(this.announceID);
       const as = this.app.getAnnounceState(this.announceID);
       if (!as) {
-        this.app.pushRoute('/');
+        pushRoute('/', true);
         return;
       }
 
@@ -153,7 +154,7 @@ export class AppAnnounceEdit {
         <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
           {this.app.msgs.announceEdit.form.btn}
         </button>
-        <a {...this.app.href(`/${this.announceID}`, true)}>{this.app.msgs.common.back}</a>
+        <a {...href(`/${this.announceID}`, true)}>{this.app.msgs.common.back}</a>
         <button class="clear deletion-toggle" onClick={this.handleDeletionToggleClick}>
           {this.app.msgs.announceEdit.deletion.guide}
         </button>

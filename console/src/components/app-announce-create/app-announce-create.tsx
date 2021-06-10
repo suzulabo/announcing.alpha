@@ -1,6 +1,7 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceMetaRule } from 'src/shared';
+import { href, pushRoute } from 'src/shared-ui/utils/route';
 
 @Component({
   tag: 'app-announce-create',
@@ -29,7 +30,7 @@ export class AppAnnounceCreate {
   private handleSubmitClick = async () => {
     await this.app.processLoading(async () => {
       await this.app.createAnnounce(this.values.name, this.values.desc);
-      this.app.pushRoute('/');
+      pushRoute('/', true);
     });
   };
 
@@ -52,7 +53,7 @@ export class AppAnnounceCreate {
         <button disabled={!this.values.name} onClick={this.handleSubmitClick}>
           {this.app.msgs.announceCreate.form.btn}
         </button>
-        <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
+        <a {...href('/', true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }

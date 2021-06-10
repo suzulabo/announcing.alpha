@@ -2,6 +2,7 @@ import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 import { Post, PostRule } from 'src/shared';
+import { href, pushRoute } from 'src/shared-ui/utils/route';
 import { isURL } from 'src/utils/isurl';
 
 @Component({
@@ -33,7 +34,7 @@ export class AppPostForm {
       await this.app.loadAnnounce(this.announceID);
       const as = this.app.getAnnounceState(this.announceID);
       if (!as) {
-        this.app.pushRoute(this.backPath, true);
+        pushRoute(this.backPath, true);
         return;
       }
 
@@ -45,13 +46,13 @@ export class AppPostForm {
       }
 
       if (!(this.postID in as.posts)) {
-        this.app.pushRoute(this.backPath, true);
+        pushRoute(this.backPath, true);
         return;
       }
 
       const post = await this.app.getPost(this.announceID, this.postID);
       if (!post) {
-        this.app.pushRoute(this.backPath, true);
+        pushRoute(this.backPath, true);
         return;
       }
       this.post = post;
@@ -95,7 +96,7 @@ export class AppPostForm {
         this.values.imgData?.split(',')[1],
         this.postID,
       );
-      this.app.pushRoute(`/${this.announceID}`);
+      pushRoute(`/${this.announceID}`);
     } finally {
       this.app.loading = false;
     }
@@ -148,7 +149,7 @@ export class AppPostForm {
         <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
           {this.app.msgs.postForm.btn}
         </button>
-        <a {...this.app.href(this.backPath, true)}>{this.app.msgs.common.back}</a>
+        <a {...href(this.backPath, true)}>{this.app.msgs.common.back}</a>
       </Host>
     );
   }

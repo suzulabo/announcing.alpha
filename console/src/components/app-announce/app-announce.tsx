@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import QRCodeStyling from 'qr-code-styling';
 import { App } from 'src/app/app';
+import { href, pushRoute } from 'src/shared-ui/utils/route';
 
 @Component({
   tag: 'app-announce',
@@ -27,7 +28,7 @@ export class AppAnnounce {
 
       const as = this.app.getAnnounceState(this.announceID);
       if (!as) {
-        this.app.pushRoute('/');
+        pushRoute('/', true);
         return;
       }
 
@@ -128,22 +129,18 @@ export class AppAnnounce {
       <Host>
         <ap-announce announce={announce}>
           <div class="buttons" slot="bottomAnnounce">
-            <a class="button small" {...this.app.href(`${this.announceID}/edit_`)}>
+            <a class="button small" {...href(`${this.announceID}/edit`)}>
               {msgs.announce.edit}
             </a>
             <button class="small" onClick={this.urlModal.handlers.show}>
               {msgs.announce.showURL}
             </button>
           </div>
-          <a
-            slot="beforePosts"
-            class="button new-post"
-            {...this.app.href(`${this.announceID}/post_`)}
-          >
+          <a slot="beforePosts" class="button new-post" {...href(`${this.announceID}/post`)}>
             {this.app.msgs.announce.newPost}
           </a>
         </ap-announce>
-        <a {...this.app.href('/', true)}>{this.app.msgs.common.back}</a>
+        <a {...href('/', true)}>{this.app.msgs.common.back}</a>
         {this.showURL && (
           <ap-modal onClose={this.urlModal.handlers.close}>
             <div class="url-modal">

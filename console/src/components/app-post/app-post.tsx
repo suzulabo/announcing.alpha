@@ -2,6 +2,7 @@ import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceState } from 'src/app/datatypes';
 import { PostJSON } from 'src/shared';
+import { href, pushRoute } from 'src/shared-ui/utils/route';
 
 @Component({
   tag: 'app-post',
@@ -29,14 +30,14 @@ export class AppPost {
 
       const as = this.app.getAnnounceState(this.announceID);
       if (!as) {
-        this.app.pushRoute(`/${this.announceID}`, true);
+        pushRoute(`/${this.announceID}`, true);
         return;
       }
       this.announce = as;
 
       const post = await this.app.getPost(this.announceID, this.postID);
       if (!post) {
-        this.app.pushRoute(`/${this.announceID}`, true);
+        pushRoute(`/${this.announceID}`, true);
         return;
       }
       this.post = { ...post, pT: post.pT.toMillis() };
@@ -66,7 +67,7 @@ export class AppPost {
     this.app.loading = true;
     try {
       await this.app.deletePost(this.announceID, this.postID);
-      this.app.pushRoute(`/${this.announceID}`, true);
+      pushRoute(`/${this.announceID}`, true);
     } finally {
       this.app.loading = false;
     }
@@ -80,14 +81,12 @@ export class AppPost {
     return (
       <Host>
         <ap-post post={this.post} msgs={{ datetime: this.app.msgs.common.datetime }} />
-        <a class="back" {...this.app.href(`/${this.announceID}`, true)}>
+        <a class="back" {...href(`/${this.announceID}`, true)}>
           {this.app.msgs.common.back}
         </a>
         <hr />
         <div class="edit">
-          <a {...this.app.href(`/${this.announceID}/${this.postID}/edit_`)}>
-            {this.app.msgs.post.edit}
-          </a>
+          <a {...href(`/${this.announceID}/${this.postID}/edit_`)}>{this.app.msgs.post.edit}</a>
           <a href="#" onClick={this.handleDelete}>
             {this.app.msgs.post.delete}
           </a>

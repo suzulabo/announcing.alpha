@@ -36,43 +36,6 @@ export class App {
     document.title = v;
   }
 
-  href(p: string, back?: boolean) {
-    return {
-      href: p,
-      onClick: (ev: MouseEvent) => {
-        // https://github.com/ionic-team/stencil-router-v2/blob/master/src/router.ts
-        if (!ev.metaKey && !ev.ctrlKey && ev.which != 2 && ev.button != 1) {
-          ev.preventDefault();
-          this.pushRoute(p, back);
-        }
-      },
-    };
-  }
-
-  redirectRoute(path: string) {
-    const url = new URL(path, location.href);
-    if (location.href == url.href) {
-      return;
-    }
-
-    history.replaceState(history.state, null, url.pathname);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  }
-
-  pushRoute(path: string, back?: boolean) {
-    const url = new URL(path, location.href);
-    if (location.href == url.href) {
-      return;
-    }
-
-    if (back && history.state?.beforeRoute == url.pathname) {
-      history.back();
-    } else {
-      history.pushState({ beforeRoute: location.pathname }, null, url.pathname);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    }
-  }
-
   private _loading = false;
   set loading(v: boolean) {
     this._loading = v;
