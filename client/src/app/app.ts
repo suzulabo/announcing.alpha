@@ -228,10 +228,6 @@ export class App {
     return { state: 'SUCCESS', value: `data:image/jpeg;base64,${v.value}` };
   }
 
-  getImageURI(id: string) {
-    return `${this.dataURLPrefix}/images/${id}`;
-  }
-
   getFollows() {
     return this.appStorage.follows.entries();
   }
