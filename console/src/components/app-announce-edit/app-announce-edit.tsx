@@ -90,9 +90,8 @@ export class AppAnnounceEdit {
     }
   };
 
-  async componentWillLoad() {
-    await this.app.processLoading(async () => {
-      await this.app.loadAnnounce(this.announceID);
+  componentWillLoad() {
+    () => {
       const as = this.app.getAnnounceState(this.announceID);
       if (as?.state != 'SUCCESS') {
         pushRoute('/', true);
@@ -109,7 +108,7 @@ export class AppAnnounceEdit {
         icon: as.value.icon,
         iconData: as.value.iconData,
       };
-    });
+    };
   }
 
   render() {

@@ -25,32 +25,28 @@ export class AppPost {
   private post!: PostJSON & { imgData?: string; imgLoader?: () => Promise<string> };
 
   async componentWillLoad() {
-    await this.app.processLoading(async () => {
-      await this.app.loadAnnounce(this.announceID);
+    const as = this.app.getAnnounceState(this.announceID);
+    if (as?.state != 'SUCCESS') {
+      pushRoute(`/${this.announceID}`, true);
+      return;
+    }
+    this.announce = as.value;
 
-      const as = this.app.getAnnounceState(this.announceID);
-      if (as?.state != 'SUCCESS') {
-        pushRoute(`/${this.announceID}`, true);
-        return;
-      }
-      this.announce = as.value;
+    const post = await this.app.getPost(this.announceID, this.postID);
+    if (!post) {
+      pushRoute(`/${this.announceID}`, true);
+      return;
+    }
+    this.post = { ...post, pT: post.pT.toMillis() };
 
-      const post = await this.app.getPost(this.announceID, this.postID);
-      if (post.state != 'SUCCESS') {
-        pushRoute(`/${this.announceID}`, true);
-        return;
-      }
-      this.post = { ...post.value, pT: post.value.pT.toMillis() };
+    if (this.post.img) {
+      this.post.imgData = await this.app.getImage(this.post.img);
+      this.post.imgLoader = () => Promise.resolve(this.post.imgData || '');
+    }
 
-      if (this.post.img) {
-        this.post.imgData = await this.app.getImage(this.post.img);
-        this.post.imgLoader = () => Promise.resolve(this.post.imgData || '');
-      }
-
-      this.app.setTitle(
-        this.app.msgs.post.pageTitle(this.post.title || this.post.body?.substr(0, 20) || ''),
-      );
-    });
+    this.app.setTitle(
+      this.app.msgs.post.pageTitle(this.post.title || this.post.body?.substr(0, 20) || ''),
+    );
   }
 
   private handleDelete = (ev: Event) => {

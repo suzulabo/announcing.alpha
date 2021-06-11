@@ -10,12 +10,6 @@ export class AppHome {
   @Prop()
   app!: App;
 
-  async componentWillLoad() {
-    await this.app.processLoading(async () => {
-      await this.app.loadUser();
-    });
-  }
-
   private handleSignOutClick = async () => {
     await this.app.signOut();
     redirectRoute('/signin');

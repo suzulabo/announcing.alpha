@@ -85,6 +85,10 @@ export class AppRoot {
   };
 
   render() {
+    if (this.app.isSignIn) {
+      this.app.loadUser();
+    }
+
     return (
       <Host>
         <ap-root

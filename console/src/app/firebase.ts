@@ -26,12 +26,10 @@ import {
   AnnounceMeta,
   AppEnv,
   CreateAnnounceParams,
-  DataResult,
   DeleteAnnounceParams,
   DeletePostParams,
   EditAnnounceParams,
   Image,
-  NOT_FOUND,
   Post,
   PutPostParams,
   User,
@@ -39,12 +37,12 @@ import {
 import { AppMsg } from './msg';
 import { AppState } from './state';
 
-const getCache = async <T>(docRef: DocumentReference): Promise<DataResult<T> | undefined> => {
+const getCache = async <T>(docRef: DocumentReference): Promise<T | undefined> => {
   {
     try {
       const doc = await getDocFromCache(docRef);
       if (doc.exists()) {
-        return { state: 'SUCCESS', value: doc.data() as T };
+        return doc.data() as T;
       }
     } catch (err) {
       if (err.code == 'unavailable') {
@@ -56,7 +54,7 @@ const getCache = async <T>(docRef: DocumentReference): Promise<DataResult<T> | u
   return;
 };
 
-const getCacheFirst = async <T>(docRef: DocumentReference): Promise<DataResult<T>> => {
+const getCacheFirst = async <T>(docRef: DocumentReference): Promise<T | undefined> => {
   {
     const r = await getCache<T>(docRef);
     if (r) {
@@ -66,10 +64,10 @@ const getCacheFirst = async <T>(docRef: DocumentReference): Promise<DataResult<T
   {
     const doc = await getDocFromServer(docRef);
     if (doc.exists()) {
-      return { state: 'SUCCESS', value: doc.data() as T };
+      return doc.data() as T;
     }
   }
-  return NOT_FOUND;
+  return;
 };
 
 export class AppFirebase {
@@ -184,21 +182,16 @@ export class AppFirebase {
   }
 
   private listeners = (() => {
-    const notFounds = new Set<string>();
     const listenMap = new Map<string, () => void>();
 
     const add = (p: string, cb: () => void) => {
       if (listenMap.has(p)) {
         return;
       }
-      if (notFounds.has(p)) {
-        return;
-      }
 
       const unsubscribe = onSnapshot(doc(this.firestore, p), {
         next: ds => {
           if (!ds.exists) {
-            notFounds.add(p);
             unsubscribe();
             listenMap.delete(p);
           }
@@ -222,7 +215,7 @@ export class AppFirebase {
       listenMap.clear();
     };
 
-    return { add, release, notFounds } as const;
+    return { add, release } as const;
   })();
 
   releaseListeners() {

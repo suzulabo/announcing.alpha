@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import QRCodeStyling from 'qr-code-styling';
 import { App } from 'src/app/app';
+import { DATA_ERROR } from 'src/shared';
 import { PostLaoderResult } from 'src/shared-ui/ap-posts/ap-posts';
 import { href, pushRoute } from 'src/shared-ui/utils/route';
 
@@ -23,41 +24,29 @@ export class AppAnnounce {
 
   private qrCode!: QRCodeStyling;
 
-  async componentWillLoad() {
-    await this.app.processLoading(async () => {
-      await this.app.loadAnnounce(this.announceID);
-
-      const as = this.app.getAnnounceState(this.announceID);
-      if (as?.state != 'SUCCESS') {
-        pushRoute('/', true);
-        return;
-      }
-
-      this.app.setTitle(this.app.msgs.announce.pageTitle(as.value.name));
-
-      this.qrCode = new QRCodeStyling({
-        width: 200,
-        height: 200,
-        dotsOptions: {
-          color: '#333333',
-          type: 'extra-rounded',
-        },
-        cornersSquareOptions: {
-          type: 'extra-rounded',
-        },
-        data: this.clientURL,
-      });
+  componentWillLoad() {
+    this.qrCode = new QRCodeStyling({
+      width: 200,
+      height: 200,
+      dotsOptions: {
+        color: '#333333',
+        type: 'extra-rounded',
+      },
+      cornersSquareOptions: {
+        type: 'extra-rounded',
+      },
+      data: this.clientURL,
     });
   }
 
   private postLoader = async (postID: string): Promise<PostLaoderResult> => {
     const post = await this.app.getPost(this.announceID, postID);
-    if (post?.state != 'SUCCESS') {
-      return post;
+    if (!post) {
+      return DATA_ERROR;
     }
     return {
       state: 'SUCCESS',
-      value: { ...post.value, pT: post.value.pT.toMillis() },
+      value: { ...post, pT: post.pT.toMillis() },
       href: `/${this.announceID}/${postID}`,
     };
   };
@@ -121,8 +110,11 @@ export class AppAnnounce {
   render() {
     const announce = this.app.getAnnounceState(this.announceID);
     if (announce?.state != 'SUCCESS') {
+      pushRoute('/', true);
       return;
     }
+
+    this.app.setTitle(this.app.msgs.announce.pageTitle(announce.value.name));
 
     const msgs = this.app.msgs;
 

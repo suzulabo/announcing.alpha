@@ -31,7 +31,6 @@ export class AppPostForm {
     await this.app.processLoading(async () => {
       this.backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
 
-      await this.app.loadAnnounce(this.announceID);
       const as = this.app.getAnnounceState(this.announceID);
       if (as?.state != 'SUCCESS') {
         pushRoute(this.backPath, true);
@@ -51,15 +50,15 @@ export class AppPostForm {
       }
 
       const post = await this.app.getPost(this.announceID, this.postID);
-      if (post.state != 'SUCCESS') {
+      if (!post) {
         pushRoute(this.backPath, true);
         return;
       }
-      this.post = post.value;
-      this.values = { ...post.value };
+      this.post = post;
+      this.values = { ...post };
 
-      if (post.value.img) {
-        this.values.imgData = await this.app.getImage(post.value.img);
+      if (post.img) {
+        this.values.imgData = await this.app.getImage(post.img);
         this.post.imgData = this.values.imgData;
       }
 

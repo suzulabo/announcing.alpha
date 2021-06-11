@@ -121,24 +121,23 @@ export class App {
 
   private async toAnnounceState(id: string, a: Announce): Promise<DataResult<AnnounceState>> {
     const meta = await this.appFirebase.getAnnounceMeta(id, a.mid);
-    if (meta?.state != 'SUCCESS') {
+    if (!meta) {
       return DATA_ERROR;
     }
 
-    const metaData = meta.value;
-    const icon = metaData.icon;
+    const icon = meta.icon;
 
     return {
       state: 'SUCCESS',
       value: {
         id,
         ...a,
-        ...metaData,
+        ...meta,
         ...(icon && {
           iconLoader: async () => {
             const d = await this.appFirebase.getImage(icon);
-            if (d?.state == 'SUCCESS') {
-              return `data:image/jpeg;base64,${d.value.data.toBase64()}`;
+            if (d) {
+              return `data:image/jpeg;base64,${d.data.toBase64()}`;
             }
             throw new Error('icon load error');
           },
@@ -148,45 +147,47 @@ export class App {
   }
 
   loadUser() {
-    this.appFirebase.listenUser(async () => {
-      const user = await this.appFirebase.getUser();
-      if (user?.state != 'SUCCESS') {
-        this.appState.user.delete();
-        return;
-      }
-      this.appState.user.set(user.value);
-      if (user.value.announces) {
-        for (const id of user.value.announces) {
-          await this.loadAnnounce(id, false);
-        }
-      }
-    });
-  }
-
-  async loadAnnounce(id: string, checkOwner = true) {
-    if (checkOwner) {
-      const user = await this.appFirebase.getUser();
-      if (user?.state != 'SUCCESS') {
-        return;
-      }
-      if (!user.value.announces?.includes(id)) {
-        return;
-      }
+    if (this.appState.user.get() != null) {
+      return;
     }
 
-    this.appFirebase.listenAnnounce(id, async () => {
+    const cb = async () => {
+      const user = await this.appFirebase.getUser();
+      if (!user) {
+        this.appState.user.set({});
+        return;
+      }
+      this.appState.user.set(user);
+      if (user.announces) {
+        for (const id of user.announces) {
+          this.loadAnnounce(id);
+        }
+      }
+    };
+
+    this.appFirebase.listenUser(cb);
+
+    void cb();
+  }
+
+  private loadAnnounce(id: string) {
+    const cb = async () => {
       const a = await this.appFirebase.getAnnounce(id);
       if (!a) {
         this.appState.announce.delete(id);
         return;
       }
-      if (a.state == 'SUCCESS') {
-        const as = await this.toAnnounceState(id, a.value);
+      if (a) {
+        const as = await this.toAnnounceState(id, a);
         this.appState.announce.set(id, as);
         return;
       }
       this.appState.announce.set(id, a);
-    });
+    };
+
+    this.appFirebase.listenAnnounce(id, cb);
+
+    void cb();
   }
 
   getAnnounces() {
@@ -196,7 +197,7 @@ export class App {
     }
 
     const result: AnnounceState[] = [];
-    if (user && user.announces) {
+    if (user.announces) {
       for (const id of user.announces) {
         const as = this.appState.announce.get(id);
         if (as?.state == 'SUCCESS') {
@@ -222,8 +223,8 @@ export class App {
 
   async getImage(id: string) {
     const d = await this.appFirebase.getImage(id);
-    if (d.state == 'SUCCESS') {
-      return `data:image/jpeg;base64,${d.value.data.toBase64()}`;
+    if (d) {
+      return `data:image/jpeg;base64,${d.data.toBase64()}`;
     }
     return;
   }

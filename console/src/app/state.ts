@@ -21,9 +21,6 @@ export class AppState {
     get: () => {
       return store.get('user') as User | undefined;
     },
-    delete: () => {
-      store.set('user', undefined);
-    },
   };
 
   announce = {
