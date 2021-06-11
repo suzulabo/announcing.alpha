@@ -229,14 +229,14 @@ export class AppFirebase {
     this.listeners.release();
   }
 
-  listenUser(cb: () => Promise<void>) {
+  listenUser(cb: () => void) {
     if (!this.user) {
       return;
     }
     return this.listeners.add(`users/${this.user.uid}`, cb);
   }
 
-  listenAnnounce(id: string, cb: () => Promise<void>) {
+  listenAnnounce(id: string, cb: () => void) {
     return this.listeners.add(`announces/${id}`, cb);
   }
 
