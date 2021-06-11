@@ -249,7 +249,7 @@ export class AppFirebase {
     this.listeners.release();
   }
 
-  listenAnnounce(id: string, cb: () => Promise<void>) {
+  listenAnnounce(id: string, cb: () => void) {
     return this.listeners.add(`announces/${id}`, cb);
   }
 
