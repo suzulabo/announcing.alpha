@@ -8,10 +8,12 @@ import {
   AnnounceMeta,
   AppEnv,
   CreateAnnounceParams,
+  DataResult,
   DeleteAnnounceParams,
   DeletePostParams,
   EditAnnounceParams,
   Image,
+  NOT_FOUND,
   Post,
   PutPostParams,
   User,
@@ -19,35 +21,47 @@ import {
 import { AppMsg } from './msg';
 import { AppState } from './state';
 
-const getCacheFirst = async <T>(
+const getCache = async <T>(
   docRef: firebase.firestore.DocumentReference,
-  cacheOnly = false,
-): Promise<T> => {
+): Promise<DataResult<T> | undefined> => {
   {
     try {
       const doc = await docRef.get({ source: 'cache' });
       if (doc.exists) {
-        return doc.data() as T;
+        return { state: 'SUCCESS', value: doc.data() as T };
       }
-    } catch {
-      //
+    } catch (err) {
+      if (err.code == 'unavailable') {
+        return;
+      }
+      throw err;
     }
   }
-  if (cacheOnly) {
-    return;
+  return;
+};
+
+const getCacheFirst = async <T>(
+  docRef: firebase.firestore.DocumentReference,
+): Promise<DataResult<T>> => {
+  {
+    const r = await getCache<T>(docRef);
+    if (r) {
+      return r;
+    }
   }
   {
     const doc = await docRef.get({ source: 'default' });
     if (doc.exists) {
-      return doc.data() as T;
+      return { state: 'SUCCESS', value: doc.data() as T };
     }
   }
+  return NOT_FOUND;
 };
 
 export class AppFirebase {
-  private functions: firebase.functions.Functions;
-  private firestore: firebase.firestore.Firestore;
-  private auth: firebase.auth.Auth;
+  private functions!: firebase.functions.Functions;
+  private firestore!: firebase.firestore.Firestore;
+  private auth!: firebase.auth.Auth;
 
   constructor(
     private appEnv: AppEnv,
@@ -85,7 +99,7 @@ export class AppFirebase {
 
     await new Promise<void>(resolve => {
       this.auth.onAuthStateChanged(user => {
-        this.appState.state.signIn = user != null;
+        this.appState.signIn.set(user != null);
         resolve();
       });
     });
@@ -149,29 +163,35 @@ export class AppFirebase {
   }
 
   private listeners = (() => {
+    const notFounds = new Set<string>();
     const listenMap = new Map<string, () => void>();
 
-    const add = async (p: string, cb: () => Promise<void>) => {
+    const add = (p: string, cb: () => void) => {
       if (listenMap.has(p)) {
         return;
       }
+      if (notFounds.has(p)) {
+        return;
+      }
 
-      return new Promise<void>((resolve, reject) => {
-        const unsubscribe = this.firestore.doc(p).onSnapshot(
-          async () => {
-            if (cb) {
-              await cb();
-            }
-            resolve();
-          },
-          err => {
+      const unsubscribe = this.firestore.doc(p).onSnapshot({
+        next: ds => {
+          if (!ds.exists) {
+            notFounds.add(p);
             unsubscribe();
             listenMap.delete(p);
-            reject(err);
-          },
-        );
-        listenMap.set(p, unsubscribe);
+          }
+          if (cb) {
+            cb();
+          }
+        },
+        error: err => {
+          console.error('onSnapshot error', p, err);
+          unsubscribe();
+          listenMap.delete(p);
+        },
       });
+      listenMap.set(p, unsubscribe);
     };
 
     const release = () => {
@@ -181,7 +201,7 @@ export class AppFirebase {
       listenMap.clear();
     };
 
-    return { add, release };
+    return { add, release, notFounds } as const;
   })();
 
   releaseListeners() {
@@ -205,12 +225,12 @@ export class AppFirebase {
     }
 
     const docRef = this.firestore.doc(`users/${this.user.uid}`);
-    return getCacheFirst<User>(docRef, true);
+    return getCache<User>(docRef);
   }
 
   async getAnnounce(id: string) {
     const docRef = this.firestore.doc(`announces/${id}`);
-    return getCacheFirst<Announce>(docRef, true);
+    return getCache<Announce>(docRef);
   }
 
   async getAnnounceMeta(id: string, metaID: string) {
@@ -225,9 +245,6 @@ export class AppFirebase {
 
   async getImage(id: string) {
     const docRef = this.firestore.doc(`images/${id}`);
-    const doc = await getCacheFirst<Image>(docRef);
-    if (doc) {
-      return `data:image/jpeg;base64,${doc.data.toBase64()}`;
-    }
+    return getCacheFirst<Image>(docRef);
   }
 }

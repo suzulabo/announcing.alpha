@@ -19,7 +19,7 @@ export class ApRoot {
   defaultPath = '/';
 
   @Prop()
-  redirect?: (p: string) => string;
+  redirect?: (p: string) => string | undefined;
 
   @State()
   path?: string;

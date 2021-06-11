@@ -1,5 +1,5 @@
 import { Build, readTask } from '@stencil/core';
-import { Announce, AppEnv } from 'src/shared';
+import { Announce, AppEnv, DataResult, DATA_ERROR } from 'src/shared';
 import { AnnounceState } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
@@ -45,10 +45,12 @@ export class App {
   private setLoadingClass = () => {
     readTask(() => {
       const apLoading = document.querySelector('ap-loading');
-      if (this._loading) {
-        apLoading.classList.add('show');
-      } else {
-        apLoading.classList.remove('show');
+      if (apLoading) {
+        if (this._loading) {
+          apLoading.classList.add('show');
+        } else {
+          apLoading.classList.remove('show');
+        }
       }
     });
   };
@@ -67,7 +69,7 @@ export class App {
   }
 
   get isSignIn() {
-    return this.appState.state.signIn;
+    return this.appState.signIn.get();
   }
 
   async signOut() {
@@ -90,15 +92,22 @@ export class App {
   editAnnounce(
     id: string,
     name: string,
-    desc: string,
-    link: string,
-    icon: string,
-    newIcon: string,
+    desc?: string,
+    link?: string,
+    icon?: string,
+    newIcon?: string,
   ) {
     return this.appFirebase.callEditAnnounce({ id, name, desc, link, icon, newIcon });
   }
 
-  putPost(id: string, title: string, body: string, link: string, imgData: string, editID: string) {
+  putPost(
+    id: string,
+    title?: string,
+    body?: string,
+    link?: string,
+    imgData?: string,
+    editID?: string,
+  ) {
     return this.appFirebase.callPutPost({ id, title, body, link, imgData, editID });
   }
 
@@ -110,33 +119,44 @@ export class App {
     return this.appFirebase.callDeletePost({ id, postID });
   }
 
-  private async toAnnounceState(id: string, a: Announce): Promise<AnnounceState> {
+  private async toAnnounceState(id: string, a: Announce): Promise<DataResult<AnnounceState>> {
     const meta = await this.appFirebase.getAnnounceMeta(id, a.mid);
-    if (!meta) {
-      return;
+    if (meta?.state != 'SUCCESS') {
+      return DATA_ERROR;
     }
 
-    const iconData = meta.icon ? await this.appFirebase.getImage(meta.icon) : undefined;
+    const metaData = meta.value;
+    const icon = metaData.icon;
 
     return {
-      id,
-      ...a,
-      ...meta,
-      ...(iconData && {
-        iconData,
-        iconLoader: () => {
-          return Promise.resolve(iconData);
-        },
-      }),
+      state: 'SUCCESS',
+      value: {
+        id,
+        ...a,
+        ...metaData,
+        ...(icon && {
+          iconLoader: async () => {
+            const d = await this.appFirebase.getImage(icon);
+            if (d?.state == 'SUCCESS') {
+              return `data:image/jpeg;base64,${d.value.data.toBase64()}`;
+            }
+            throw new Error('icon load error');
+          },
+        }),
+      },
     };
   }
 
-  async loadUser() {
-    await this.appFirebase.listenUser(async () => {
+  loadUser() {
+    this.appFirebase.listenUser(async () => {
       const user = await this.appFirebase.getUser();
-      this.appState.state.user = user;
-      if (user && user.announces) {
-        for (const id of user.announces) {
+      if (user?.state != 'SUCCESS') {
+        this.appState.user.delete();
+        return;
+      }
+      this.appState.user.set(user.value);
+      if (user.value.announces) {
+        for (const id of user.value.announces) {
           await this.loadAnnounce(id, false);
         }
       }
@@ -146,26 +166,31 @@ export class App {
   async loadAnnounce(id: string, checkOwner = true) {
     if (checkOwner) {
       const user = await this.appFirebase.getUser();
-      if (!user || !user.announces.includes(id)) {
+      if (user?.state != 'SUCCESS') {
+        return;
+      }
+      if (!user.value.announces?.includes(id)) {
         return;
       }
     }
 
-    await this.appFirebase.listenAnnounce(id, async () => {
+    this.appFirebase.listenAnnounce(id, async () => {
       const a = await this.appFirebase.getAnnounce(id);
-      const m = new Map(this.appState.state.announces);
       if (!a) {
-        m.delete(id);
-      } else {
-        const as = await this.toAnnounceState(id, a);
-        m.set(id, as);
+        this.appState.announce.delete(id);
+        return;
       }
-      this.appState.state.announces = m;
+      if (a.state == 'SUCCESS') {
+        const as = await this.toAnnounceState(id, a.value);
+        this.appState.announce.set(id, as);
+        return;
+      }
+      this.appState.announce.set(id, a);
     });
   }
 
   getAnnounces() {
-    const user = this.appState.state.user;
+    const user = this.appState.user.get();
     if (!user) {
       return;
     }
@@ -173,9 +198,9 @@ export class App {
     const result: AnnounceState[] = [];
     if (user && user.announces) {
       for (const id of user.announces) {
-        const as = this.appState.state.announces.get(id);
-        if (as) {
-          result.push(as);
+        const as = this.appState.announce.get(id);
+        if (as?.state == 'SUCCESS') {
+          result.push(as.value);
         }
       }
     }
@@ -188,14 +213,18 @@ export class App {
   }
 
   getAnnounceState(id: string) {
-    return this.appState.state.announces.get(id);
+    return this.appState.announce.get(id);
   }
 
   getPost(id: string, postID: string) {
     return this.appFirebase.getPost(id, postID);
   }
 
-  getImage(id: string) {
-    return this.appFirebase.getImage(id);
+  async getImage(id: string) {
+    const d = await this.appFirebase.getImage(id);
+    if (d.state == 'SUCCESS') {
+      return `data:image/jpeg;base64,${d.value.data.toBase64()}`;
+    }
+    return;
   }
 }

@@ -1,4 +1,4 @@
-export const isURL = (s: string, nullResult = true) => {
+export const isURL = (s: string | undefined, nullResult = true) => {
   if (!s) {
     return nullResult;
   }

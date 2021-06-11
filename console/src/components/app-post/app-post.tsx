@@ -10,45 +10,45 @@ import { href, pushRoute } from 'src/shared-ui/utils/route';
 })
 export class AppPost {
   @Prop()
-  app: App;
+  app!: App;
 
   @Prop()
-  announceID: string;
+  announceID!: string;
 
   @Prop()
-  postID: string;
+  postID!: string;
 
   @State()
   showDelete = false;
 
-  private announce: AnnounceState;
-  private post: PostJSON & { imgData?: string; imgLoader?: () => Promise<string> };
+  private announce!: AnnounceState;
+  private post!: PostJSON & { imgData?: string; imgLoader?: () => Promise<string> };
 
   async componentWillLoad() {
     await this.app.processLoading(async () => {
       await this.app.loadAnnounce(this.announceID);
 
       const as = this.app.getAnnounceState(this.announceID);
-      if (!as) {
+      if (as?.state != 'SUCCESS') {
         pushRoute(`/${this.announceID}`, true);
         return;
       }
-      this.announce = as;
+      this.announce = as.value;
 
       const post = await this.app.getPost(this.announceID, this.postID);
-      if (!post) {
+      if (post.state != 'SUCCESS') {
         pushRoute(`/${this.announceID}`, true);
         return;
       }
-      this.post = { ...post, pT: post.pT.toMillis() };
+      this.post = { ...post.value, pT: post.value.pT.toMillis() };
 
       if (this.post.img) {
         this.post.imgData = await this.app.getImage(this.post.img);
-        this.post.imgLoader = () => Promise.resolve(this.post.imgData);
+        this.post.imgLoader = () => Promise.resolve(this.post.imgData || '');
       }
 
       this.app.setTitle(
-        this.app.msgs.post.pageTitle(this.post.title || this.post.body.substr(0, 20)),
+        this.app.msgs.post.pageTitle(this.post.title || this.post.body?.substr(0, 20) || ''),
       );
     });
   }

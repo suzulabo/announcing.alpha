@@ -53,7 +53,7 @@ export class App {
     // if not granted, clear local settings. Server settings will delete automatically.
     const permission = await this.appFirebase.checkNotifyPermission(false);
     if (permission != 'granted') {
-      const ids = await this.appStorage.notifications.keys();
+      const ids = this.appStorage.notifications.keys();
       for (const id of ids) {
         await this.appStorage.notifications.remove(id);
       }
@@ -153,7 +153,7 @@ export class App {
                   },
             },
           });
-          const follow = await this.getFollow(id);
+          const follow = this.getFollow(id);
           if (follow && follow.name != meta.value.name) {
             follow.name = meta.value.name;
             await this.setFollow(id, follow);

@@ -11,21 +11,21 @@ import { isURL } from 'src/utils/isurl';
 })
 export class AppPostForm {
   @Prop()
-  app: App;
+  app!: App;
 
   @Prop()
-  announceID: string;
+  announceID!: string;
 
   @Prop()
-  postID: string;
+  postID!: string;
 
   @State()
-  values: { title?: string; body?: string; link?: string; img?: string; imgData?: string };
+  values!: { title?: string; body?: string; link?: string; img?: string; imgData?: string };
 
-  private announce: AnnounceState;
-  private post: Post & { imgData?: string };
+  private announce!: AnnounceState;
+  private post!: Post & { imgData?: string };
 
-  private backPath: string;
+  private backPath!: string;
 
   async componentWillLoad() {
     await this.app.processLoading(async () => {
@@ -33,37 +33,37 @@ export class AppPostForm {
 
       await this.app.loadAnnounce(this.announceID);
       const as = this.app.getAnnounceState(this.announceID);
-      if (!as) {
+      if (as?.state != 'SUCCESS') {
         pushRoute(this.backPath, true);
         return;
       }
 
-      this.announce = as;
+      this.announce = as.value;
 
       if (!this.postID) {
         this.values = {};
         return;
       }
 
-      if (!(this.postID in as.posts)) {
+      if (!(this.postID in as.value.posts)) {
         pushRoute(this.backPath, true);
         return;
       }
 
       const post = await this.app.getPost(this.announceID, this.postID);
-      if (!post) {
+      if (post.state != 'SUCCESS') {
         pushRoute(this.backPath, true);
         return;
       }
-      this.post = post;
-      this.values = { ...post };
+      this.post = post.value;
+      this.values = { ...post.value };
 
-      if (post.img) {
-        this.values.imgData = await this.app.getImage(post.img);
+      if (post.value.img) {
+        this.values.imgData = await this.app.getImage(post.value.img);
         this.post.imgData = this.values.imgData;
       }
 
-      this.app.setTitle(this.app.msgs.postForm.pageTitle(as.name));
+      this.app.setTitle(this.app.msgs.postForm.pageTitle(as.value.name));
     });
   }
 

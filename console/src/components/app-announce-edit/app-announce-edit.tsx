@@ -11,15 +11,15 @@ import { isURL } from 'src/utils/isurl';
 })
 export class AppAnnounceEdit {
   @Prop()
-  app: App;
+  app!: App;
 
   @Prop()
-  announceID: string;
+  announceID!: string;
 
   @State()
-  values: { name?: string; desc?: string; link?: string; icon?: string; iconData?: string };
+  values!: { name?: string; desc?: string; link?: string; icon?: string; iconData?: string };
 
-  private announce: AnnounceState;
+  private announce!: AnnounceState;
 
   @State()
   showDeletion = false;
@@ -48,6 +48,9 @@ export class AppAnnounceEdit {
   };
 
   private handleSubmitClick = async () => {
+    if (!this.values.name) {
+      return;
+    }
     this.app.loading = true;
     try {
       await this.app.editAnnounce(
@@ -91,20 +94,20 @@ export class AppAnnounceEdit {
     await this.app.processLoading(async () => {
       await this.app.loadAnnounce(this.announceID);
       const as = this.app.getAnnounceState(this.announceID);
-      if (!as) {
+      if (as?.state != 'SUCCESS') {
         pushRoute('/', true);
         return;
       }
 
-      this.app.setTitle(this.app.msgs.announceEdit.pageTitle(as.name));
+      this.app.setTitle(this.app.msgs.announceEdit.pageTitle(as.value.name));
 
-      this.announce = as;
+      this.announce = as.value;
       this.values = {
-        name: as.name,
-        desc: as.desc,
-        link: as.link,
-        icon: as.icon,
-        iconData: as.iconData,
+        name: as.value.name,
+        desc: as.value.desc,
+        link: as.value.link,
+        icon: as.value.icon,
+        iconData: as.value.iconData,
       };
     });
   }

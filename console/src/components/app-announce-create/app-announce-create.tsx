@@ -9,7 +9,7 @@ import { href, pushRoute } from 'src/shared-ui/utils/route';
 })
 export class AppAnnounceCreate {
   @Prop()
-  app: App;
+  app!: App;
 
   @State()
   values = { name: '', desc: '' };

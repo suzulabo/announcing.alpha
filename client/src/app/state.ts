@@ -2,7 +2,7 @@ import { createStore } from '@stencil/store';
 import { DataResult } from 'src/shared';
 import { AnnounceState } from './datatypes';
 
-const store = createStore<{ [k: string]: unknown }>({});
+const store = createStore<Record<string, unknown>>({});
 
 export class AppState {
   announce = {
@@ -29,7 +29,7 @@ export class AppState {
       return store.get(`announce.${id}`) as DataResult<AnnounceState> | undefined;
     },
     delete: (id: string) => {
-      delete store.state[`announce.${id}`];
+      store.set(`announce.${id}`, undefined);
     },
   };
 }

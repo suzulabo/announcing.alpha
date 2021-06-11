@@ -1,6 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import QRCodeStyling from 'qr-code-styling';
 import { App } from 'src/app/app';
+import { PostLaoderResult } from 'src/shared-ui/ap-posts/ap-posts';
 import { href, pushRoute } from 'src/shared-ui/utils/route';
 
 @Component({
@@ -9,10 +10,10 @@ import { href, pushRoute } from 'src/shared-ui/utils/route';
 })
 export class AppAnnounce {
   @Prop()
-  app: App;
+  app!: App;
 
   @Prop()
-  announceID: string;
+  announceID!: string;
 
   @State()
   showURL = false;
@@ -20,19 +21,19 @@ export class AppAnnounce {
   @State()
   showQRCode = false;
 
-  private qrCode: QRCodeStyling;
+  private qrCode!: QRCodeStyling;
 
   async componentWillLoad() {
     await this.app.processLoading(async () => {
       await this.app.loadAnnounce(this.announceID);
 
       const as = this.app.getAnnounceState(this.announceID);
-      if (!as) {
+      if (as?.state != 'SUCCESS') {
         pushRoute('/', true);
         return;
       }
 
-      this.app.setTitle(this.app.msgs.announce.pageTitle(as.name));
+      this.app.setTitle(this.app.msgs.announce.pageTitle(as.value.name));
 
       this.qrCode = new QRCodeStyling({
         width: 200,
@@ -49,26 +50,24 @@ export class AppAnnounce {
     });
   }
 
-  /*
-  private postLoader = async (postID: string) => {
+  private postLoader = async (postID: string): Promise<PostLaoderResult> => {
     const post = await this.app.getPost(this.announceID, postID);
-    if (!post) {
-      return;
+    if (post?.state != 'SUCCESS') {
+      return post;
     }
     return {
-      ...post,
-      pT: post.pT.toMillis(),
+      state: 'SUCCESS',
+      value: { ...post.value, pT: post.value.pT.toMillis() },
       href: `/${this.announceID}/${postID}`,
     };
   };
-  */
 
   private get clientURL() {
     return `${this.app.clientSite}/${this.announceID}`;
   }
 
   private urlModal = {
-    urlEl: null as HTMLElement,
+    urlEl: undefined as HTMLElement | undefined,
     handlers: {
       show: () => {
         this.showURL = true;
@@ -102,22 +101,26 @@ export class AppAnnounce {
       },
       download: () => {
         const announce = this.app.getAnnounceState(this.announceID);
-        if (announce) {
-          this.qrCode.download({ name: `qrcode-${announce.name}`, extension: 'png' });
+        if (announce?.state == 'SUCCESS') {
+          this.qrCode.download({ name: `qrcode-${announce.value.name}`, extension: 'png' });
         }
       },
-      urlRef: (el: HTMLElement) => {
-        this.urlModal.urlEl = el;
+      urlRef: (el?: HTMLElement) => {
+        if (el) {
+          this.urlModal.urlEl = el;
+        }
       },
-      qrcodeRef: (el: HTMLElement) => {
-        this.qrCode.append(el);
+      qrcodeRef: (el?: HTMLElement) => {
+        if (el) {
+          this.qrCode.append(el);
+        }
       },
     },
   };
 
   render() {
     const announce = this.app.getAnnounceState(this.announceID);
-    if (!announce) {
+    if (announce?.state != 'SUCCESS') {
       return;
     }
 
@@ -127,19 +130,27 @@ export class AppAnnounce {
 
     return (
       <Host>
-        <ap-announce announce={announce}>
-          <div class="buttons" slot="bottomAnnounce">
-            <a class="button small" {...href(`${this.announceID}/edit`)}>
-              {msgs.announce.edit}
-            </a>
-            <button class="small" onClick={this.urlModal.handlers.show}>
-              {msgs.announce.showURL}
-            </button>
-          </div>
-          <a slot="beforePosts" class="button new-post" {...href(`${this.announceID}/post`)}>
-            {this.app.msgs.announce.newPost}
+        <ap-announce announce={{ ...announce.value, showDetails: true }} />
+        <div class="buttons" slot="bottomAnnounce">
+          <a class="button small" {...href(`${this.announceID}/edit`)}>
+            {msgs.announce.edit}
           </a>
-        </ap-announce>
+          <button class="small" onClick={this.urlModal.handlers.show}>
+            {msgs.announce.showURL}
+          </button>
+        </div>
+        <a class="button new-post" {...href(`${this.announceID}/post`)}>
+          {this.app.msgs.announce.newPost}
+        </a>
+        <ap-posts
+          posts={announce.value.posts}
+          postLoader={this.postLoader}
+          msgs={{
+            datetime: msgs.common.datetime,
+            dataError: msgs.announce.dataError,
+          }}
+        />
+
         <a {...href('/', true)}>{this.app.msgs.common.back}</a>
         {this.showURL && (
           <ap-modal onClose={this.urlModal.handlers.close}>

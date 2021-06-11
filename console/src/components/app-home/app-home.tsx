@@ -8,7 +8,7 @@ import { href, redirectRoute } from 'src/shared-ui/utils/route';
 })
 export class AppHome {
   @Prop()
-  app: App;
+  app!: App;
 
   async componentWillLoad() {
     await this.app.processLoading(async () => {

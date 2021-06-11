@@ -13,6 +13,7 @@ export const msgs: Msgs = {
       if (d > 0) {
         return format(d, 'yyyy/MM/dd H:mm');
       }
+      return '';
     },
   },
   footer: {
@@ -26,6 +27,7 @@ export const msgs: Msgs = {
       if (d > 0) {
         return format(d, 'yyyy/MM/dd H:mm:ss');
       }
+      return '';
     },
   },
   signIn: {

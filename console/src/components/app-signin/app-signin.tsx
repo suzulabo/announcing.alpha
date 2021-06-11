@@ -7,7 +7,7 @@ import { App } from 'src/app/app';
 })
 export class AppSignIn {
   @Prop()
-  app: App;
+  app!: App;
 
   @State()
   keepSignedIn = false;

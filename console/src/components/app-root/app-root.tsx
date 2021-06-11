@@ -56,7 +56,10 @@ export class AppRoot {
 
   constructor() {
     const appMsg = new AppMsg();
-    document.querySelector('ap-error').msgs = appMsg.msgs.error;
+    const apError = document.querySelector('ap-error');
+    if (apError) {
+      apError.msgs = appMsg.msgs.error;
+    }
 
     const appEnv = new AppEnv();
     const appState = new AppState();
@@ -78,6 +81,7 @@ export class AppRoot {
         return '/signin';
       }
     }
+    return;
   };
 
   render() {
