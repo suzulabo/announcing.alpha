@@ -136,6 +136,7 @@ createDevProxy(9292, 9392, [
   { proxy: 9099, pattern: '/www.googleapis.com/identitytoolkit/' }, // auth
   { proxy: 9099, pattern: '/securetoken.googleapis.com/' }, // auth
   { proxy: 9099, pattern: '/emulator/auth' }, // auth
+  { proxy: 9099, pattern: '/identitytoolkit.googleapis.com/' }, // auth
   { proxy: 8080, pattern: '/google.firestore.v1.Firestore/' }, // firestore RPC
   { proxy: 8080, pattern: '/v1/' }, // firestore REST
   { proxy: 5001, pattern: new RegExp('.+/us-central1/.+') }, // functions

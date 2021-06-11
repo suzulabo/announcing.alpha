@@ -1,8 +1,26 @@
 import { Build } from '@stencil/core';
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
-import 'firebase/functions';
+import { FirebaseApp, initializeApp } from 'firebase/app';
+import {
+  Auth,
+  getAuth,
+  GoogleAuthProvider,
+  setPersistence,
+  signInWithRedirect,
+  TwitterAuthProvider,
+  useAuthEmulator,
+} from 'firebase/auth';
+import {
+  doc,
+  DocumentReference,
+  enableMultiTabIndexedDbPersistence,
+  FirebaseFirestore,
+  getDocFromCache,
+  getDocFromServer,
+  getFirestore,
+  onSnapshot,
+  useFirestoreEmulator,
+} from 'firebase/firestore';
+import { Functions, getFunctions, httpsCallable, useFunctionsEmulator } from 'firebase/functions';
 import {
   Announce,
   AnnounceMeta,
@@ -21,13 +39,11 @@ import {
 import { AppMsg } from './msg';
 import { AppState } from './state';
 
-const getCache = async <T>(
-  docRef: firebase.firestore.DocumentReference,
-): Promise<DataResult<T> | undefined> => {
+const getCache = async <T>(docRef: DocumentReference): Promise<DataResult<T> | undefined> => {
   {
     try {
-      const doc = await docRef.get({ source: 'cache' });
-      if (doc.exists) {
+      const doc = await getDocFromCache(docRef);
+      if (doc.exists()) {
         return { state: 'SUCCESS', value: doc.data() as T };
       }
     } catch (err) {
@@ -40,9 +56,7 @@ const getCache = async <T>(
   return;
 };
 
-const getCacheFirst = async <T>(
-  docRef: firebase.firestore.DocumentReference,
-): Promise<DataResult<T>> => {
+const getCacheFirst = async <T>(docRef: DocumentReference): Promise<DataResult<T>> => {
   {
     const r = await getCache<T>(docRef);
     if (r) {
@@ -50,8 +64,8 @@ const getCacheFirst = async <T>(
     }
   }
   {
-    const doc = await docRef.get({ source: 'default' });
-    if (doc.exists) {
+    const doc = await getDocFromServer(docRef);
+    if (doc.exists()) {
       return { state: 'SUCCESS', value: doc.data() as T };
     }
   }
@@ -59,15 +73,15 @@ const getCacheFirst = async <T>(
 };
 
 export class AppFirebase {
-  private functions!: firebase.functions.Functions;
-  private firestore!: firebase.firestore.Firestore;
-  private auth!: firebase.auth.Auth;
+  private functions!: Functions;
+  private firestore!: FirebaseFirestore;
+  private auth!: Auth;
 
   constructor(
     private appEnv: AppEnv,
     private appState: AppState,
     private appMsg: AppMsg,
-    private _firebaseApp?: firebase.app.App,
+    private _firebaseApp?: FirebaseApp,
   ) {}
 
   private devonly_setEmulator() {
@@ -75,9 +89,9 @@ export class AppFirebase {
       return;
     }
     console.log('useEmulator');
-    this.functions.useEmulator(location.hostname, parseInt(location.port));
-    this.firestore.settings({ ssl: location.protocol == 'https:', host: `${location.host}` });
-    this.auth.useEmulator(location.origin);
+    useFunctionsEmulator(this.functions, location.hostname, parseInt(location.port));
+    useFirestoreEmulator(this.firestore, location.hostname, parseInt(location.port));
+    useAuthEmulator(this.auth, location.origin, { disableWarnings: true });
   }
 
   async init() {
@@ -85,14 +99,14 @@ export class AppFirebase {
       return;
     }
 
-    this._firebaseApp = firebase.initializeApp(this.appEnv.env.firebaseConfig);
-    this.functions = this._firebaseApp.functions(this.appEnv.env.functionsRegion);
-    this.firestore = this._firebaseApp.firestore();
-    this.auth = this._firebaseApp.auth();
+    this._firebaseApp = initializeApp(this.appEnv.env.firebaseConfig);
+    this.functions = getFunctions(this._firebaseApp, this.appEnv.env.functionsRegion);
+    this.firestore = getFirestore(this._firebaseApp);
+    this.auth = getAuth(this._firebaseApp);
     this.devonly_setEmulator();
 
     try {
-      await this.firestore.enablePersistence({ synchronizeTabs: true });
+      await enableMultiTabIndexedDbPersistence(this.firestore);
     } catch (err) {
       console.warn('enablePersistence', err);
     }
@@ -111,55 +125,62 @@ export class AppFirebase {
   }
 
   async signInGoogle(keep: boolean) {
-    await this.auth.setPersistence(keep ? 'local' : 'session');
+    if (keep) {
+      await setPersistence(this.auth, { type: 'LOCAL' });
+    }
 
-    const provider = new firebase.auth.GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
     provider.setCustomParameters({
       prompt: 'select_account',
     });
 
-    await this.auth.signInWithRedirect(provider);
+    await signInWithRedirect(this.auth, provider);
   }
 
   async signInTwitter(keep: boolean) {
-    await this.auth.setPersistence(keep ? 'local' : 'session');
+    if (keep) {
+      await setPersistence(this.auth, { type: 'LOCAL' });
+    }
 
-    const provider = new firebase.auth.TwitterAuthProvider();
+    const provider = new TwitterAuthProvider();
     provider.setCustomParameters({
       prompt: 'select_account',
     });
 
-    await this.auth.signInWithRedirect(provider);
+    await signInWithRedirect(this.auth, provider);
   }
 
   async signOut() {
     await this.auth.signOut();
   }
 
-  private async callFunc<T>(name: string, params: any): Promise<T> {
-    const f = this.functions.httpsCallable(name);
+  private async callFunc<RequestData = unknown, ResponseData = unknown>(
+    name: string,
+    params: RequestData,
+  ): Promise<ResponseData> {
+    const f = httpsCallable<RequestData, ResponseData>(this.functions, name);
     const res = await f(params);
-    return res.data as T;
+    return res.data;
   }
 
   async callCreateAnnounce(params: CreateAnnounceParams) {
-    return this.callFunc<void>('createAnnounce', params);
+    return this.callFunc<CreateAnnounceParams, void>('createAnnounce', params);
   }
 
   async callEditAnnounce(params: EditAnnounceParams) {
-    return this.callFunc<void>('editAnnounce', params);
+    return this.callFunc<EditAnnounceParams, void>('editAnnounce', params);
   }
 
   async callDeleteAnnounce(params: DeleteAnnounceParams) {
-    return this.callFunc<void>('deleteAnnounce', params);
+    return this.callFunc<DeleteAnnounceParams, void>('deleteAnnounce', params);
   }
 
   async callPutPost(params: PutPostParams) {
-    return this.callFunc<void>('putPost', params);
+    return this.callFunc<PutPostParams, void>('putPost', params);
   }
 
   async callDeletePost(params: DeletePostParams) {
-    return this.callFunc<void>('deletePost', params);
+    return this.callFunc<DeletePostParams, void>('deletePost', params);
   }
 
   private listeners = (() => {
@@ -174,7 +195,7 @@ export class AppFirebase {
         return;
       }
 
-      const unsubscribe = this.firestore.doc(p).onSnapshot({
+      const unsubscribe = onSnapshot(doc(this.firestore, p), {
         next: ds => {
           if (!ds.exists) {
             notFounds.add(p);
@@ -224,27 +245,27 @@ export class AppFirebase {
       return;
     }
 
-    const docRef = this.firestore.doc(`users/${this.user.uid}`);
+    const docRef = doc(this.firestore, `users/${this.user.uid}`);
     return getCache<User>(docRef);
   }
 
   async getAnnounce(id: string) {
-    const docRef = this.firestore.doc(`announces/${id}`);
+    const docRef = doc(this.firestore, `announces/${id}`);
     return getCache<Announce>(docRef);
   }
 
   async getAnnounceMeta(id: string, metaID: string) {
-    const docRef = this.firestore.doc(`announces/${id}/meta/${metaID}`);
+    const docRef = doc(this.firestore, `announces/${id}/meta/${metaID}`);
     return getCacheFirst<AnnounceMeta>(docRef);
   }
 
   async getPost(id: string, postID: string) {
-    const docRef = this.firestore.doc(`announces/${id}/posts/${postID}`);
+    const docRef = doc(this.firestore, `announces/${id}/posts/${postID}`);
     return getCacheFirst<Post>(docRef);
   }
 
   async getImage(id: string) {
-    const docRef = this.firestore.doc(`images/${id}`);
+    const docRef = doc(this.firestore, `images/${id}`);
     return getCacheFirst<Image>(docRef);
   }
 }
