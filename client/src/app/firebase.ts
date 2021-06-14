@@ -4,19 +4,15 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { Build } from '@stencil/core';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import {
-  doc,
-  DocumentData,
-  DocumentReference,
   enableMultiTabIndexedDbPersistence,
   FirebaseFirestore,
-  getDocFromCache,
   getFirestore,
-  onSnapshot,
   useFirestoreEmulator,
 } from 'firebase/firestore';
 import { Functions, getFunctions, httpsCallable, useFunctionsEmulator } from 'firebase/functions';
 import { FirebaseMessaging, getMessaging, getToken } from 'firebase/messaging';
 import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
+import { FirestoreHelper } from 'src/shared-ui/utils/firestore';
 import nacl from 'tweetnacl';
 import { PostNotificationRecievedEvent } from './datatypes';
 import { bs62 } from './utils';
@@ -125,90 +121,6 @@ class CapNotification {
     }
   }
 }
-
-export class FirestoreUpdatedEvent extends CustomEvent<{
-  collection: string;
-  id: string;
-  value?: DocumentData;
-}> {
-  constructor(detail: { collection: string; id: string; value?: DocumentData }) {
-    super('FirestoreUpdated', { detail });
-  }
-}
-
-class FirestoreHelper {
-  private docMap = new Map<
-    string,
-    {
-      unsubscribe?: () => void;
-      listener?: Promise<{ data?: DocumentData }>;
-      temporary?: boolean;
-    }
-  >();
-
-  constructor(private firestore: FirebaseFirestore) {}
-
-  async listenAndGet<T>(p: string, temporary?: boolean): Promise<T | undefined> {
-    const docInfo = this.docMap.get(p) || {};
-    const docRef = doc(this.firestore, p);
-
-    if (!docInfo.listener) {
-      docInfo.temporary = temporary;
-      docInfo.listener = new Promise((resolve, reject) => {
-        const value: { data?: DocumentData } = {};
-
-        docInfo.unsubscribe = onSnapshot(docRef, {
-          next: ds => {
-            value.data = ds.data();
-            resolve(value);
-
-            window.dispatchEvent(
-              new FirestoreUpdatedEvent({
-                collection: docRef.parent.id,
-                id: docRef.id,
-                value: ds.data(),
-              }),
-            );
-          },
-          error: reason => {
-            if (docInfo.unsubscribe) {
-              docInfo.unsubscribe();
-            }
-            this.docMap.delete(p);
-            reject(reason);
-          },
-        });
-      });
-
-      this.docMap.set(p, docInfo);
-    }
-
-    {
-      const v = await getCache<T>(docRef);
-      if (v) {
-        return v;
-      }
-    }
-
-    const v = await docInfo.listener;
-    return v.data as T;
-  }
-}
-
-const getCache = async <T>(docRef: DocumentReference): Promise<T | undefined> => {
-  try {
-    const doc = await getDocFromCache(docRef);
-    if (doc.exists()) {
-      return doc.data() as T;
-    }
-  } catch (err) {
-    if (err.code == 'unavailable') {
-      return;
-    }
-    throw err;
-  }
-  return;
-};
 
 export class AppFirebase {
   private functions: Functions;

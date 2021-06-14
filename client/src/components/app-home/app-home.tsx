@@ -1,8 +1,8 @@
 import { Component, FunctionalComponent, h, Host, Listen, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { Follow } from 'src/app/datatypes';
-import { FirestoreUpdatedEvent } from 'src/app/firebase';
 import { Announce, AnnounceMetaBase, PostJSON } from 'src/shared';
+import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PromiseState } from 'src/shared-ui/utils/promise';
 import { href } from 'src/shared-ui/utils/route';
 
