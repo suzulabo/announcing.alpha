@@ -4,7 +4,6 @@ import { PostNotificationRecievedEvent } from 'src/app/datatypes';
 import { AppFirebase } from 'src/app/firebase';
 import { AppIdbCache } from 'src/app/idbcache';
 import { AppMsg } from 'src/app/msg';
-import { AppState } from 'src/app/state';
 import { AppStorage } from 'src/app/storage';
 import { AppEnv } from 'src/shared';
 import { RouteMatch } from 'src/shared-ui/ap-root/ap-root';
@@ -60,10 +59,9 @@ export class AppRoot {
     }
     const appEnv = new AppEnv();
     const appFirebase = new AppFirebase(appEnv);
-    const appState = new AppState();
     const appStorage = new AppStorage();
     const appIdbCache = new AppIdbCache();
-    this.app = new App(appEnv, appMsg, appFirebase, appState, appStorage, appIdbCache);
+    this.app = new App(appEnv, appMsg, appFirebase, appStorage, appIdbCache);
   }
 
   @Listen('PostNotificationRecieved', { target: 'window' })

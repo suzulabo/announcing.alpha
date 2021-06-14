@@ -1,32 +1,36 @@
-import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
-import { Announce, DataResult, DATA_ERROR, PostJSON } from 'src/shared';
+import { Component, Element, forceUpdate, Fragment, h, Host, Prop, Watch } from '@stencil/core';
+import { Announce, PostJSON } from 'src/shared';
+import { PromiseState } from '../utils/promise';
 import { href } from '../utils/route';
-
-export type PostLaoderResult = DataResult<PostJSON> & { href?: string };
-
-type PostsMapValue = PostLaoderResult | 'LOADING' | undefined;
 
 @Component({
   tag: 'ap-posts',
   styleUrl: 'ap-posts.scss',
 })
 export class ApPosts {
+  @Element()
+  el!: HTMLApPostsElement;
+
   @Prop()
   posts!: Announce['posts'];
+
+  @Prop()
+  postsPromises!: Record<string, PromiseState<PostJSON>>;
+
+  @Prop()
+  hrefFormat?: string;
+
+  private postIds!: string[];
+
   @Watch('posts')
   watchPosts() {
     const pe = Object.entries(this.posts);
     pe.sort(([, p1], [, p2]) => {
       return p2.pT.toMillis() - p1.pT.toMillis();
     });
+    this.postIds = pe.map(([id]) => id);
 
-    this.postsMap.map = new Map();
     this.visibleMap = new Map();
-    const map = this.postsMap.map;
-    pe.forEach(([id]) => {
-      map.set(id, undefined);
-    });
-    this.postsMap = { map };
 
     if (this.iob) {
       this.iob.disconnect();
@@ -37,17 +41,9 @@ export class ApPosts {
   }
 
   @Prop()
-  postLoader!: (id: string) => Promise<PostLaoderResult>;
-
-  @Prop()
   msgs!: {
     datetime: (d: number) => string;
     dataError: string;
-  };
-
-  @State()
-  postsMap = {
-    map: new Map<string, PostsMapValue>(),
   };
 
   private visibleMap = new Map<string, boolean>();
@@ -59,8 +55,6 @@ export class ApPosts {
       return;
     }
 
-    const map = this.postsMap.map;
-
     for (const entry of entries) {
       const postID = entry.target.getAttribute('data-postid');
       if (!postID) {
@@ -68,30 +62,8 @@ export class ApPosts {
       }
 
       this.visibleMap.set(postID, entry.isIntersecting);
-
-      if (!entry.isIntersecting) {
-        continue;
-      }
-
-      if (map.get(postID) != undefined) {
-        continue;
-      }
-
-      map.set(postID, 'LOADING');
-
-      this.postLoader(postID)
-        .then(result => {
-          map.set(postID, result);
-          this.postsMap = { map };
-        })
-        .catch(err => {
-          console.error('postLoader Error', err);
-          map.set(postID, DATA_ERROR);
-          this.postsMap = { map };
-        });
     }
-
-    this.postsMap = { map };
+    forceUpdate(this.el);
   };
 
   componentWillLoad() {
@@ -108,24 +80,26 @@ export class ApPosts {
     }
   };
 
-  private renderPost(postID: string, postResult: PostsMapValue): { href?: string; el: any } {
-    if (!postResult || !this.visibleMap.get(postID)) {
+  private renderPost(postID: string): { href?: string; el: any } {
+    if (!this.visibleMap.get(postID)) {
       return { el: <Fragment></Fragment> };
     }
 
-    if (postResult == 'LOADING') {
+    const state = this.postsPromises[postID];
+
+    if (state.error()) {
+      return { el: <Fragment>{this.msgs.dataError}</Fragment> };
+    }
+
+    const post = state.result();
+    if (!post) {
       return {
         el: <ap-spinner />,
       };
     }
 
-    if (postResult.state != 'SUCCESS') {
-      return { el: <Fragment>{this.msgs.dataError}</Fragment> };
-    }
-
-    const post = postResult.value;
     return {
-      href: postResult.href,
+      href: this.hrefFormat ? this.hrefFormat.replace(':postID', postID) : undefined,
       el: (
         <Fragment>
           <span class="date">{this.msgs.datetime(post.pT)}</span>
@@ -139,8 +113,8 @@ export class ApPosts {
   render() {
     return (
       <Host>
-        {[...this.postsMap.map.entries()].map(([id, result]) => {
-          const r = this.renderPost(id, result);
+        {this.postIds.map(id => {
+          const r = this.renderPost(id);
           return (
             <a key={id} data-postid={id} ref={this.handleRef} class="card post" {...href(r.href)}>
               {r.el}

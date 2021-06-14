@@ -1,7 +1,7 @@
 import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
-import { DataResult } from 'src/shared';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
+import { PromiseState } from 'src/shared-ui/utils/promise';
 import { pushRoute } from 'src/shared-ui/utils/route';
 
 @Component({
@@ -23,15 +23,15 @@ export class AppImage {
 
   @Watch('imageID')
   watchImageID() {
-    this.loadImage();
+    this.imageState = undefined;
   }
 
   @State()
-  image?: DataResult<string>;
+  imageState?: PromiseState<string>;
 
   private naviLinks!: ApNaviLinks;
 
-  private loadImage() {
+  componentWillRender() {
     this.naviLinks = [
       {
         label: this.app.msgs.common.back,
@@ -40,40 +40,30 @@ export class AppImage {
       },
     ];
 
-    this.image = undefined;
-
-    this.app
-      .fetchImage(this.imageID)
-      .then(result => {
-        if (result?.state != 'SUCCESS') {
-          pushRoute(`/${this.announceID}/${this.postID}`, true);
-        }
-        this.image = result;
-      })
-      .catch(err => {
-        console.error(err);
-        pushRoute(`/${this.announceID}/${this.postID}`, true);
-      });
-  }
-
-  componentWillLoad() {
-    this.loadImage();
+    if (!this.imageState) {
+      this.imageState = new PromiseState(this.app.fetchImage(this.imageID));
+    }
   }
 
   render() {
+    if (this.imageState?.noResult()) {
+      pushRoute(`/${this.announceID}/${this.postID}`, true);
+      return;
+    }
+
+    const image = this.imageState?.result();
+
     const renderContent = () => {
-      switch (this.image?.state) {
-        case 'SUCCESS':
-          return (
-            <Fragment>
-              <pinch-zoom>
-                <img src={this.image.value} />
-              </pinch-zoom>
-            </Fragment>
-          );
-        default:
-          return <ap-spinner />;
+      if (image) {
+        return (
+          <Fragment>
+            <pinch-zoom>
+              <img src={image} />
+            </pinch-zoom>
+          </Fragment>
+        );
       }
+      return <ap-spinner />;
     };
 
     return (

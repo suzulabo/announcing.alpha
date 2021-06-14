@@ -3,14 +3,14 @@ import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Build, readTask } from '@stencil/core';
-import { AnnounceMetaJSON, AppEnv, DataResult, DATA_ERROR, NOT_FOUND, PostJSON } from 'src/shared';
+import { Announce, AnnounceMetaBase, AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
+import { LazyPromiseState, PromiseState } from 'src/shared-ui/utils/promise';
 import { pushRoute } from 'src/shared-ui/utils/route';
 import nacl from 'tweetnacl';
-import { AnnounceState, Follow } from './datatypes';
+import { Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppIdbCache } from './idbcache';
 import { AppMsg } from './msg';
-import { AppState } from './state';
 import { AppStorage } from './storage';
 import { bs62 } from './utils';
 
@@ -29,7 +29,6 @@ export class App {
     private appEnv: AppEnv,
     private appMsg: AppMsg,
     private appFirebase: AppFirebase,
-    private appState: AppState,
     private appStorage: AppStorage,
     private appIdbCache: AppIdbCache,
   ) {
@@ -103,113 +102,82 @@ export class App {
     return Share.share({ url });
   }
 
-  loadAnnounce(id: string) {
-    const cb = async () => {
-      const announceState = this.appState.announce;
-      const a = await this.appFirebase.getAnnounce(id);
-      switch (a?.state) {
-        case 'NOT_FOUND':
-          announceState.set(id, a);
-          break;
-        case 'SUCCESS': {
-          const meta = await this.fetchAnnounceMeta(id, a.value.mid);
-          if (meta.state != 'SUCCESS') {
-            announceState.set(id, DATA_ERROR);
-            return;
-          }
-          let latestPost: AnnounceState['latestPost'];
-          {
-            const latest = Object.entries(a.value.posts)
-              .sort((v1, v2) => {
-                return v2[1].pT.toMillis() - v1[1].pT.toMillis();
-              })
-              .shift();
-            if (latest) {
-              const post = await this.fetchPost(id, latest[0]);
-              if (post.state != 'SUCCESS') {
-                console.warn('missing post', id, post);
-                announceState.set(id, DATA_ERROR);
-                return;
-              }
-              latestPost = post.value;
-            }
-          }
+  async getAnnounceAndMeta(
+    id: string,
+    temporary?: boolean,
+  ): Promise<(Announce & AnnounceMetaBase) | undefined> {
+    const a = await this.appFirebase.getAnnounce(id, temporary);
+    if (!a) {
+      return;
+    }
+    const meta = await this.fetchAnnounceMeta(id, a.mid);
+    if (!meta) {
+      throw new Error(`fetchAnnounceMeta: ${id}/${a.mid}`);
+    }
 
-          announceState.set(id, {
-            state: 'SUCCESS',
-            value: {
-              ...a.value,
-              ...meta.value,
-              id,
-              latestPost,
-              iconLoader: !meta.value.icon
-                ? undefined
-                : async () => {
-                    const v = await this.fetchImage(meta.value.icon || '');
-                    if (v.state != 'SUCCESS') {
-                      throw new Error('fetch error');
-                    }
-                    return v.value;
-                  },
-            },
-          });
-          const follow = this.getFollow(id);
-          if (follow && follow.name != meta.value.name) {
-            follow.name = meta.value.name;
-            await this.setFollow(id, follow);
-          }
-          break;
-        }
-        default:
-          announceState.delete(id);
-      }
-    };
-
-    this.appFirebase.listenAnnounce(id, cb);
-
-    void cb();
+    return { ...a, ...meta };
   }
 
-  getAnnounceState(id: string) {
-    return this.appState.announce.get(id);
+  async getLatestPost(id: string, a: Announce) {
+    const posts = a.posts;
+    if (posts) {
+      const latest = Object.entries(posts)
+        .sort((v1, v2) => {
+          return v2[1].pT.toMillis() - v1[1].pT.toMillis();
+        })
+        .shift();
+      if (latest) {
+        const post = await this.fetchPost(id, latest[0]);
+        return post;
+      }
+    }
+    return;
+  }
+
+  getPosts(id: string, a: Announce) {
+    const postsPromises: Record<string, PromiseState<PostJSON>> = {};
+    for (const postID of Object.keys(a.posts)) {
+      postsPromises[postID] = new LazyPromiseState(() => {
+        return this.fetchPost(id, postID);
+      });
+    }
+    return postsPromises;
   }
 
   private async fetchData<T>(
     p: string,
     responseType: 'blob' | 'json' = 'json',
-  ): Promise<DataResult<T>> {
+  ): Promise<T | undefined> {
     const cacheKey = `fetch:${p}`;
     {
       const v = await this.appIdbCache.get<T>(cacheKey);
       if (v) {
-        console.debug('hit fetch cache', p);
-        return { state: 'SUCCESS', value: v };
+        // console.debug('hit fetch cache', p);
+        return v;
       }
     }
 
+    const url = `${this.dataURLPrefix}/${p}`;
     const res = await Http.request({
       method: 'GET',
-      url: `${this.dataURLPrefix}/${p}`,
+      url,
       responseType,
     });
     if (res.status == 200) {
       const dataType = typeof res.data;
-      if (responseType == 'json' && dataType == 'object') {
+      const ok = (dataType == 'object' && responseType == 'json') || dataType == 'string';
+      if (ok) {
         await this.appIdbCache.set(cacheKey, res.data);
-        return { state: 'SUCCESS', value: res.data };
-      }
-      if (dataType == 'string') {
-        await this.appIdbCache.set(cacheKey, res.data);
-        return { state: 'SUCCESS', value: res.data };
+        return res.data as T;
       }
     }
 
     if (res.status == 404) {
-      return NOT_FOUND;
+      return;
     }
 
-    console.error(`Fetch Error (${res.status})`, res.data);
-    return DATA_ERROR;
+    console.error(`Fetch Error: ${url}(${res.status})`, res.data);
+    throw new Error(`Fetch Error: ${url}(${res.status})`);
   }
 
   fetchAnnounceMeta(id: string, metaID: string) {
@@ -220,12 +188,12 @@ export class App {
     return this.fetchData<PostJSON>(`announces/${id}/posts/${postID}`);
   }
 
-  async fetchImage(id: string): Promise<DataResult<string>> {
+  async fetchImage(id: string) {
     const v = await this.fetchData<string>(`images/${id}`, 'blob');
-    if (v.state != 'SUCCESS') {
-      return v;
+    if (v) {
+      return `data:image/jpeg;base64,${v}`;
     }
-    return { state: 'SUCCESS', value: `data:image/jpeg;base64,${v.value}` };
+    return;
   }
 
   getFollows() {

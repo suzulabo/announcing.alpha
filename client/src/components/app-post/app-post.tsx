@@ -1,7 +1,9 @@
-import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, Fragment, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
-import { DataResult, DATA_ERROR, PostJSON } from 'src/shared';
+import { FirestoreUpdatedEvent } from 'src/app/firebase';
+import { Announce, AnnounceMetaBase, PostJSON } from 'src/shared';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
+import { PromiseState } from 'src/shared-ui/utils/promise';
 import { pushRoute } from 'src/shared-ui/utils/route';
 
 @Component({
@@ -14,26 +16,10 @@ export class AppPost {
 
   @Prop()
   announceID!: string;
+
   @Watch('announceID')
   watchAnnounceID() {
-    this.loadAnnounce();
-  }
-
-  @Prop()
-  postID!: string;
-  @Watch('postID')
-  watchPostID() {
-    this.loadPost();
-  }
-
-  @State()
-  post?: DataResult<PostJSON & { imgLoader?: () => Promise<string>; imgHref?: string }>;
-
-  private naviLinks!: ApNaviLinks;
-  private naviLinksLoading!: ApNaviLinks;
-
-  private loadAnnounce() {
-    this.app.loadAnnounce(this.announceID);
+    this.announceState = undefined;
 
     this.naviLinksLoading = [
       {
@@ -51,30 +37,75 @@ export class AppPost {
     }
   }
 
-  private loadPost() {
-    this.post = undefined;
-    this.app
-      .fetchPost(this.announceID, this.postID)
-      .then(result => {
-        this.post = result;
-        if (this.post?.state == 'SUCCESS') {
-          const img = this.post.value.img;
-          if (img) {
-            this.post.value.imgLoader = async () => {
-              const v = await this.app.fetchImage(img);
-              if (v?.state != 'SUCCESS') {
-                throw new Error('fetch error');
-              }
-              return v.value;
-            };
-            this.post.value.imgHref = `/${this.announceID}/${this.postID}/image/${img}`;
-          }
-        }
-      })
-      .catch(err => {
-        this.post = DATA_ERROR;
-        throw err;
-      });
+  @Prop()
+  postID!: string;
+
+  @Watch('postID')
+  watchPostID() {
+    this.postState = undefined;
+  }
+
+  @Listen('FirestoreUpdated')
+  handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
+    const { collection, id } = event.detail;
+    if (collection == 'announces' && id == this.announceID) {
+      this.announceState = undefined;
+    }
+  }
+
+  @State()
+  announceState?: PromiseState<
+    Announce &
+      AnnounceMetaBase & {
+        announceIcon?: PromiseState<string>;
+        postsPromises: Record<string, PromiseState<PostJSON>>;
+      }
+  >;
+
+  @State()
+  postState?: PromiseState<PostJSON & { imgPromise?: PromiseState<string>; imgHref?: string }>;
+
+  private naviLinks!: ApNaviLinks;
+  private naviLinksLoading!: ApNaviLinks;
+
+  private async loadAnnounce() {
+    const id = this.announceID;
+    const a = await this.app.getAnnounceAndMeta(id);
+    if (a) {
+      return {
+        ...a,
+        announceIcon: a.icon ? new PromiseState(this.app.fetchImage(a.icon)) : undefined,
+        postsPromises: this.app.getPosts(id, a),
+      };
+    }
+    return;
+  }
+
+  private async loadPost() {
+    const id = this.announceID;
+    const postID = this.postID;
+    const post = await this.app.fetchPost(id, postID);
+    if (post) {
+      return {
+        ...post,
+        imgPromise: post.img ? new PromiseState(this.app.fetchImage(post.img)) : undefined,
+        imgHref: post.img ? `/${this.announceID}/${this.postID}/image/${post.img}` : undefined,
+      };
+    }
+    return;
+  }
+
+  componentWillLoad() {
+    this.watchAnnounceID();
+  }
+
+  componentWillRender() {
+    if (!this.announceState) {
+      this.announceState = new PromiseState(this.loadAnnounce());
+    }
+    if (!this.postState) {
+      this.postState = new PromiseState(this.loadPost());
+    }
   }
 
   private shareClick = async () => {
@@ -85,39 +116,32 @@ export class AppPost {
     }
   };
 
-  componentWillLoad() {
-    this.loadAnnounce();
-    this.loadPost();
-  }
-
   render() {
-    const a = this.app.getAnnounceState(this.announceID);
+    if (this.announceState?.noResult() || this.postState?.noResult()) {
+      pushRoute(`/${this.announceID}`, true);
+      return;
+    }
+
+    const announce = this.announceState?.result();
+    const post = this.postState?.result();
+    const enableNotification = this.app.getNotification(this.announceID) != null;
+    const isFollow = this.app.getFollow(this.announceID) != null;
 
     const renderContent = () => {
-      if (!a) {
+      if (!announce) {
         return <ap-spinner />;
       }
 
-      if (a.state != 'SUCCESS') {
-        pushRoute(`/${this.announceID}`, true);
-        return;
-      }
-
-      const announce = a.value;
-      const enableNotification = this.app.getNotification(this.announceID) != null;
-      const isFollow = this.app.getFollow(this.announceID) != null;
-
       const apAnnounce = (
         <ap-announce
-          announce={{
-            ...announce,
-            icons: { isFollow, enableNotification },
-            href: `/${this.announceID}`,
-          }}
+          announce={announce}
+          announceIcon={announce.announceIcon}
+          icons={{ isFollow, enableNotification }}
+          href={`/${this.announceID}`}
         />
       );
 
-      if (!this.post) {
+      if (!post) {
         return (
           <Fragment>
             {apAnnounce}
@@ -126,27 +150,24 @@ export class AppPost {
         );
       }
 
-      if (this.post.state != 'SUCCESS') {
-        pushRoute(`/${this.announceID}`, true);
-        return;
-      }
-
       this.app.setTitle(
-        this.app.msgs.post.pageTitle(
-          a.value.name,
-          this.post.value.title || this.post.value.body?.substr(0, 20) || '',
-        ),
+        this.app.msgs.post.pageTitle(announce.name, post.title || post.body?.substr(0, 20) || ''),
       );
 
       return (
         <Fragment>
           {apAnnounce}
-          <ap-post post={this.post.value} msgs={{ datetime: this.app.msgs.common.datetime }} />
+          <ap-post
+            post={post}
+            imgPromise={post.imgPromise}
+            imgHref={post.imgHref}
+            msgs={{ datetime: this.app.msgs.common.datetime }}
+          />
         </Fragment>
       );
     };
 
-    const loaded = a?.state == 'SUCCESS' && this.post?.state == 'SUCCESS';
+    const loaded = !!post;
 
     return (
       <Host>

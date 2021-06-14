@@ -1,4 +1,6 @@
-import { Component, h, Prop, State, Watch } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
+import { PromiseState } from '../utils/promise';
+import { href } from '../utils/route';
 
 @Component({
   tag: 'ap-image',
@@ -6,46 +8,33 @@ import { Component, h, Prop, State, Watch } from '@stencil/core';
 })
 export class ApImage {
   @Prop()
-  loader?: () => Promise<string>;
+  srcPromise?: PromiseState<string | undefined>;
 
-  @Watch('loader')
-  watchLoader(loader: ApImage['loader']) {
-    if (loader) {
-      this.src = '';
-      this.loaderError = false;
-      loader()
-        .then(src => {
-          if (loader == this.loader) {
-            this.src = src;
-          }
-        })
-        .catch(err => {
-          console.error('ap-image loader error', err);
-          if (loader == this.loader) {
-            this.loaderError = true;
-          }
-        });
-    }
-  }
-
-  @State()
-  src = '';
-
-  @State()
-  loaderError = false;
-
-  componentWillLoad() {
-    this.watchLoader(this.loader);
-  }
+  @Prop()
+  href?: string;
 
   render() {
-    if (this.loaderError) {
+    if (!this.srcPromise) {
+      return;
+    }
+
+    if (this.srcPromise.error() != null) {
       return <ap-icon icon="exclamationDiamondFill" />;
     }
 
-    if (this.src) {
-      return <img src={this.src} />;
+    const src = this.srcPromise.result();
+    if (src) {
+      if (this.href) {
+        return (
+          <a {...href(this.href)}>
+            <img src={src} />
+          </a>
+        );
+      } else {
+        return <img src={src} />;
+      }
     }
+
     return <ap-spinner />;
   }
 }

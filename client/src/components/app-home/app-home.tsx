@@ -1,7 +1,9 @@
-import { Component, Fragment, h, Host, Prop } from '@stencil/core';
+import { Component, FunctionalComponent, h, Host, Listen, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
-import { AnnounceState, Follow } from 'src/app/datatypes';
-import { DataResult } from 'src/shared';
+import { Follow } from 'src/app/datatypes';
+import { FirestoreUpdatedEvent } from 'src/app/firebase';
+import { Announce, AnnounceMetaBase, PostJSON } from 'src/shared';
+import { PromiseState } from 'src/shared-ui/utils/promise';
 import { href } from 'src/shared-ui/utils/route';
 
 @Component({
@@ -9,16 +11,57 @@ import { href } from 'src/shared-ui/utils/route';
   styleUrl: 'app-home.scss',
 })
 export class AppHome {
+  @State()
+  rerender = {};
+
   @Prop()
   app!: App;
 
+  @Listen('FirestoreUpdated')
+  handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
+    const { collection, id } = event.detail;
+    if (collection == 'announces') {
+      if (this.announceStateMap.has(id)) {
+        this.announceStateMap.set(id, new PromiseState(this.loadAnnounce(id)));
+      }
+      this.rerender = {};
+    }
+  }
+
+  private announceStateMap = new Map<
+    string,
+    PromiseState<
+      Announce &
+        AnnounceMetaBase & {
+          announceIcon?: PromiseState<string>;
+          latestPost?: PostJSON;
+        }
+    >
+  >();
+
+  private async loadAnnounce(id: string) {
+    const a = await this.app.getAnnounceAndMeta(id);
+    if (a) {
+      const post = await this.app.getLatestPost(id, a);
+      return {
+        ...a,
+        announceIcon: a.icon ? new PromiseState(this.app.fetchImage(a.icon)) : undefined,
+        latestPost: post,
+      };
+    }
+    return;
+  }
+
   componentWillLoad() {
     this.app.setTitle(this.app.msgs.home.pageTitle);
+  }
 
+  componentWillRender() {
     const follows = this.app.getFollows();
-
     for (const [id] of follows) {
-      this.app.loadAnnounce(id);
+      if (!this.announceStateMap.has(id)) {
+        this.announceStateMap.set(id, new PromiseState(this.loadAnnounce(id)));
+      }
     }
   }
 
@@ -32,73 +75,79 @@ export class AppHome {
   };
 
   private renderAnnounces() {
-    const follows = [...this.app.getFollows()];
+    const follows = this.app.getFollows();
 
     if (follows.length == 0) {
-      return this.renderNofollows();
+      return <div class="no-follows">{this.app.msgs.home.noFollows}</div>;
     }
 
     const msgs = this.app.msgs;
 
-    const renderContent = (id: string, follow: Follow, a?: DataResult<AnnounceState>) => {
-      switch (a?.state) {
-        case 'NOT_FOUND':
-        case 'DATA_ERROR':
-          return (
+    const renderAnnounceCard = (id: string, follow: Follow) => {
+      const announceState = this.announceStateMap.get(id);
+      if (!announceState || announceState.state() == 'pending') {
+        return (
+          <AnnounceCard>
+            <ap-spinner />
+          </AnnounceCard>
+        );
+      }
+
+      const announce = announceState.result();
+      if (!announce) {
+        return (
+          <AnnounceCard>
             <div class="main">
               <span class="name">{follow.name}</span>
               <span class="data-error">
-                {a.state == 'DATA_ERROR' ? msgs.home.dataError : msgs.home.notFound}
+                {announceState.error() ? msgs.home.dataError : msgs.home.notFound}
               </span>
               <button class="anchor" data-announce-id={id} onClick={this.handleUnfollowClick}>
                 {msgs.home.unfollowBtn}
               </button>
             </div>
-          );
-        case 'SUCCESS': {
-          const latestPost = a.value.latestPost;
-          const hasNew = (latestPost?.pT || 0) > follow.readTime;
-
-          return (
-            <Fragment>
-              <div class="main">
-                <span class="name">{a.value.name}</span>
-                {latestPost && (
-                  <div class="latest">
-                    {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
-                    <span class="pT">{msgs.common.datetime(latestPost?.pT)}</span>
-                    <span class="title">{latestPost.title || latestPost.body}</span>
-                  </div>
-                )}
-              </div>
-              {a.value.iconLoader && <ap-image loader={a.value.iconLoader} />}
-            </Fragment>
-          );
-        }
-        default:
-          return <ap-spinner />;
+          </AnnounceCard>
+        );
       }
+
+      const latestPost = announce.latestPost;
+      const hasNew = (latestPost?.pT || 0) > follow.readTime;
+
+      return (
+        <AnnounceCard href={`/${id}`}>
+          <div class="main">
+            <span class="name">{announce.name}</span>
+            {latestPost && (
+              <div class="latest">
+                {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
+                <span class="pT">{msgs.common.datetime(latestPost?.pT)}</span>
+                <span class="title">{latestPost.title || latestPost.body}</span>
+              </div>
+            )}
+          </div>
+          {announce.announceIcon && <ap-image srcPromise={announce.announceIcon} />}
+        </AnnounceCard>
+      );
     };
 
     return (
       <div class="announces">
         {follows?.map(([id, follow]) => {
-          const a = this.app.getAnnounceState(id);
-          return (
-            <a class="card" {...{ ...(a?.state == 'SUCCESS' && href(`/${id}`)) }}>
-              {renderContent(id, follow, a)}
-            </a>
-          );
+          return renderAnnounceCard(id, follow);
         })}
       </div>
     );
-  }
-
-  private renderNofollows() {
-    return <div class="no-follows">{this.app.msgs.home.noFollows}</div>;
   }
 
   render() {
     return <Host>{this.renderAnnounces()}</Host>;
   }
 }
+
+const AnnounceCard: FunctionalComponent<{ href?: string }> = (props, children) => {
+  return (
+    <a class="card" {...href(props.href)}>
+      {children}
+    </a>
+  );
+};

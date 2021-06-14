@@ -1,5 +1,6 @@
-import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
-import { href } from '../utils/route';
+import { Component, Fragment, h, Host, Prop } from '@stencil/core';
+import { PostJSON } from 'src/shared';
+import { PromiseState } from '../utils/promise';
 
 const tweetIDPattern = new RegExp('^https://twitter\\.com/.+/status/([0-9]+)$');
 
@@ -9,56 +10,18 @@ const tweetIDPattern = new RegExp('^https://twitter\\.com/.+/status/([0-9]+)$');
 })
 export class ApPost {
   @Prop()
-  post!: {
-    title?: string;
-    body?: string;
-    link?: string;
-    pT: number;
-    imgLoader?: () => Promise<string>;
-    imgHref?: string;
-  };
+  post!: PostJSON;
+
+  @Prop()
+  imgPromise?: PromiseState<string>;
+
+  @Prop()
+  imgHref?: string;
 
   @Prop()
   msgs!: {
     datetime: (v: number) => string;
   };
-
-  @State()
-  imageSrc?: string;
-
-  componentWillLoad() {
-    if (this.post.imgLoader) {
-      this.post
-        .imgLoader()
-        .then(src => {
-          if (src) {
-            this.imageSrc = src;
-          } else {
-            this.imageSrc = 'ERROR';
-          }
-        })
-        .catch(err => {
-          console.error('imageLoader Error', err);
-          this.imageSrc = 'ERROR';
-        });
-    }
-  }
-
-  private renderImage() {
-    if (!this.imageSrc) {
-      return <ap-spinner />;
-    }
-
-    if (this.imageSrc == 'ERROR') {
-      return <ap-icon icon="exclamationDiamondFill" />;
-    }
-
-    return (
-      <a {...href(this.post.imgHref)}>
-        <img src={this.imageSrc} />
-      </a>
-    );
-  }
 
   private renderTweet(link: string) {
     //
@@ -76,7 +39,11 @@ export class ApPost {
 
     return (
       <Host>
-        {this.post.imgLoader && <div class="image">{this.renderImage()}</div>}
+        {this.imgPromise && (
+          <div class="image">
+            <ap-image srcPromise={this.imgPromise} href={this.imgHref} />
+          </div>
+        )}
         <span class="date">{this.msgs.datetime(post.pT)}</span>
         {post.title && <span class="title">{post.title}</span>}
         {post.body && <ap-textview class="body" text={post.body} />}

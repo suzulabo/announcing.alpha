@@ -5,6 +5,7 @@ import { Build } from '@stencil/core';
 import { FirebaseApp, initializeApp } from 'firebase/app';
 import {
   doc,
+  DocumentData,
   DocumentReference,
   enableMultiTabIndexedDbPersistence,
   FirebaseFirestore,
@@ -15,14 +16,7 @@ import {
 } from 'firebase/firestore';
 import { Functions, getFunctions, httpsCallable, useFunctionsEmulator } from 'firebase/functions';
 import { FirebaseMessaging, getMessaging, getToken } from 'firebase/messaging';
-import {
-  Announce,
-  AppEnv,
-  DataResult,
-  Lang,
-  NOT_FOUND,
-  RegisterNotificationParams,
-} from 'src/shared';
+import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 import nacl from 'tweetnacl';
 import { PostNotificationRecievedEvent } from './datatypes';
 import { bs62 } from './utils';
@@ -132,11 +126,80 @@ class CapNotification {
   }
 }
 
-const getCache = async <T>(docRef: DocumentReference): Promise<DataResult<T> | undefined> => {
+export class FirestoreUpdatedEvent extends CustomEvent<{
+  collection: string;
+  id: string;
+  value?: DocumentData;
+}> {
+  constructor(detail: { collection: string; id: string; value?: DocumentData }) {
+    super('FirestoreUpdated', { detail });
+  }
+}
+
+class FirestoreHelper {
+  private docMap = new Map<
+    string,
+    {
+      unsubscribe?: () => void;
+      listener?: Promise<{ data?: DocumentData }>;
+      temporary?: boolean;
+    }
+  >();
+
+  constructor(private firestore: FirebaseFirestore) {}
+
+  async listenAndGet<T>(p: string, temporary?: boolean): Promise<T | undefined> {
+    const docInfo = this.docMap.get(p) || {};
+    const docRef = doc(this.firestore, p);
+
+    if (!docInfo.listener) {
+      docInfo.temporary = temporary;
+      docInfo.listener = new Promise((resolve, reject) => {
+        const value: { data?: DocumentData } = {};
+
+        docInfo.unsubscribe = onSnapshot(docRef, {
+          next: ds => {
+            value.data = ds.data();
+            resolve(value);
+
+            window.dispatchEvent(
+              new FirestoreUpdatedEvent({
+                collection: docRef.parent.id,
+                id: docRef.id,
+                value: ds.data(),
+              }),
+            );
+          },
+          error: reason => {
+            if (docInfo.unsubscribe) {
+              docInfo.unsubscribe();
+            }
+            this.docMap.delete(p);
+            reject(reason);
+          },
+        });
+      });
+
+      this.docMap.set(p, docInfo);
+    }
+
+    {
+      const v = await getCache<T>(docRef);
+      if (v) {
+        return v;
+      }
+    }
+
+    const v = await docInfo.listener;
+    return v.data as T;
+  }
+}
+
+const getCache = async <T>(docRef: DocumentReference): Promise<T | undefined> => {
   try {
     const doc = await getDocFromCache(docRef);
     if (doc.exists()) {
-      return { state: 'SUCCESS', value: doc.data() as T };
+      return doc.data() as T;
     }
   } catch (err) {
     if (err.code == 'unavailable') {
@@ -150,6 +213,7 @@ const getCache = async <T>(docRef: DocumentReference): Promise<DataResult<T> | u
 export class AppFirebase {
   private functions: Functions;
   private firestore: FirebaseFirestore;
+  private firestoreHelper: FirestoreHelper;
 
   private messaging?: FirebaseMessaging;
   private capNotification?: CapNotification;
@@ -161,6 +225,7 @@ export class AppFirebase {
 
     this.functions = getFunctions(_firebaseApp, this.appEnv.env.functionsRegion);
     this.firestore = getFirestore(_firebaseApp);
+    this.firestoreHelper = new FirestoreHelper(this.firestore);
 
     if (Capacitor.getPlatform() != 'web') {
       this.capNotification = new CapNotification();
@@ -203,63 +268,8 @@ export class AppFirebase {
     return res.data;
   }
 
-  private listeners = (() => {
-    const notFounds = new Set<string>();
-    const listenMap = new Map<string, () => void>();
-
-    const add = (p: string, cb: () => void) => {
-      if (listenMap.has(p)) {
-        return;
-      }
-      if (notFounds.has(p)) {
-        return;
-      }
-
-      const unsubscribe = onSnapshot(doc(this.firestore, p), {
-        next: ds => {
-          if (!ds.exists) {
-            notFounds.add(p);
-            unsubscribe();
-            listenMap.delete(p);
-          }
-          if (cb) {
-            cb();
-          }
-        },
-        error: err => {
-          console.error('onSnapshot error', p, err);
-          unsubscribe();
-          listenMap.delete(p);
-        },
-      });
-      listenMap.set(p, unsubscribe);
-    };
-
-    const release = () => {
-      listenMap.forEach(v => {
-        v();
-      });
-      listenMap.clear();
-    };
-
-    return { add, release, notFounds } as const;
-  })();
-
-  releaseListeners() {
-    this.listeners.release();
-  }
-
-  listenAnnounce(id: string, cb: () => void) {
-    return this.listeners.add(`announces/${id}`, cb);
-  }
-
-  getAnnounce(id: string): Promise<DataResult<Announce> | undefined> {
-    const p = `announces/${id}`;
-    if (this.listeners.notFounds.has(p)) {
-      return Promise.resolve(NOT_FOUND);
-    }
-    const docRef = doc(this.firestore, p);
-    return getCache<Announce>(docRef);
+  async getAnnounce(id: string, temporary?: boolean) {
+    return this.firestoreHelper.listenAndGet<Announce>(`announces/${id}`, temporary);
   }
 
   private async messageToken() {

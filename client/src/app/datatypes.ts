@@ -1,14 +1,12 @@
-import { Announce, AnnounceMetaJSON, PostJSON } from 'src/shared';
+import { Announce, AnnounceMetaBase, PostJSON } from 'src/shared';
 
 export interface Follow {
   name: string; // Needed after deleted
   readTime: number;
 }
 
-export interface AnnounceState extends Announce, AnnounceMetaJSON {
-  id: string;
+export interface AnnounceState extends Announce, AnnounceMetaBase {
   latestPost?: PostJSON;
-  iconLoader?: () => Promise<string>;
 }
 
 export class PostNotificationRecievedEvent extends CustomEvent<{

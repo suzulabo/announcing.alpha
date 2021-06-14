@@ -1,4 +1,6 @@
 import { Component, Fragment, h, Host, Prop } from '@stencil/core';
+import { Announce, AnnounceMetaBase } from 'src/shared';
+import { PromiseState } from '../utils/promise';
 import { href } from '../utils/route';
 
 @Component({
@@ -7,26 +9,22 @@ import { href } from '../utils/route';
 })
 export class ApAnnounce {
   @Prop()
-  announce!: {
-    name: string;
-    desc?: string;
-    iconLoader?: () => Promise<string>;
-    link?: string;
-    posts: Record<
-      string,
-      {
-        pT: {
-          toMillis: () => number;
-        };
-      }
-    >;
-    href?: string;
-    icons?: {
-      isFollow: boolean;
-      enableNotification: boolean;
-    };
-    showDetails?: boolean;
+  announce!: Announce & AnnounceMetaBase;
+
+  @Prop()
+  announceIcon?: PromiseState<string | undefined>;
+
+  @Prop()
+  showDetails?: boolean;
+
+  @Prop()
+  icons?: {
+    isFollow: boolean;
+    enableNotification: boolean;
   };
+
+  @Prop()
+  href?: string;
 
   render() {
     const announce = this.announce;
@@ -34,21 +32,21 @@ export class ApAnnounce {
       return;
     }
 
-    const Tag = announce.href ? 'a' : 'div';
+    const Tag = this.href ? 'a' : 'div';
 
     return (
       <Host>
-        <Tag class="head" {...(announce.href && href(announce.href))}>
+        <Tag class="head" {...(this.href && href(this.href))}>
           <div class="name">
             <div class="icons">
-              {announce.icons && announce.icons.isFollow && <ap-icon icon="heart" />}
-              {announce.icons && announce.icons.enableNotification && <ap-icon icon="bell" />}
+              {this.icons?.isFollow && <ap-icon icon="heart" />}
+              {this.icons?.enableNotification && <ap-icon icon="bell" />}
             </div>
             <span>{announce.name}</span>
           </div>
-          {announce.iconLoader && <ap-image loader={announce.iconLoader} />}
+          {this.announceIcon && <ap-image srcPromise={this.announceIcon} />}
         </Tag>
-        {announce.showDetails && (
+        {this.showDetails && (
           <Fragment>
             {announce.desc && <div class="desc">{announce.desc}</div>}
             {announce.link && (
