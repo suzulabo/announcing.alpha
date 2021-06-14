@@ -281,11 +281,13 @@ export class AppFirebase {
       return;
     }
 
-    const swReg = await navigator.serviceWorker.getRegistration();
+    const serviceWorkerRegistration = await navigator.serviceWorker.getRegistration();
     const token = await getToken(this.messaging, {
       vapidKey: this.appEnv.env.vapidKey,
-      swReg,
-    });
+      serviceWorkerRegistration,
+    } as any);
+    // TODO: It seeems a bug of declare
+
     return token;
   }
 
