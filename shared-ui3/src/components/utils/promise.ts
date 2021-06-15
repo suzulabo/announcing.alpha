@@ -34,8 +34,8 @@ export class LazyPromise<T> implements Promise<T> {
 export class PromiseState<T> {
   private value?: T;
   private reason?: any;
-  private touched = false;
   private _state: 'pending' | 'fulfilled' | 'rejected' = 'pending';
+  private touched = false;
   private refs = new Set<any>();
 
   constructor(private promise: Promise<T | undefined>) {

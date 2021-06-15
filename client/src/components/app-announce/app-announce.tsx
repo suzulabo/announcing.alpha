@@ -61,7 +61,8 @@ export class AppAnnounce {
     ];
   }
 
-  private async loadAnnounce(id: string) {
+  private async loadAnnounce() {
+    const id = this.announceID;
     const a = await this.app.getAnnounceAndMeta(id);
     if (a) {
       return {
@@ -75,7 +76,7 @@ export class AppAnnounce {
 
   componentWillRender() {
     if (!this.announceState) {
-      this.announceState = new PromiseState(this.loadAnnounce(this.announceID));
+      this.announceState = new PromiseState(this.loadAnnounce());
     }
   }
 

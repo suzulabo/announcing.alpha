@@ -46,6 +46,7 @@ export const msgs: Msgs = {
       postBtn: '投稿',
       editBtn: '設定',
     },
+    dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
   },
   announce: {
     pageTitle: (s: string) => {

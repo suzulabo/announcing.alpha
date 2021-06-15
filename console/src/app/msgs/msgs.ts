@@ -31,6 +31,7 @@ export interface Msgs {
       postBtn: string;
       editBtn: string;
     };
+    dataError: string;
   };
   announce: {
     pageTitle: (s: string) => string;

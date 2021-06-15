@@ -1,8 +1,8 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
-import { AnnounceState } from 'src/app/datatypes';
-import { Post, PostRule } from 'src/shared';
-import { href, pushRoute } from 'src/shared-ui/utils/route';
+import { Announce, AnnounceMetaBase, Post, PostRule } from 'src/shared';
+import { PromiseState } from 'src/shared-ui/utils/promise';
+import { href, pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
 import { isURL } from 'src/utils/isurl';
 
 @Component({
@@ -16,55 +16,34 @@ export class AppPostForm {
   @Prop()
   announceID!: string;
 
+  @Watch('announceID')
+  watchAnnounceID() {
+    this.announceState = undefined;
+  }
+
+  @State()
+  announceState?: PromiseState<
+    Announce &
+      AnnounceMetaBase & {
+        iconData?: string;
+      }
+  >;
+
   @Prop()
   postID!: string;
 
-  @State()
-  values!: { title?: string; body?: string; link?: string; img?: string; imgData?: string };
+  @Watch('postID')
+  watchPostID() {
+    this.values = undefined;
+  }
 
-  private announce!: AnnounceState;
-  private post!: Post & { imgData?: string };
+  @State()
+  postState?: PromiseState<Post & { imgData?: string }>;
+
+  @State()
+  values?: { title?: string; body?: string; link?: string; img?: string; imgData?: string };
 
   private backPath!: string;
-
-  async componentWillLoad() {
-    await this.app.processLoading(async () => {
-      this.backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
-
-      const as = this.app.getAnnounceState(this.announceID);
-      if (as?.state != 'SUCCESS') {
-        pushRoute(this.backPath, true);
-        return;
-      }
-
-      this.announce = as.value;
-
-      if (!this.postID) {
-        this.values = {};
-        return;
-      }
-
-      if (!(this.postID in as.value.posts)) {
-        pushRoute(this.backPath, true);
-        return;
-      }
-
-      const post = await this.app.getPost(this.announceID, this.postID);
-      if (!post) {
-        pushRoute(this.backPath, true);
-        return;
-      }
-      this.post = post;
-      this.values = { ...post };
-
-      if (post.img) {
-        this.values.imgData = await this.app.getImage(post.img);
-        this.post.imgData = this.values.imgData;
-      }
-
-      this.app.setTitle(this.app.msgs.postForm.pageTitle(as.value.name));
-    });
-  }
 
   private handleInput = {
     title: (ev: Event) => {
@@ -85,6 +64,9 @@ export class AppPostForm {
   };
 
   private handleSubmitClick = async () => {
+    if (!this.values) {
+      return;
+    }
     this.app.loading = true;
     try {
       await this.app.putPost(
@@ -101,16 +83,75 @@ export class AppPostForm {
     }
   };
 
+  componentWillRender() {
+    if (!this.announceState) {
+      this.backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
+
+      this.announceState = new PromiseState(
+        (async () => {
+          const id = this.announceID;
+          const a = await this.app.getAnnounceAndMeta(id);
+          if (a) {
+            return {
+              ...a,
+              iconData: a.icon ? await this.app.getImage(a.icon) : undefined,
+            };
+          }
+          return;
+        })(),
+      );
+    }
+
+    if (!this.values) {
+      if (!this.postID) {
+        this.values = {};
+        return;
+      }
+      this.postState = new PromiseState(
+        (async () => {
+          const id = this.announceID;
+          const postID = this.postID;
+          const post = await this.app.getPost(id, postID);
+          if (post) {
+            return {
+              ...post,
+              imgPromise: post.img ? new PromiseState(this.app.getImage(post.img)) : undefined,
+            };
+          }
+          return;
+        })(),
+      );
+      this.postState.then(post => {
+        this.values = { ...post };
+      });
+    }
+  }
+
   render() {
-    if (!this.announce) {
+    if (!this.announceState || !this.values) {
       return;
     }
+
+    if (this.announceState.error() || this.postState?.error()) {
+      redirectRoute(this.backPath);
+      return;
+    }
+
+    const announce = this.announceState.result();
+    if (!announce) {
+      return;
+    }
+
+    this.app.setTitle(this.app.msgs.postForm.pageTitle(announce.name));
 
     const values = this.values;
 
     let canSubmit = (values.title || values.body) && isURL(this.values.link);
     if (canSubmit && this.postID) {
-      const post = this.post;
+      const post = this.postState?.result();
+      if (!post) {
+        return;
+      }
       canSubmit =
         values.title != post.title ||
         values.body != post.body ||

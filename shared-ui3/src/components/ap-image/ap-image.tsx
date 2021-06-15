@@ -8,7 +8,7 @@ import { href } from '../utils/route';
 })
 export class ApImage {
   @Prop()
-  srcPromise?: PromiseState<string | undefined>;
+  srcPromise?: PromiseState<string>;
 
   @Prop()
   href?: string;

@@ -1,8 +1,8 @@
-import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
-import { AnnounceState } from 'src/app/datatypes';
-import { AnnounceMetaRule } from 'src/shared';
-import { href, pushRoute } from 'src/shared-ui/utils/route';
+import { Announce, AnnounceMetaBase, AnnounceMetaRule } from 'src/shared';
+import { PromiseState } from 'src/shared-ui/utils/promise';
+import { href, pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
 import { isURL } from 'src/utils/isurl';
 
 @Component({
@@ -16,10 +16,21 @@ export class AppAnnounceEdit {
   @Prop()
   announceID!: string;
 
+  @Watch('announceID')
+  watchAnnounceID() {
+    this.announceState = undefined;
+  }
+
+  @State()
+  announceState?: PromiseState<
+    Announce &
+      AnnounceMetaBase & {
+        iconData?: string;
+      }
+  >;
+
   @State()
   values!: { name?: string; desc?: string; link?: string; icon?: string; iconData?: string };
-
-  private announce!: AnnounceState;
 
   @State()
   showDeletion = false;
@@ -90,38 +101,58 @@ export class AppAnnounceEdit {
     }
   };
 
-  componentWillLoad() {
-    () => {
-      const as = this.app.getAnnounceState(this.announceID);
-      if (as?.state != 'SUCCESS') {
-        pushRoute('/', true);
-        return;
-      }
-
-      this.app.setTitle(this.app.msgs.announceEdit.pageTitle(as.value.name));
-
-      this.announce = as.value;
-      this.values = {
-        name: as.value.name,
-        desc: as.value.desc,
-        link: as.value.link,
-        icon: as.value.icon,
-        iconData: as.value.iconData,
+  private async loadAnnounce() {
+    const id = this.announceID;
+    const a = await this.app.getAnnounceAndMeta(id);
+    if (a) {
+      return {
+        ...a,
+        iconData: a.icon ? await this.app.getImage(a.icon) : undefined,
       };
-    };
+    }
+    return;
+  }
+
+  componentWillRender() {
+    if (!this.announceState) {
+      this.announceState = new PromiseState(this.loadAnnounce());
+      this.announceState.then(a => {
+        if (a) {
+          this.values = {
+            name: a.name,
+            desc: a.desc,
+            link: a.link,
+            icon: a.icon,
+            iconData: a.iconData,
+          };
+        }
+      });
+    }
   }
 
   render() {
-    if (!this.values) {
+    switch (this.announceState?.state()) {
+      case 'pending':
+        return <ap-spinner />;
+      case 'rejected':
+        redirectRoute(`/${this.announceID}`);
+        return;
+    }
+
+    const announce = this.announceState?.result();
+    if (!announce) {
+      redirectRoute(`/${this.announceID}`);
       return;
     }
 
+    this.app.setTitle(this.app.msgs.announceEdit.pageTitle(announce.name));
+
     const modified =
-      this.values.name != this.announce.name ||
-      this.values.desc != this.announce.desc ||
-      this.values.link != this.announce.link ||
-      this.values.icon != this.announce.icon ||
-      this.values.iconData != this.announce.iconData;
+      this.values.name != announce.name ||
+      this.values.desc != announce.desc ||
+      this.values.link != announce.link ||
+      this.values.icon != announce.icon ||
+      this.values.iconData != announce.iconData;
 
     const canSubmit = !!this.values.name && isURL(this.values.link) && modified;
 
@@ -164,7 +195,7 @@ export class AppAnnounceEdit {
           <Fragment>
             <div>{this.app.msgs.announceEdit.deletion.desc}</div>
             <button onClick={this.handleDeletionClick}>
-              {this.app.msgs.announceEdit.deletion.btn(this.announce.name)}
+              {this.app.msgs.announceEdit.deletion.btn(announce.name)}
             </button>
           </Fragment>
         )}

@@ -19,7 +19,7 @@ export class FirestoreUpdatedEvent extends CustomEvent<{
 }
 
 export class FirestoreHelper {
-  private docMap = new Map<
+  private listenerMap = new Map<
     string,
     {
       unsubscribe?: () => void;
@@ -31,7 +31,7 @@ export class FirestoreHelper {
   constructor(private firestore: FirebaseFirestore) {}
 
   async listenAndGet<T>(p: string, temporary?: boolean): Promise<T | undefined> {
-    const docInfo = this.docMap.get(p) || {};
+    const docInfo = this.listenerMap.get(p) || {};
     const docRef = doc(this.firestore, p);
 
     if (!docInfo.listener) {
@@ -56,13 +56,13 @@ export class FirestoreHelper {
             if (docInfo.unsubscribe) {
               docInfo.unsubscribe();
             }
-            this.docMap.delete(p);
+            this.listenerMap.delete(p);
             reject(reason);
           },
         });
       });
 
-      this.docMap.set(p, docInfo);
+      this.listenerMap.set(p, docInfo);
     }
 
     {
@@ -76,17 +76,24 @@ export class FirestoreHelper {
     return v.data as T;
   }
 
-  async getCacheFirst<T>(p: string) {
+  releaseListener() {
+    this.listenerMap.forEach(v => {
+      if (v.unsubscribe) v.unsubscribe();
+    });
+    this.listenerMap.clear();
+  }
+
+  async getCacheFirst<T>(p: string): Promise<T | undefined> {
     const docRef = doc(this.firestore, p);
     {
       const v = await getCache(docRef);
       if (v) {
-        return;
+        return v as T;
       }
     }
 
     const d = await getDocFromServer(docRef);
-    return d.data() as T;
+    return d.data() as T | undefined;
   }
 }
 

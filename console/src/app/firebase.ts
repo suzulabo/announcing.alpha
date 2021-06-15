@@ -10,14 +10,9 @@ import {
   useAuthEmulator,
 } from 'firebase/auth';
 import {
-  doc,
-  DocumentReference,
   enableMultiTabIndexedDbPersistence,
   FirebaseFirestore,
-  getDocFromCache,
-  getDocFromServer,
   getFirestore,
-  onSnapshot,
   useFirestoreEmulator,
 } from 'firebase/firestore';
 import { Functions, getFunctions, httpsCallable, useFunctionsEmulator } from 'firebase/functions';
@@ -34,53 +29,33 @@ import {
   PutPostParams,
   User,
 } from 'src/shared';
+import { FirestoreHelper } from 'src/shared-ui/utils/firestore';
 import { AppMsg } from './msg';
 import { AppState } from './state';
 
-const getCache = async <T>(docRef: DocumentReference): Promise<T | undefined> => {
-  {
-    try {
-      const doc = await getDocFromCache(docRef);
-      if (doc.exists()) {
-        return doc.data() as T;
-      }
-    } catch (err) {
-      if (err.code == 'unavailable') {
-        return;
-      }
-      throw err;
-    }
-  }
-  return;
-};
-
-const getCacheFirst = async <T>(docRef: DocumentReference): Promise<T | undefined> => {
-  {
-    const r = await getCache<T>(docRef);
-    if (r) {
-      return r;
-    }
-  }
-  {
-    const doc = await getDocFromServer(docRef);
-    if (doc.exists()) {
-      return doc.data() as T;
-    }
-  }
-  return;
-};
-
 export class AppFirebase {
-  private functions!: Functions;
-  private firestore!: FirebaseFirestore;
-  private auth!: Auth;
+  private functions: Functions;
+  private firestore: FirebaseFirestore;
+  private auth: Auth;
+  private firestoreHelper: FirestoreHelper;
 
   constructor(
     private appEnv: AppEnv,
     private appState: AppState,
     private appMsg: AppMsg,
-    private _firebaseApp?: FirebaseApp,
-  ) {}
+    firebaseApp?: FirebaseApp,
+  ) {
+    if (!firebaseApp) {
+      firebaseApp = initializeApp(this.appEnv.env.firebaseConfig);
+    }
+
+    this.functions = getFunctions(firebaseApp, this.appEnv.env.functionsRegion);
+    this.firestore = getFirestore(firebaseApp);
+    this.auth = getAuth(firebaseApp);
+    this.firestoreHelper = new FirestoreHelper(this.firestore);
+
+    this.devonly_setEmulator();
+  }
 
   private devonly_setEmulator() {
     if (!Build.isDev) {
@@ -93,16 +68,6 @@ export class AppFirebase {
   }
 
   async init() {
-    if (this._firebaseApp) {
-      return;
-    }
-
-    this._firebaseApp = initializeApp(this.appEnv.env.firebaseConfig);
-    this.functions = getFunctions(this._firebaseApp, this.appEnv.env.functionsRegion);
-    this.firestore = getFirestore(this._firebaseApp);
-    this.auth = getAuth(this._firebaseApp);
-    this.devonly_setEmulator();
-
     try {
       await enableMultiTabIndexedDbPersistence(this.firestore);
     } catch (err) {
@@ -149,6 +114,7 @@ export class AppFirebase {
   }
 
   async signOut() {
+    this.firestoreHelper.releaseListener();
     await this.auth.signOut();
   }
 
@@ -181,84 +147,27 @@ export class AppFirebase {
     return this.callFunc<DeletePostParams, void>('deletePost', params);
   }
 
-  private listeners = (() => {
-    const listenMap = new Map<string, () => void>();
-
-    const add = (p: string, cb: () => void) => {
-      if (listenMap.has(p)) {
-        return;
-      }
-
-      const unsubscribe = onSnapshot(doc(this.firestore, p), {
-        next: ds => {
-          if (!ds.exists) {
-            unsubscribe();
-            listenMap.delete(p);
-          }
-          if (cb) {
-            cb();
-          }
-        },
-        error: err => {
-          console.error('onSnapshot error', p, err);
-          unsubscribe();
-          listenMap.delete(p);
-        },
-      });
-      listenMap.set(p, unsubscribe);
-    };
-
-    const release = () => {
-      listenMap.forEach(v => {
-        v();
-      });
-      listenMap.clear();
-    };
-
-    return { add, release } as const;
-  })();
-
-  releaseListeners() {
-    this.listeners.release();
-  }
-
-  listenUser(cb: () => void) {
-    if (!this.user) {
-      return;
-    }
-    return this.listeners.add(`users/${this.user.uid}`, cb);
-  }
-
-  listenAnnounce(id: string, cb: () => void) {
-    return this.listeners.add(`announces/${id}`, cb);
-  }
-
   async getUser() {
     if (!this.user) {
       return;
     }
 
-    const docRef = doc(this.firestore, `users/${this.user.uid}`);
-    return getCache<User>(docRef);
+    return this.firestoreHelper.listenAndGet<User>(`users/${this.user.uid}`);
   }
 
   async getAnnounce(id: string) {
-    const docRef = doc(this.firestore, `announces/${id}`);
-    return getCache<Announce>(docRef);
+    return this.firestoreHelper.listenAndGet<Announce>(`announces/${id}`);
   }
 
   async getAnnounceMeta(id: string, metaID: string) {
-    const docRef = doc(this.firestore, `announces/${id}/meta/${metaID}`);
-    return getCacheFirst<AnnounceMeta>(docRef);
+    return this.firestoreHelper.getCacheFirst<AnnounceMeta>(`announces/${id}/meta/${metaID}`);
   }
 
   async getPost(id: string, postID: string) {
-    const docRef = doc(this.firestore, `announces/${id}/posts/${postID}`);
-    return getCacheFirst<Post>(docRef);
+    return this.firestoreHelper.getCacheFirst<Post>(`announces/${id}/posts/${postID}`);
   }
 
   async getImage(id: string) {
-    const docRef = doc(this.firestore, `images/${id}`);
-    return getCacheFirst<Image>(docRef);
+    return this.firestoreHelper.getCacheFirst<Image>(`images/${id}`);
   }
 }

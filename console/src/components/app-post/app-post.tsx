@@ -1,7 +1,8 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
-import { AnnounceState } from 'src/app/datatypes';
-import { PostJSON } from 'src/shared';
+import { Announce, AnnounceMetaBase, PostJSON } from 'src/shared';
+import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
+import { PromiseState } from 'src/shared-ui/utils/promise';
 import { href, pushRoute } from 'src/shared-ui/utils/route';
 
 @Component({
@@ -15,39 +16,80 @@ export class AppPost {
   @Prop()
   announceID!: string;
 
+  @Watch('announceID')
+  watchAnnounceID() {
+    this.announceState = undefined;
+  }
+
   @Prop()
   postID!: string;
 
+  @Watch('postID')
+  watchPostID() {
+    this.postState = undefined;
+  }
+
+  @Listen('FirestoreUpdated')
+  handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
+    const { collection, id } = event.detail;
+    if (collection == 'announces' && id == this.announceID) {
+      this.announceState = undefined;
+    }
+  }
+
+  @State()
+  announceState?: PromiseState<
+    Announce &
+      AnnounceMetaBase & {
+        announceIcon?: PromiseState<string>;
+        postsPromises: Record<string, PromiseState<PostJSON>>;
+      }
+  >;
+
+  @State()
+  postState?: PromiseState<PostJSON & { imgPromise?: PromiseState<string> }>;
+
+  private async loadAnnounce() {
+    const id = this.announceID;
+    const a = await this.app.getAnnounceAndMeta(id);
+    if (a) {
+      return {
+        ...a,
+        announceIcon: a.icon ? new PromiseState(this.app.getImage(a.icon)) : undefined,
+        postsPromises: this.app.getPosts(id, a),
+      };
+    }
+    return;
+  }
+
+  private async loadPost() {
+    const id = this.announceID;
+    const postID = this.postID;
+    const post = await this.app.getPostJSON(id, postID);
+    if (post) {
+      return {
+        ...post,
+        imgPromise: post.img ? new PromiseState(this.app.getImage(post.img)) : undefined,
+      };
+    }
+    return;
+  }
+
+  componentWillLoad() {
+    this.watchAnnounceID();
+  }
+
+  componentWillRender() {
+    if (!this.announceState) {
+      this.announceState = new PromiseState(this.loadAnnounce());
+    }
+    if (!this.postState) {
+      this.postState = new PromiseState(this.loadPost());
+    }
+  }
+
   @State()
   showDelete = false;
-
-  private announce!: AnnounceState;
-  private post!: PostJSON & { imgData?: string; imgLoader?: () => Promise<string> };
-
-  async componentWillLoad() {
-    const as = this.app.getAnnounceState(this.announceID);
-    if (as?.state != 'SUCCESS') {
-      pushRoute(`/${this.announceID}`, true);
-      return;
-    }
-    this.announce = as.value;
-
-    const post = await this.app.getPost(this.announceID, this.postID);
-    if (!post) {
-      pushRoute(`/${this.announceID}`, true);
-      return;
-    }
-    this.post = { ...post, pT: post.pT.toMillis() };
-
-    if (this.post.img) {
-      this.post.imgData = await this.app.getImage(this.post.img);
-      this.post.imgLoader = () => Promise.resolve(this.post.imgData || '');
-    }
-
-    this.app.setTitle(
-      this.app.msgs.post.pageTitle(this.post.title || this.post.body?.substr(0, 20) || ''),
-    );
-  }
 
   private handleDelete = (ev: Event) => {
     ev.preventDefault();
@@ -70,19 +112,56 @@ export class AppPost {
   };
 
   render() {
-    if (!this.announce || !this.post) {
+    if (this.announceState?.noResult() || this.postState?.noResult()) {
+      pushRoute(`/${this.announceID}`, true);
       return;
     }
 
+    const announce = this.announceState?.result();
+    const post = this.postState?.result();
+
+    const renderContent = () => {
+      if (!announce) {
+        return <ap-spinner />;
+      }
+
+      const apAnnounce = (
+        <ap-announce
+          announce={announce}
+          announceIcon={announce.announceIcon}
+          href={`/${this.announceID}`}
+        />
+      );
+
+      if (!post) {
+        return (
+          <Fragment>
+            {apAnnounce}
+            <ap-spinner />
+          </Fragment>
+        );
+      }
+
+      this.app.setTitle(this.app.msgs.post.pageTitle(post.title || post.body?.substr(0, 20) || ''));
+
+      return (
+        <Fragment>
+          {apAnnounce}
+          <ap-post
+            post={post}
+            imgPromise={post.imgPromise}
+            msgs={{ datetime: this.app.msgs.common.datetime }}
+          />
+        </Fragment>
+      );
+    };
+
     return (
       <Host>
-        <ap-post post={this.post} msgs={{ datetime: this.app.msgs.common.datetime }} />
-        <a class="back" {...href(`/${this.announceID}`, true)}>
-          {this.app.msgs.common.back}
-        </a>
+        {renderContent()}
         <hr />
         <div class="edit">
-          <a {...href(`/${this.announceID}/${this.postID}/edit_`)}>{this.app.msgs.post.edit}</a>
+          <a {...href(`/${this.announceID}/${this.postID}/edit`)}>{this.app.msgs.post.edit}</a>
           <a href="#" onClick={this.handleDelete}>
             {this.app.msgs.post.delete}
           </a>

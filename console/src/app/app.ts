@@ -1,6 +1,6 @@
 import { Build, readTask } from '@stencil/core';
-import { Announce, AppEnv, DataResult, DATA_ERROR } from 'src/shared';
-import { AnnounceState } from './datatypes';
+import { Announce, AnnounceMetaBase, AppEnv, PostJSON } from 'src/shared';
+import { LazyPromiseState, PromiseState } from 'src/shared-ui/utils/promise';
 import { AppFirebase } from './firebase';
 import { AppMsg } from './msg';
 import { AppState } from './state';
@@ -73,7 +73,6 @@ export class App {
   }
 
   async signOut() {
-    this.appFirebase.releaseListeners();
     await this.appFirebase.signOut();
   }
 
@@ -119,106 +118,60 @@ export class App {
     return this.appFirebase.callDeletePost({ id, postID });
   }
 
-  private async toAnnounceState(id: string, a: Announce): Promise<DataResult<AnnounceState>> {
+  getUser() {
+    return this.appFirebase.getUser();
+  }
+
+  async getAnnounceAndMeta(id: string): Promise<(Announce & AnnounceMetaBase) | undefined> {
+    const a = await this.appFirebase.getAnnounce(id);
+    if (!a) {
+      return;
+    }
     const meta = await this.appFirebase.getAnnounceMeta(id, a.mid);
     if (!meta) {
-      return DATA_ERROR;
+      throw new Error(`fetchAnnounceMeta: ${id}/${a.mid}`);
     }
 
-    const icon = meta.icon;
-
-    return {
-      state: 'SUCCESS',
-      value: {
-        id,
-        ...a,
-        ...meta,
-        ...(icon && {
-          iconLoader: async () => {
-            const d = await this.appFirebase.getImage(icon);
-            if (d) {
-              return `data:image/jpeg;base64,${d.data.toBase64()}`;
-            }
-            throw new Error('icon load error');
-          },
-        }),
-      },
-    };
+    return { ...a, ...meta };
   }
 
-  loadUser() {
-    if (this.appState.user.get() != null) {
-      return;
-    }
-
-    const cb = async () => {
-      const user = await this.appFirebase.getUser();
-      if (!user) {
-        this.appState.user.set({});
-        return;
-      }
-      this.appState.user.set(user);
-      if (user.announces) {
-        for (const id of user.announces) {
-          this.loadAnnounce(id);
-        }
-      }
-    };
-
-    this.appFirebase.listenUser(cb);
-
-    void cb();
-  }
-
-  private loadAnnounce(id: string) {
-    const cb = async () => {
-      const a = await this.appFirebase.getAnnounce(id);
-      if (!a) {
-        this.appState.announce.delete(id);
-        return;
-      }
-      if (a) {
-        const as = await this.toAnnounceState(id, a);
-        this.appState.announce.set(id, as);
-        return;
-      }
-      this.appState.announce.set(id, a);
-    };
-
-    this.appFirebase.listenAnnounce(id, cb);
-
-    void cb();
-  }
-
-  getAnnounces() {
-    const user = this.appState.user.get();
-    if (!user) {
-      return;
-    }
-
-    const result: AnnounceState[] = [];
-    if (user.announces) {
-      for (const id of user.announces) {
-        const as = this.appState.announce.get(id);
-        if (as?.state == 'SUCCESS') {
-          result.push(as.value);
-        }
+  async getLatestPost(id: string, a: Announce) {
+    const posts = a.posts;
+    if (posts) {
+      const latest = Object.entries(posts)
+        .sort((v1, v2) => {
+          return v2[1].pT.toMillis() - v1[1].pT.toMillis();
+        })
+        .shift();
+      if (latest) {
+        const post = await this.appFirebase.getPost(id, latest[0]);
+        return post;
       }
     }
-
-    result.sort((v1, v2) => {
-      return v2.uT.toMillis() - v1.uT.toMillis();
-    });
-
-    return result;
+    return;
   }
 
-  getAnnounceState(id: string) {
-    return this.appState.announce.get(id);
+  getPosts(id: string, a: Announce) {
+    const postsPromises: Record<string, PromiseState<PostJSON>> = {};
+    for (const postID of Object.keys(a.posts)) {
+      postsPromises[postID] = new LazyPromiseState(async () => {
+        const post = await this.getPost(id, postID);
+        return { ...post, pT: post?.pT.toMillis() || 0 };
+      });
+    }
+    return postsPromises;
   }
 
   getPost(id: string, postID: string) {
     return this.appFirebase.getPost(id, postID);
+  }
+
+  async getPostJSON(id: string, postID: string): Promise<PostJSON | undefined> {
+    const post = await this.appFirebase.getPost(id, postID);
+    if (post) {
+      return { ...post, pT: post.pT.toMillis() };
+    }
+    return;
   }
 
   async getImage(id: string) {

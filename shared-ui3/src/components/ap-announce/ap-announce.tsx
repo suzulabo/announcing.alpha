@@ -12,7 +12,7 @@ export class ApAnnounce {
   announce!: Announce & AnnounceMetaBase;
 
   @Prop()
-  announceIcon?: PromiseState<string | undefined>;
+  announceIcon?: PromiseState<string>;
 
   @Prop()
   showDetails?: boolean;
