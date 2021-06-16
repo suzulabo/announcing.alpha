@@ -1,5 +1,11 @@
 import { forceUpdate, getRenderingRef } from '@stencil/core';
 
+type StatusResult<T> =
+  | { state: 'pending' }
+  | { state: 'rejected'; error: any }
+  | { state: 'fulfilled-empty'; value: undefined }
+  | { state: 'fulfilled'; value: T };
+
 export class LazyPromise<T> implements Promise<T> {
   constructor(private executor: () => Promise<T>) {}
 
@@ -34,7 +40,7 @@ export class LazyPromise<T> implements Promise<T> {
 export class PromiseState<T> {
   private value?: T;
   private reason?: any;
-  private _state: 'pending' | 'fulfilled' | 'rejected' = 'pending';
+  private _state: 'pending' | 'fulfilled' | 'fulfilled-empty' | 'rejected' = 'pending';
   private touched = false;
   private refs = new Set<any>();
 
@@ -48,7 +54,7 @@ export class PromiseState<T> {
     if (!this.touched) {
       this.promise.then(
         v => {
-          this._state = 'fulfilled';
+          this._state = v == undefined ? 'fulfilled-empty' : 'fulfilled';
           this.value = v;
           this.refs.forEach(forceUpdate);
         },
@@ -59,6 +65,21 @@ export class PromiseState<T> {
         },
       );
       this.touched = true;
+    }
+  }
+
+  status(): StatusResult<T> {
+    this.touch();
+    this.refs.add(getRenderingRef());
+    switch (this._state) {
+      case 'pending':
+        return { state: 'pending' };
+      case 'rejected':
+        return { state: 'rejected', error: this.reason };
+      case 'fulfilled':
+        return { state: 'fulfilled', value: this.value as T };
+      case 'fulfilled-empty':
+        return { state: 'fulfilled-empty', value: undefined };
     }
   }
 
@@ -79,11 +100,10 @@ export class PromiseState<T> {
     this.refs.add(getRenderingRef());
     return this.reason;
   }
-
   noResult() {
     this.touch();
     this.refs.add(getRenderingRef());
-    return this._state != 'pending' && this.value == null;
+    return this._state != 'pending' && this.value == undefined;
   }
 
   then(onfulfilled: (v: T | undefined) => void) {
@@ -95,7 +115,7 @@ export class PromiseState<T> {
 }
 
 export class LazyPromiseState<T> extends PromiseState<T> {
-  constructor(executor: () => Promise<T>) {
+  constructor(executor: () => Promise<T | undefined>) {
     super(new LazyPromise(executor));
   }
 }
