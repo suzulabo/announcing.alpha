@@ -2,7 +2,7 @@ import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core'
 import { App } from 'src/app/app';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { PromiseState } from 'src/shared-ui/utils/promise';
-import { pushRoute } from 'src/shared-ui/utils/route';
+import { redirectRoute } from 'src/shared-ui/utils/route';
 
 @Component({
   tag: 'app-image',
@@ -18,6 +18,17 @@ export class AppImage {
   @Prop()
   postID!: string;
 
+  @Watch('postID')
+  watchPostID() {
+    this.naviLinks = [
+      {
+        label: this.app.msgs.common.back,
+        href: `/${this.announceID}/${this.postID}`,
+        back: true,
+      },
+    ];
+  }
+
   @Prop()
   imageID!: string;
 
@@ -31,44 +42,41 @@ export class AppImage {
 
   private naviLinks!: ApNaviLinks;
 
-  componentWillRender() {
-    this.naviLinks = [
-      {
-        label: this.app.msgs.common.back,
-        href: `/${this.announceID}/${this.postID}`,
-        back: true,
-      },
-    ];
+  componentWillLoad() {
+    this.watchPostID();
+  }
 
+  componentWillRender() {
     if (!this.imageState) {
       this.imageState = new PromiseState(this.app.fetchImage(this.imageID));
     }
   }
 
-  render() {
-    if (this.imageState?.noResult()) {
-      pushRoute(`/${this.announceID}/${this.postID}`, true);
-      return;
-    }
+  private renderContent() {
+    const status = this.imageState?.status();
 
-    const image = this.imageState?.result();
-
-    const renderContent = () => {
-      if (image) {
+    switch (status?.state) {
+      case 'rejected':
+      case 'fulfilled-empty':
+        redirectRoute(`/${this.announceID}/${this.postID}`);
+        return;
+      case 'fulfilled':
         return (
           <Fragment>
             <pinch-zoom>
-              <img src={image} />
+              <img src={status.value} />
             </pinch-zoom>
           </Fragment>
         );
-      }
-      return <ap-spinner />;
-    };
+      default:
+        return <ap-spinner />;
+    }
+  }
 
+  render() {
     return (
       <Host class="full">
-        {renderContent()}
+        {this.renderContent()}
         <ap-navi links={this.naviLinks} />
       </Host>
     );

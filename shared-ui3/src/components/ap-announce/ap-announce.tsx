@@ -1,5 +1,5 @@
 import { Component, Fragment, h, Host, Prop } from '@stencil/core';
-import { Announce, AnnounceMetaBase } from 'src/shared';
+import { AnnounceAndMeta } from 'src/shared';
 import { PromiseState } from '../utils/promise';
 import { href } from '../utils/route';
 
@@ -9,10 +9,10 @@ import { href } from '../utils/route';
 })
 export class ApAnnounce {
   @Prop()
-  announce!: Announce & AnnounceMetaBase;
+  announce!: AnnounceAndMeta;
 
   @Prop()
-  announceIcon?: PromiseState<string>;
+  iconImgPromise?: PromiseState<string>;
 
   @Prop()
   showDetails?: boolean;
@@ -44,7 +44,7 @@ export class ApAnnounce {
             </div>
             <span>{announce.name}</span>
           </div>
-          {this.announceIcon && <ap-image srcPromise={this.announceIcon} />}
+          {this.iconImgPromise && <ap-image srcPromise={this.iconImgPromise} />}
         </Tag>
         {this.showDetails && (
           <Fragment>

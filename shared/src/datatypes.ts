@@ -87,6 +87,8 @@ export const ImageRule = {
   data: { length: 1000 * 1000 },
 };
 
+export type AnnounceAndMeta = Announce & AnnounceMetaBase;
+
 export interface CreateAnnounceParams {
   name: string;
   desc?: string;
