@@ -158,8 +158,10 @@ const renderAnnounce = (ctx: RenderContext, a: RenderContext['announces'][number
       );
     }
     default:
-      <a class="card">
-        <ap-spinner />
-      </a>;
+      return (
+        <a class="card">
+          <ap-spinner />
+        </a>
+      );
   }
 };
