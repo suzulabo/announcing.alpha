@@ -6,6 +6,7 @@ export interface Msgs {
     close: string;
     ok: string;
     datetime: (d: number) => string;
+    pageTitle: string;
   };
   error: {
     main: string;

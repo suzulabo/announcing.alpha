@@ -16,6 +16,7 @@ export const msgs: Msgs = {
       }
       return '';
     },
+    pageTitle: titleSuffix,
   },
   error: {
     main: 'ご迷惑をおかけします。\nしばらくしてから再度お試しください。',

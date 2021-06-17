@@ -2,7 +2,7 @@ import { Http } from '@capacitor-community/http';
 import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
-import { Build, readTask } from '@stencil/core';
+import { Build } from '@stencil/core';
 import { Announce, AnnounceMetaBase, AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
 import { LazyPromiseState, PromiseState } from 'src/shared-ui/utils/promise';
 import { pushRoute } from 'src/shared-ui/utils/route';
@@ -62,14 +62,6 @@ export class App {
       console.log('App opened with URL:', data);
       const url = new URL(data.url);
       pushRoute(url.pathname);
-    });
-  }
-
-  private _title = '';
-  setTitle(v: string) {
-    this._title = v;
-    readTask(() => {
-      document.title = this._title;
     });
   }
 

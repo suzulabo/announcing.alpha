@@ -1,4 +1,4 @@
-import { Component, h, Listen, Prop, State } from '@stencil/core';
+import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
 import assert from 'assert';
 import { App } from 'src/app/app';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
@@ -49,8 +49,6 @@ export class AppHome {
   }
 
   componentWillRender() {
-    this.app.setTitle(this.app.msgs.home.pageTitle);
-
     const follows = this.app.getFollows();
     for (const [id] of follows) {
       if (!this.announceStateMap.has(id)) {
@@ -83,6 +81,7 @@ export class AppHome {
 
     return {
       msgs: this.app.msgs,
+      pageTitle: this.app.msgs.home.pageTitle,
       announces,
       handleUnfollowClick: this.handleUnfollowClick,
     };
@@ -96,6 +95,15 @@ export class AppHome {
 type RenderContext = ReturnType<AppHome['renderContext']>;
 
 const render = (ctx: RenderContext) => {
+  return (
+    <Host>
+      {renderContent(ctx)}
+      <ap-head pageTitle={ctx.pageTitle} />
+    </Host>
+  );
+};
+
+const renderContent = (ctx: RenderContext) => {
   if (ctx.announces.length == 0) {
     return <div class="no-follows">{ctx.msgs.home.noFollows}</div>;
   }

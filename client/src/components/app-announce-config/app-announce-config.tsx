@@ -108,12 +108,18 @@ export class AppAnnounceConfig {
       notification: this.app.getNotification(this.announceID) != null,
     };
     const naviLinks = this.naviLinks;
+
+    const { announce } = this.announceState?.result() || {};
+    const pageTitle = announce
+      ? this.app.msgs.announceConfig.pageTitle(announce.name)
+      : this.app.msgs.common.pageTitle;
     return {
       msgs: this.app.msgs,
       announceID: this.announceID,
       announceStatus,
       icons,
       naviLinks,
+      pageTitle,
       handleUnfollowClick: this.handleUnfollowClick,
       handleFollowClick: this.handleFollowClick,
       handleEnableNotifyClick: this.handleEnableNotifyClick,
@@ -133,6 +139,7 @@ const render = (ctx: RenderContext) => {
     <Host>
       {renderContent(ctx)}
       <ap-navi links={ctx.naviLinks} />
+      <ap-head pageTitle={ctx.pageTitle} />
     </Host>
   );
 };

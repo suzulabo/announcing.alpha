@@ -121,8 +121,16 @@ export class AppPost {
       follow: this.app.getFollow(this.announceID) != null,
       notification: this.app.getNotification(this.announceID) != null,
     };
-    const loaded = announceStatus?.state == 'fulfilled' && postStatus?.state == 'fulfilled';
-    const naviLinks = loaded ? this.naviLinks : this.naviLinksLoading;
+    const { announce } = this.announceState?.result() || {};
+    const { post } = this.postState?.result() || {};
+    const naviLinks = announce && post ? this.naviLinks : this.naviLinksLoading;
+    const pageTitle =
+      announce && post
+        ? this.app.msgs.post.pageTitle(
+            announce.name,
+            post?.title || post?.body?.substr(0, 20) || '',
+          )
+        : this.app.msgs.common.pageTitle;
     return {
       msgs: this.app.msgs,
       announceID: this.announceID,
@@ -130,6 +138,7 @@ export class AppPost {
       postStatus,
       icons,
       naviLinks,
+      pageTitle,
     };
   }
 
@@ -146,6 +155,7 @@ const render = (ctx: RenderContext) => {
       {renderAnnounce(ctx)}
       {renderPost(ctx)}
       <ap-navi links={ctx.naviLinks} />
+      <ap-head pageTitle={ctx.pageTitle} />
     </Host>
   );
 };

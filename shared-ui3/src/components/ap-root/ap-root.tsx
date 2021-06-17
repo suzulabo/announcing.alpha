@@ -1,4 +1,4 @@
-import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
+import { Component, Element, h, Host, Listen, Prop, State } from '@stencil/core';
 import { Match, pathMatcher } from 'src/shared/path-matcher';
 import { redirectRoute } from '../utils/route';
 
@@ -9,6 +9,9 @@ export type RouteMatch = Match & { tag?: string };
   styleUrl: 'ap-root.scss',
 })
 export class ApRoot {
+  @Element()
+  el!: HTMLApRootElement;
+
   @Prop()
   routeMatches!: RouteMatch[];
 
@@ -46,7 +49,10 @@ export class ApRoot {
 
   componentWillLoad() {
     this.handlePopState();
+    this.defaultApHead = document.querySelector<HTMLApHeadElement>('ap-head.default');
   }
+
+  private defaultApHead?: HTMLApHeadElement | null;
 
   private tags = new Map<string, Record<string, any>>();
 
@@ -71,5 +77,14 @@ export class ApRoot {
         })}
       </Host>
     );
+  }
+
+  componentDidRender() {
+    const apHead = this.el.querySelector<HTMLApHeadElement>('ap-root > .page:not(.hide) > ap-head');
+    if (apHead) {
+      apHead.writeHead();
+    } else if (this.defaultApHead) {
+      this.defaultApHead.writeHead();
+    }
   }
 }

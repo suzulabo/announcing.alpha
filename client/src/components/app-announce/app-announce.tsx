@@ -87,14 +87,18 @@ export class AppAnnounce {
       follow: this.app.getFollow(this.announceID) != null,
       notification: this.app.getNotification(this.announceID) != null,
     };
-    const loaded = announceStatus?.state == 'fulfilled';
-    const naviLinks = loaded ? this.naviLinks : this.naviLinksLoading;
+    const { announce } = this.announceState?.result() || {};
+    const naviLinks = announce ? this.naviLinks : this.naviLinksLoading;
+    const pageTitle = announce
+      ? this.app.msgs.announce.pageTitle(announce.name)
+      : this.app.msgs.common.pageTitle;
     return {
       msgs: this.app.msgs,
       announceID: this.announceID,
       announceStatus,
       icons,
       naviLinks,
+      pageTitle,
     };
   }
 
@@ -110,6 +114,7 @@ const render = (ctx: RenderContext) => {
     <Host>
       {renderContent(ctx)}
       <ap-navi links={ctx.naviLinks} />
+      <ap-head pageTitle={ctx.pageTitle} />
     </Host>
   );
 };
