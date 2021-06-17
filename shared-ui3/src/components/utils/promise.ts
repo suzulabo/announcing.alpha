@@ -1,11 +1,5 @@
 import { forceUpdate, getRenderingRef } from '@stencil/core';
 
-type StatusResult<T> =
-  | { state: 'pending' }
-  | { state: 'rejected'; error: any }
-  | { state: 'fulfilled-empty'; value: undefined }
-  | { state: 'fulfilled'; value: T };
-
 export class LazyPromise<T> implements Promise<T> {
   constructor(private executor: () => Promise<T>) {}
 
@@ -36,6 +30,12 @@ export class LazyPromise<T> implements Promise<T> {
 
   [Symbol.toStringTag] = 'LazyPromise';
 }
+
+type StatusResult<T> =
+  | { state: 'pending' }
+  | { state: 'rejected'; error: any }
+  | { state: 'fulfilled-empty'; value: undefined }
+  | { state: 'fulfilled'; value: Exclude<T, undefined> };
 
 export class PromiseState<T> {
   private value?: T;
@@ -77,7 +77,7 @@ export class PromiseState<T> {
       case 'rejected':
         return { state: 'rejected', error: this.reason };
       case 'fulfilled':
-        return { state: 'fulfilled', value: this.value as T };
+        return { state: 'fulfilled', value: this.value as Exclude<T, undefined> };
       case 'fulfilled-empty':
         return { state: 'fulfilled-empty', value: undefined };
     }

@@ -1,10 +1,10 @@
-import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
+import { Component, h, Listen, Prop, State } from '@stencil/core';
+import assert from 'assert';
 import { App } from 'src/app/app';
-import { Follow } from 'src/app/datatypes';
-import { AnnounceAndMeta, PostJSON } from 'src/shared';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PromiseState } from 'src/shared-ui/utils/promise';
 import { href } from 'src/shared-ui/utils/route';
+import { AsyncReturnType } from 'type-fest';
 
 @Component({
   tag: 'app-home',
@@ -17,24 +17,9 @@ export class AppHome {
   @Prop()
   app!: App;
 
-  @Listen('FirestoreUpdated')
-  handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
-    const { collection, id } = event.detail;
-    if (collection == 'announces') {
-      if (this.announceStateMap.has(id)) {
-        this.announceStateMap.set(id, new PromiseState(this.loadAnnounce(id)));
-      }
-      this.rerender = {};
-    }
-  }
-
   private announceStateMap = new Map<
     string,
-    PromiseState<{
-      announce: AnnounceAndMeta;
-      iconImgPromise?: PromiseState<string>;
-      latestPost?: PostJSON;
-    }>
+    PromiseState<AsyncReturnType<AppHome['loadAnnounce']>>
   >();
 
   private async loadAnnounce(id: string) {
@@ -52,11 +37,20 @@ export class AppHome {
     return;
   }
 
-  componentWillLoad() {
-    this.app.setTitle(this.app.msgs.home.pageTitle);
+  @Listen('FirestoreUpdated')
+  handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
+    const { collection, id } = event.detail;
+    if (collection == 'announces') {
+      if (this.announceStateMap.has(id)) {
+        this.announceStateMap.set(id, new PromiseState(this.loadAnnounce(id)));
+      }
+      this.rerender = {};
+    }
   }
 
   componentWillRender() {
+    this.app.setTitle(this.app.msgs.home.pageTitle);
+
     const follows = this.app.getFollows();
     for (const [id] of follows) {
       if (!this.announceStateMap.has(id)) {
@@ -74,73 +68,90 @@ export class AppHome {
     }
   };
 
-  private renderAnnounce(id: string, follow: Follow) {
-    const msgs = this.app.msgs;
-    const announceState = this.announceStateMap.get(id);
-    if (!announceState) return;
-
-    const status = announceState.status();
-
-    switch (status.state) {
-      case 'rejected':
-      case 'fulfilled-empty':
-        return (
-          <a class="card">
-            <div class="main">
-              <span class="name">{follow.name}</span>
-              <span class="data-error">
-                {status.state == 'rejected' ? msgs.home.dataError : msgs.home.notFound}
-              </span>
-              <button class="anchor" data-announce-id={id} onClick={this.handleUnfollowClick}>
-                {msgs.home.unfollowBtn}
-              </button>
-            </div>
-          </a>
-        );
-      case 'fulfilled': {
-        const { announce, iconImgPromise, latestPost } = status.value;
-        const hasNew = (latestPost?.pT || 0) > follow.readTime;
-
-        return (
-          <a class="card" {...href(`/${id}`)}>
-            <div class="main">
-              <span class="name">{announce.name}</span>
-              {latestPost && (
-                <div class="latest">
-                  {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
-                  <span class="pT">{msgs.common.datetime(latestPost?.pT)}</span>
-                  <span class="title">{latestPost.title || latestPost.body}</span>
-                </div>
-              )}
-            </div>
-            {iconImgPromise && <ap-image srcPromise={iconImgPromise} />}
-          </a>
-        );
-      }
-      default:
-        <a class="card">
-          <ap-spinner />
-        </a>;
-    }
-  }
-
-  private renderAnnounces() {
+  private renderContext() {
     const follows = this.app.getFollows();
+    const announces = follows.map(([id, follow]) => {
+      const state = this.announceStateMap.get(id);
+      assert(state);
+      const status = state.status();
+      return {
+        id,
+        status,
+        follow,
+      };
+    });
 
-    if (follows.length == 0) {
-      return <div class="no-follows">{this.app.msgs.home.noFollows}</div>;
-    }
-
-    return (
-      <div class="announces">
-        {follows?.map(([id, follow]) => {
-          return this.renderAnnounce(id, follow);
-        })}
-      </div>
-    );
+    return {
+      msgs: this.app.msgs,
+      announces,
+      handleUnfollowClick: this.handleUnfollowClick,
+    };
   }
 
   render() {
-    return <Host>{this.renderAnnounces()}</Host>;
+    return render(this.renderContext());
   }
 }
+
+type RenderContext = ReturnType<AppHome['renderContext']>;
+
+const render = (ctx: RenderContext) => {
+  if (ctx.announces.length == 0) {
+    return <div class="no-follows">{ctx.msgs.home.noFollows}</div>;
+  }
+
+  return (
+    <div class="announces">
+      {ctx.announces.map(v => {
+        return renderAnnounce(ctx, v);
+      })}
+    </div>
+  );
+};
+
+const renderAnnounce = (ctx: RenderContext, a: RenderContext['announces'][number]) => {
+  const msgs = ctx.msgs;
+  const { id, status, follow } = a;
+
+  switch (status.state) {
+    case 'rejected':
+    case 'fulfilled-empty':
+      return (
+        <a class="card">
+          <div class="main">
+            <span class="name">{follow.name}</span>
+            <span class="data-error">
+              {status.state == 'rejected' ? msgs.home.dataError : msgs.home.notFound}
+            </span>
+            <button class="anchor" data-announce-id={id} onClick={ctx.handleUnfollowClick}>
+              {msgs.home.unfollowBtn}
+            </button>
+          </div>
+        </a>
+      );
+    case 'fulfilled': {
+      const { announce, iconImgPromise, latestPost } = status.value;
+      const hasNew = (latestPost?.pT || 0) > follow.readTime;
+
+      return (
+        <a class="card" {...href(`/${id}`)}>
+          <div class="main">
+            <span class="name">{announce.name}</span>
+            {latestPost && (
+              <div class="latest">
+                {hasNew && <span class="badge">{msgs.home.newBadge}</span>}
+                <span class="pT">{msgs.common.datetime(latestPost?.pT)}</span>
+                <span class="title">{latestPost.title || latestPost.body}</span>
+              </div>
+            )}
+          </div>
+          {iconImgPromise && <ap-image srcPromise={iconImgPromise} />}
+        </a>
+      );
+    }
+    default:
+      <a class="card">
+        <ap-spinner />
+      </a>;
+  }
+};

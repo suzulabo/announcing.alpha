@@ -1,10 +1,11 @@
 import { Component, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
+import assert from 'assert';
 import { App } from 'src/app/app';
-import { AnnounceAndMeta, PostJSON } from 'src/shared';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PromiseState } from 'src/shared-ui/utils/promise';
 import { redirectRoute } from 'src/shared-ui/utils/route';
+import { AsyncReturnType } from 'type-fest';
 
 @Component({
   tag: 'app-post',
@@ -54,13 +55,10 @@ export class AppPost {
   }
 
   @State()
-  announceState?: PromiseState<{
-    announce: AnnounceAndMeta;
-    iconImgPromise?: PromiseState<string>;
-  }>;
+  announceState?: PromiseState<AsyncReturnType<AppPost['loadAnnounce']>>;
 
   @State()
-  postState?: PromiseState<{ post: PostJSON; imgPromise?: PromiseState<string>; imgHref?: string }>;
+  postState?: PromiseState<AsyncReturnType<AppPost['loadPost']>>;
 
   private naviLinks!: ApNaviLinks;
   private naviLinksLoading!: ApNaviLinks;
@@ -93,6 +91,14 @@ export class AppPost {
     return;
   }
 
+  private shareClick = async () => {
+    try {
+      await this.app.share(`${this.app.clientSite}/${this.announceID}/${this.postID}`);
+    } catch {
+      //
+    }
+  };
+
   componentWillLoad() {
     this.watchAnnounceID();
   }
@@ -106,92 +112,84 @@ export class AppPost {
     }
   }
 
-  private shareClick = async () => {
-    try {
-      await this.app.share(`${this.app.clientSite}/${this.announceID}/${this.postID}`);
-    } catch {
-      //
-    }
-  };
-
   private renderContext() {
     const announceStatus = this.announceState?.status();
+    assert(announceStatus);
     const postStatus = this.postState?.status();
+    assert(postStatus);
+    const icons = {
+      follow: this.app.getFollow(this.announceID) != null,
+      notification: this.app.getNotification(this.announceID) != null,
+    };
+    const loaded = announceStatus?.state == 'fulfilled' && postStatus?.state == 'fulfilled';
+    const naviLinks = loaded ? this.naviLinks : this.naviLinksLoading;
     return {
+      msgs: this.app.msgs,
+      announceID: this.announceID,
       announceStatus,
       postStatus,
-      loaded: announceStatus?.state == 'fulfilled' && postStatus?.state == 'fulfilled',
+      icons,
+      naviLinks,
     };
   }
 
-  private renderAnnounce(ctx: ReturnType<AppPost['renderContext']>) {
-    const status = ctx.announceStatus;
-    if (!status) return;
-
-    switch (status.state) {
-      case 'rejected':
-      case 'fulfilled-empty':
-        redirectRoute(`/${this.announceID}`);
-        return;
-      case 'fulfilled': {
-        const enableNotification = this.app.getNotification(this.announceID) != null;
-        const isFollow = this.app.getFollow(this.announceID) != null;
-        const { announce, iconImgPromise } = status.value;
-        return (
-          <ap-announce
-            announce={announce}
-            iconImgPromise={iconImgPromise}
-            icons={{ isFollow, enableNotification }}
-          />
-        );
-      }
-      default:
-        return <ap-spinner />;
-    }
-  }
-
-  private renderPost(ctx: ReturnType<AppPost['renderContext']>) {
-    if (ctx.announceStatus?.state != 'fulfilled') return;
-
-    const status = ctx.postStatus;
-    if (!status) return;
-
-    switch (status.state) {
-      case 'rejected':
-      case 'fulfilled-empty':
-        redirectRoute(`/${this.announceID}`);
-        return;
-      case 'fulfilled': {
-        const { post, imgPromise, imgHref } = status.value;
-
-        const { announce } = ctx.announceStatus.value;
-        this.app.setTitle(
-          this.app.msgs.post.pageTitle(announce.name, post.title || post.body?.substr(0, 20) || ''),
-        );
-
-        return (
-          <ap-post
-            post={post}
-            imgPromise={imgPromise}
-            imgHref={imgHref}
-            msgs={{ datetime: this.app.msgs.common.datetime }}
-          />
-        );
-      }
-      default:
-        return <ap-spinner />;
-    }
-  }
-
   render() {
-    const ctx = this.renderContext();
-
-    return (
-      <Host>
-        {this.renderAnnounce(ctx)}
-        {this.renderPost(ctx)}
-        <ap-navi links={ctx.loaded ? this.naviLinks : this.naviLinksLoading} />
-      </Host>
-    );
+    return render(this.renderContext());
   }
 }
+
+type RenderContext = ReturnType<AppPost['renderContext']>;
+
+const render = (ctx: RenderContext) => {
+  return (
+    <Host>
+      {renderAnnounce(ctx)}
+      {renderPost(ctx)}
+      <ap-navi links={ctx.naviLinks} />
+    </Host>
+  );
+};
+
+const renderAnnounce = (ctx: RenderContext) => {
+  const status = ctx.announceStatus;
+
+  switch (status.state) {
+    case 'rejected':
+    case 'fulfilled-empty':
+      redirectRoute(`/${ctx.announceID}`);
+      return;
+    case 'fulfilled': {
+      const { announce, iconImgPromise } = status.value;
+      return <ap-announce announce={announce} iconImgPromise={iconImgPromise} icons={ctx.icons} />;
+    }
+    default:
+      return <ap-spinner />;
+  }
+};
+
+const renderPost = (ctx: RenderContext) => {
+  if (ctx.announceStatus.state != 'fulfilled') return;
+
+  const status = ctx.postStatus;
+
+  switch (status.state) {
+    case 'rejected':
+    case 'fulfilled-empty':
+      redirectRoute(`/${ctx.announceID}`);
+      return;
+    case 'fulfilled': {
+      const { post, imgPromise, imgHref } = status.value;
+
+      return (
+        <ap-post
+          post={post}
+          imgPromise={imgPromise}
+          imgHref={imgHref}
+          msgs={{ datetime: ctx.msgs.common.datetime }}
+        />
+      );
+    }
+    default:
+      return <ap-spinner />;
+  }
+};

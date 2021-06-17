@@ -1,9 +1,10 @@
 import { Component, Fragment, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
+import assert from 'assert';
 import { App } from 'src/app/app';
-import { AnnounceAndMeta, PostJSON } from 'src/shared';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PromiseState } from 'src/shared-ui/utils/promise';
+import { AsyncReturnType } from 'type-fest';
 
 @Component({
   tag: 'app-announce',
@@ -49,18 +50,7 @@ export class AppAnnounce {
   }
 
   @State()
-  announceState?: PromiseState<{
-    announce: AnnounceAndMeta;
-    iconImgPromise?: PromiseState<string>;
-    postsPromises: Record<string, PromiseState<PostJSON>>;
-  }>;
-
-  private naviLinks!: ApNaviLinks;
-  private naviLinksLoading!: ApNaviLinks;
-
-  componentWillLoad() {
-    this.watchAnnounceID();
-  }
+  announceState?: PromiseState<AsyncReturnType<AppAnnounce['loadAnnounce']>>;
 
   private async loadAnnounce() {
     const id = this.announceID;
@@ -77,77 +67,92 @@ export class AppAnnounce {
     return;
   }
 
+  private naviLinks!: ApNaviLinks;
+  private naviLinksLoading!: ApNaviLinks;
+
+  componentWillLoad() {
+    this.watchAnnounceID();
+  }
+
   componentWillRender() {
     if (!this.announceState) {
       this.announceState = new PromiseState(this.loadAnnounce());
     }
   }
 
-  private renderContent() {
-    const announceState = this.announceState;
-    if (!announceState) return;
-
-    const msgs = this.app.msgs;
-    const enableNotification = this.app.getNotification(this.announceID) != null;
-    const follow = this.app.getFollow(this.announceID);
-
-    const status = announceState.status();
-    switch (status.state) {
-      case 'rejected':
-        return (
-          <Fragment>
-            <div class="data-error">{msgs.announce.dataError}</div>
-          </Fragment>
-        );
-      case 'fulfilled-empty':
-        return (
-          <Fragment>
-            <div class="deleted">{msgs.announce.deleted}</div>
-          </Fragment>
-        );
-
-      case 'fulfilled': {
-        const { announce, iconImgPromise, postsPromises } = status.value;
-
-        this.app.setTitle(this.app.msgs.announce.pageTitle(announce.name));
-
-        return (
-          <Fragment>
-            <ap-announce
-              announce={announce}
-              href={`/${this.announceID}/config`}
-              iconImgPromise={iconImgPromise}
-              icons={{
-                isFollow: follow != null,
-                enableNotification,
-              }}
-            ></ap-announce>
-            <ap-posts
-              posts={announce.posts}
-              postsPromises={postsPromises}
-              hrefFormat={`/${this.announceID}/:postID`}
-              msgs={{
-                datetime: msgs.common.datetime,
-                dataError: msgs.announce.dataError,
-              }}
-            />
-          </Fragment>
-        );
-      }
-      default:
-        return <ap-spinner />;
-    }
+  private renderContext() {
+    const announceStatus = this.announceState?.status();
+    assert(announceStatus);
+    const icons = {
+      follow: this.app.getFollow(this.announceID) != null,
+      notification: this.app.getNotification(this.announceID) != null,
+    };
+    const loaded = announceStatus?.state == 'fulfilled';
+    const naviLinks = loaded ? this.naviLinks : this.naviLinksLoading;
+    return {
+      msgs: this.app.msgs,
+      announceID: this.announceID,
+      announceStatus,
+      icons,
+      naviLinks,
+    };
   }
 
   render() {
-    const links =
-      this.announceState?.status().state == 'fulfilled' ? this.naviLinks : this.naviLinksLoading;
-
-    return (
-      <Host>
-        {this.renderContent()}
-        <ap-navi links={links} />
-      </Host>
-    );
+    return render(this.renderContext());
   }
 }
+
+type RenderContext = ReturnType<AppAnnounce['renderContext']>;
+
+const render = (ctx: RenderContext) => {
+  return (
+    <Host>
+      {renderContent(ctx)}
+      <ap-navi links={ctx.naviLinks} />
+    </Host>
+  );
+};
+
+const renderContent = (ctx: RenderContext) => {
+  switch (ctx.announceStatus.state) {
+    case 'rejected':
+      return (
+        <Fragment>
+          <div class="data-error">{ctx.msgs.announce.dataError}</div>
+        </Fragment>
+      );
+    case 'fulfilled-empty':
+      return (
+        <Fragment>
+          <div class="deleted">{ctx.msgs.announce.deleted}</div>
+        </Fragment>
+      );
+
+    case 'fulfilled': {
+      const { announce, iconImgPromise, postsPromises } = ctx.announceStatus.value;
+
+      return (
+        <Fragment>
+          <ap-announce
+            announce={announce}
+            href={`/${ctx.announceID}/config`}
+            iconImgPromise={iconImgPromise}
+            icons={ctx.icons}
+          ></ap-announce>
+          <ap-posts
+            posts={announce.posts}
+            postsPromises={postsPromises}
+            hrefFormat={`/${ctx.announceID}/:postID`}
+            msgs={{
+              datetime: ctx.msgs.common.datetime,
+              dataError: ctx.msgs.announce.dataError,
+            }}
+          />
+        </Fragment>
+      );
+    }
+    default:
+      return <ap-spinner />;
+  }
+};

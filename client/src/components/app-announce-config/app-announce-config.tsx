@@ -1,11 +1,11 @@
 import { Component, Fragment, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
+import assert from 'assert';
 import { App } from 'src/app/app';
-import { AnnounceAndMeta } from 'src/shared';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PromiseState } from 'src/shared-ui/utils/promise';
 import { redirectRoute } from 'src/shared-ui/utils/route';
-import { PromiseValue } from 'type-fest';
+import { AsyncReturnType } from 'type-fest';
 
 @Component({
   tag: 'app-announce-config',
@@ -39,26 +39,24 @@ export class AppAnnounceConfig {
   }
 
   @State()
-  announceState?: PromiseState<{
-    announce: AnnounceAndMeta;
-    iconImgPromise?: PromiseState<string>;
-  }>;
-
-  private naviLinks!: ApNaviLinks;
-  private permission?: PromiseValue<ReturnType<App['checkNotifyPermission']>>;
+  announceState?: PromiseState<AsyncReturnType<AppAnnounceConfig['loadAnnounce']>>;
 
   private async loadAnnounce(id: string) {
     const announce = await this.app.getAnnounceAndMeta(id);
+    const permission = await this.app.checkNotifyPermission(false);
     if (announce) {
       return {
         announce,
         iconImgPromise: announce.icon
           ? new PromiseState(this.app.fetchImage(announce.icon))
           : undefined,
-      };
+        permission,
+      } as const;
     }
     return;
   }
+
+  private naviLinks!: ApNaviLinks;
 
   componentWillLoad() {
     this.watchAnnounceID();
@@ -96,103 +94,117 @@ export class AppAnnounceConfig {
     });
   };
 
-  async componentWillRender() {
-    this.permission = await this.app.checkNotifyPermission(false);
-
+  componentWillRender() {
     if (!this.announceState) {
       this.announceState = new PromiseState(this.loadAnnounce(this.announceID));
     }
   }
 
-  private renderNotification() {
-    const msgs = this.app.msgs;
-    const enableNotification = this.app.getNotification(this.announceID) != null;
-
-    switch (this.permission) {
-      case 'unsupported':
-        return (
-          <div class="warn">
-            <ap-icon icon="frown" />
-            <div>{msgs.announceConfig.unsupported}</div>
-          </div>
-        );
-      case 'denied':
-        return (
-          <div class="warn">
-            <ap-icon icon="dizzy" />
-            <div>{msgs.announceConfig.notPermitted}</div>
-          </div>
-        );
-      default:
-        return (
-          <Fragment>
-            {!enableNotification && (
-              <button class="submit" onClick={this.handleEnableNotifyClick}>
-                {msgs.announceConfig.enableNotifyBtn}
-              </button>
-            )}
-            {enableNotification && (
-              <button class="submit" onClick={this.handleDisableNotifyClick}>
-                {msgs.announceConfig.disableNotifyBtn}
-              </button>
-            )}
-          </Fragment>
-        );
-    }
-  }
-
-  private renderContent() {
-    const announceState = this.announceState;
-    if (!announceState) return;
-
-    const msgs = this.app.msgs;
-    const enableNotification = this.app.getNotification(this.announceID) != null;
-    const isFollow = this.app.getFollow(this.announceID) != null;
-
-    const status = announceState.status();
-
-    switch (status.state) {
-      case 'rejected':
-      case 'fulfilled-empty':
-        redirectRoute(`/${this.announceID}`);
-        return;
-      case 'fulfilled': {
-        const { announce, iconImgPromise } = status.value;
-
-        this.app.setTitle(this.app.msgs.announceConfig.pageTitle(announce.name));
-
-        return (
-          <Fragment>
-            <ap-announce
-              announce={announce}
-              iconImgPromise={iconImgPromise}
-              icons={{ isFollow, enableNotification }}
-              showDetails={true}
-            />
-            <div class="follow">
-              {isFollow ? (
-                <button onClick={this.handleUnfollowClick}>
-                  {msgs.announceConfig.unfollowBtn}
-                </button>
-              ) : (
-                <button onClick={this.handleFollowClick}>{msgs.announceConfig.followBtn}</button>
-              )}
-            </div>
-            <div class="notify">{this.renderNotification()}</div>
-          </Fragment>
-        );
-      }
-      default:
-        return <ap-spinner />;
-    }
+  private renderContext() {
+    const announceStatus = this.announceState?.status();
+    assert(announceStatus);
+    const icons = {
+      follow: this.app.getFollow(this.announceID) != null,
+      notification: this.app.getNotification(this.announceID) != null,
+    };
+    const naviLinks = this.naviLinks;
+    return {
+      msgs: this.app.msgs,
+      announceID: this.announceID,
+      announceStatus,
+      icons,
+      naviLinks,
+      handleUnfollowClick: this.handleUnfollowClick,
+      handleFollowClick: this.handleFollowClick,
+      handleEnableNotifyClick: this.handleEnableNotifyClick,
+      handleDisableNotifyClick: this.handleDisableNotifyClick,
+    };
   }
 
   render() {
-    return (
-      <Host>
-        {this.renderContent()}
-        <ap-navi links={this.naviLinks} />
-      </Host>
-    );
+    return render(this.renderContext());
   }
 }
+
+type RenderContext = ReturnType<AppAnnounceConfig['renderContext']>;
+
+const render = (ctx: RenderContext) => {
+  return (
+    <Host>
+      {renderContent(ctx)}
+      <ap-navi links={ctx.naviLinks} />
+    </Host>
+  );
+};
+
+const renderContent = (ctx: RenderContext) => {
+  switch (ctx.announceStatus.state) {
+    case 'rejected':
+    case 'fulfilled-empty':
+      redirectRoute(`/${ctx.announceID}`);
+      return;
+    case 'fulfilled': {
+      const { announce, iconImgPromise, permission } = ctx.announceStatus.value;
+
+      return (
+        <Fragment>
+          <ap-announce
+            announce={announce}
+            iconImgPromise={iconImgPromise}
+            icons={ctx.icons}
+            showDetails={true}
+          />
+          <div class="follow">
+            {ctx.icons.follow ? (
+              <button onClick={ctx.handleUnfollowClick}>
+                {ctx.msgs.announceConfig.unfollowBtn}
+              </button>
+            ) : (
+              <button onClick={ctx.handleFollowClick}>{ctx.msgs.announceConfig.followBtn}</button>
+            )}
+          </div>
+          <div class="notify">{renderNotification(ctx, permission)}</div>
+        </Fragment>
+      );
+    }
+    default:
+      return <ap-spinner />;
+  }
+};
+
+const renderNotification = (
+  ctx: RenderContext,
+  permission: AsyncReturnType<App['checkNotifyPermission']>,
+) => {
+  switch (permission) {
+    case 'unsupported':
+      return (
+        <div class="warn">
+          <ap-icon icon="frown" />
+          <div>{ctx.msgs.announceConfig.unsupported}</div>
+        </div>
+      );
+    case 'denied':
+      return (
+        <div class="warn">
+          <ap-icon icon="dizzy" />
+          <div>{ctx.msgs.announceConfig.notPermitted}</div>
+        </div>
+      );
+    default:
+      return (
+        <Fragment>
+          {!ctx.icons.notification && (
+            <button class="submit" onClick={ctx.handleEnableNotifyClick}>
+              {ctx.msgs.announceConfig.enableNotifyBtn}
+            </button>
+          )}
+          {ctx.icons.notification && (
+            <button class="submit" onClick={ctx.handleDisableNotifyClick}>
+              {ctx.msgs.announceConfig.disableNotifyBtn}
+            </button>
+          )}
+        </Fragment>
+      );
+  }
+};

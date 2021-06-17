@@ -19,8 +19,8 @@ export class ApAnnounce {
 
   @Prop()
   icons?: {
-    isFollow: boolean;
-    enableNotification: boolean;
+    follow: boolean;
+    notification: boolean;
   };
 
   @Prop()
@@ -39,8 +39,8 @@ export class ApAnnounce {
         <Tag class="head" {...(this.href && href(this.href))}>
           <div class="name">
             <div class="icons">
-              {this.icons?.isFollow && <ap-icon icon="heart" />}
-              {this.icons?.enableNotification && <ap-icon icon="bell" />}
+              {this.icons?.follow && <ap-icon icon="heart" />}
+              {this.icons?.notification && <ap-icon icon="bell" />}
             </div>
             <span>{announce.name}</span>
           </div>
