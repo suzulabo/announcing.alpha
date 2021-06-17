@@ -119,3 +119,14 @@ export class LazyPromiseState<T> extends PromiseState<T> {
     super(new LazyPromise(executor));
   }
 }
+
+// Utility classes
+export class _PendingPromiseState<T> extends PromiseState<T> {
+  constructor() {
+    super(
+      new Promise<T>(() => {
+        //
+      }),
+    );
+  }
+}
