@@ -15,6 +15,7 @@ export const msgs: Msgs = {
       }
       return '';
     },
+    pageTitle: titleSuffix,
   },
   footer: {
     title: 'Announcing♪ Console',

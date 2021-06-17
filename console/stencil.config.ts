@@ -1,6 +1,7 @@
 import replace from '@rollup/plugin-replace';
 import { Config } from '@stencil/core';
 import { sass } from '@stencil/sass';
+import nodePolyfills from 'rollup-plugin-node-polyfills';
 
 // https://stenciljs.com/docs/config
 
@@ -36,6 +37,9 @@ export const config: Config = {
       preventAssignment: true,
     }),
   ],
+  rollupPlugins: {
+    after: [nodePolyfills()],
+  },
   devServer: {
     openBrowser: false,
     port: 3370,

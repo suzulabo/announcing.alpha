@@ -5,6 +5,7 @@ export interface Msgs {
     close: string;
     ok: string;
     datetime: (d: number) => string;
+    pageTitle: string;
   };
   footer: {
     title: string;
