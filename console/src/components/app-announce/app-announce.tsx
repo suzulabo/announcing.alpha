@@ -47,7 +47,7 @@ export class AppAnnounce {
   announceState?: PromiseState<
     Announce &
       AnnounceMetaBase & {
-        announceIcon?: PromiseState<string>;
+        iconImgPromise?: PromiseState<string>;
         postsPromises: Record<string, PromiseState<PostJSON>>;
       }
   >;
@@ -171,7 +171,7 @@ export class AppAnnounce {
               <ap-announce
                 announce={announce}
                 href={`/${this.announceID}/config`}
-                announceIcon={announce.announceIcon}
+                iconImgPromise={announce.iconImgPromise}
               ></ap-announce>
               <div class="buttons" slot="bottomAnnounce">
                 <a class="button small" {...href(`${this.announceID}/edit`)}>

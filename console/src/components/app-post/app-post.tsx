@@ -41,7 +41,7 @@ export class AppPost {
   announceState?: PromiseState<
     Announce &
       AnnounceMetaBase & {
-        announceIcon?: PromiseState<string>;
+        iconImgPromise?: PromiseState<string>;
         postsPromises: Record<string, PromiseState<PostJSON>>;
       }
   >;
@@ -55,7 +55,7 @@ export class AppPost {
     if (a) {
       return {
         ...a,
-        announceIcon: a.icon ? new PromiseState(this.app.getImage(a.icon)) : undefined,
+        imgPromise: a.icon ? new PromiseState(this.app.getImage(a.icon)) : undefined,
         postsPromises: this.app.getPosts(id, a),
       };
     }
@@ -128,7 +128,7 @@ export class AppPost {
       const apAnnounce = (
         <ap-announce
           announce={announce}
-          announceIcon={announce.announceIcon}
+          iconImgPromise={announce.iconImgPromise}
           href={`/${this.announceID}`}
         />
       );
