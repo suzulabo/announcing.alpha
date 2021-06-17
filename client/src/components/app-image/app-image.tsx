@@ -1,4 +1,5 @@
 import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
+import assert from 'assert';
 import { App } from 'src/app/app';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { PromiseState } from 'src/shared-ui/utils/promise';
@@ -52,33 +53,49 @@ export class AppImage {
     }
   }
 
-  private renderContent() {
-    const status = this.imageState?.status();
+  private renderContext() {
+    const imgStatus = this.imageState?.status();
+    assert(imgStatus);
 
-    switch (status?.state) {
-      case 'rejected':
-      case 'fulfilled-empty':
-        redirectRoute(`/${this.announceID}/${this.postID}`);
-        return;
-      case 'fulfilled':
-        return (
-          <Fragment>
-            <pinch-zoom>
-              <img src={status.value} />
-            </pinch-zoom>
-          </Fragment>
-        );
-      default:
-        return <ap-spinner />;
-    }
+    return {
+      announceID: this.announceID,
+      postID: this.postID,
+      imgStatus,
+      naviLinks: this.naviLinks,
+    };
   }
 
   render() {
-    return (
-      <Host class="full">
-        {this.renderContent()}
-        <ap-navi links={this.naviLinks} />
-      </Host>
-    );
+    return render(this.renderContext());
   }
 }
+
+type RenderContext = ReturnType<AppImage['renderContext']>;
+
+const render = (ctx: RenderContext) => {
+  return (
+    <Host class="full">
+      {renderContent(ctx)}
+      <ap-navi links={ctx.naviLinks} />
+    </Host>
+  );
+};
+
+const renderContent = (ctx: RenderContext) => {
+  switch (ctx.imgStatus.state) {
+    case 'rejected':
+    case 'fulfilled-empty':
+      redirectRoute(`/${ctx.announceID}/${ctx.postID}`);
+      return;
+    case 'fulfilled':
+      return (
+        <Fragment>
+          <pinch-zoom>
+            <img src={ctx.imgStatus.value} />
+          </pinch-zoom>
+        </Fragment>
+      );
+    default:
+      return <ap-spinner />;
+  }
+};
