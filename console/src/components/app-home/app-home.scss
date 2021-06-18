@@ -1,7 +1,6 @@
 app-home {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  --page-max-width: 1200px;
+
   display: flex;
   flex-direction: column;
   align-items: center;

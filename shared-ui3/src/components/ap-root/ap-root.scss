@@ -3,12 +3,11 @@ ap-root {
   display: flex;
   flex-direction: column;
 
-  max-width: var(--page-max-width);
-  margin: auto;
-
   .page {
     flex-grow: 1;
-    margin-bottom: var(--page-margin-bottom);
+    width: 100%;
+    max-width: var(--page-max-width);
+    margin: 0 auto var(--page-margin-bottom);
   }
   .page.hide {
     display: none;
