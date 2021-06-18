@@ -135,20 +135,28 @@ export class App {
     return { ...a, ...meta };
   }
 
-  async getLatestPost(id: string, a: Announce) {
-    const posts = a.posts;
-    if (posts) {
-      const latest = Object.entries(posts)
-        .sort((v1, v2) => {
-          return v2[1].pT.toMillis() - v1[1].pT.toMillis();
-        })
-        .shift();
-      if (latest) {
-        const post = await this.appFirebase.getPost(id, latest[0]);
-        return post;
+  latestPost(a: Announce) {
+    const posts = Object.entries(a.posts);
+    let latest = posts.shift();
+    if (!latest) {
+      return;
+    }
+    for (const post of posts) {
+      if (post[1].pT.toMillis() > latest[1].pT.toMillis()) {
+        latest = post;
       }
     }
-    return;
+
+    return latest;
+  }
+
+  async getLatestPost(id: string, a: Announce) {
+    const latest = this.latestPost(a);
+    if (!latest) {
+      return;
+    }
+    const post = await this.appFirebase.getPost(id, latest[0]);
+    return post;
   }
 
   getPosts(id: string, a: Announce) {
