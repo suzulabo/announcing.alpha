@@ -45,13 +45,15 @@ export class AppHome {
   private async loadAnnounce(id: string) {
     const announce = await this.app.getAnnounceAndMeta(id);
     if (announce) {
-      const post = await this.app.getLatestPost(id, announce);
+      const info = {
+        postCount: Object.keys(announce.posts).length,
+      };
       return {
         announce,
         iconImgPromise: announce.icon
           ? new PromiseState(this.app.getImage(announce.icon))
           : undefined,
-        latestPost: post,
+        info,
       };
     }
     return;
@@ -133,25 +135,32 @@ const renderAnnounces = (ctx: RenderContext) => {
   return ctx.announces.map(({ id, status }) => {
     switch (status.state) {
       case 'rejected':
-        return <a class="announce-box">{ctx.msgs.home.dataError}</a>;
+        return (
+          <a class="card">
+            <div class="head">
+              <span class="name">ID:{id}</span>
+            </div>
+            <span class="data-error">{ctx.msgs.home.dataError}</span>
+          </a>
+        );
       case 'fulfilled-empty':
         console.warn('missing own announce', id);
         return;
       case 'fulfilled': {
-        const { announce, iconImgPromise } = status.value;
+        const { announce, iconImgPromise, info } = status.value;
         return (
-          <a class="announce-box" {...href(`/${id}`)}>
+          <a class="card" {...href(`/${id}`)}>
             <div class="head">
               <span class="name">{announce.name}</span>
               {iconImgPromise && <ap-image srcPromise={iconImgPromise} />}
             </div>
-            <span class="desc">{announce.desc}</span>
+            <span>投稿数: {info.postCount}</span>
           </a>
         );
       }
       default:
         return (
-          <a class="announce-box">
+          <a class="card">
             <ap-spinner />
           </a>
         );
