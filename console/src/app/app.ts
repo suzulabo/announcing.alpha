@@ -135,30 +135,6 @@ export class App {
     return { ...a, ...meta };
   }
 
-  latestPost(a: Announce) {
-    const posts = Object.entries(a.posts);
-    let latest = posts.shift();
-    if (!latest) {
-      return;
-    }
-    for (const post of posts) {
-      if (post[1].pT.toMillis() > latest[1].pT.toMillis()) {
-        latest = post;
-      }
-    }
-
-    return latest;
-  }
-
-  async getLatestPost(id: string, a: Announce) {
-    const latest = this.latestPost(a);
-    if (!latest) {
-      return;
-    }
-    const post = await this.appFirebase.getPost(id, latest[0]);
-    return post;
-  }
-
   getPosts(id: string, a: Announce) {
     const postsPromises: Record<string, PromiseState<PostJSON>> = {};
     for (const postID of Object.keys(a.posts)) {
