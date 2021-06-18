@@ -1,9 +1,11 @@
-import { Component, Fragment, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
+import { Component, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
+import assert from 'assert';
 import { App } from 'src/app/app';
-import { Announce, AnnounceMetaBase, PostJSON } from 'src/shared';
+import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PromiseState } from 'src/shared-ui/utils/promise';
-import { href, pushRoute } from 'src/shared-ui/utils/route';
+import { href, pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
+import { AsyncReturnType } from 'type-fest';
 
 @Component({
   tag: 'app-post',
@@ -27,6 +29,25 @@ export class AppPost {
   @Watch('postID')
   watchPostID() {
     this.postState = undefined;
+
+    this.naviLinks = [
+      {
+        label: this.app.msgs.common.back,
+        href: '/',
+        back: true,
+      },
+      {
+        label: this.app.msgs.post.edit,
+        href: `/${this.announceID}/${this.postID}/edit`,
+      },
+    ];
+    this.naviLinksLoading = [
+      {
+        label: this.app.msgs.common.back,
+        href: `/${this.announceID}`,
+        back: true,
+      },
+    ];
   }
 
   @Listen('FirestoreUpdated')
@@ -38,25 +59,27 @@ export class AppPost {
   }
 
   @State()
-  announceState?: PromiseState<
-    Announce &
-      AnnounceMetaBase & {
-        iconImgPromise?: PromiseState<string>;
-        postsPromises: Record<string, PromiseState<PostJSON>>;
-      }
-  >;
+  showDelete = false;
 
   @State()
-  postState?: PromiseState<PostJSON & { imgPromise?: PromiseState<string> }>;
+  announceState?: PromiseState<AsyncReturnType<AppPost['loadAnnounce']>>;
+
+  @State()
+  postState?: PromiseState<AsyncReturnType<AppPost['loadPost']>>;
+
+  private naviLinks!: ApNaviLinks;
+  private naviLinksLoading!: ApNaviLinks;
 
   private async loadAnnounce() {
     const id = this.announceID;
-    const a = await this.app.getAnnounceAndMeta(id);
-    if (a) {
+    const announce = await this.app.getAnnounceAndMeta(id);
+    if (announce) {
       return {
-        ...a,
-        imgPromise: a.icon ? new PromiseState(this.app.getImage(a.icon)) : undefined,
-        postsPromises: this.app.getPosts(id, a),
+        announce,
+        iconImgPromise: announce.icon
+          ? new PromiseState(this.app.getImage(announce.icon))
+          : undefined,
+        postsPromises: this.app.getPosts(id, announce),
       };
     }
     return;
@@ -68,15 +91,38 @@ export class AppPost {
     const post = await this.app.getPostJSON(id, postID);
     if (post) {
       return {
-        ...post,
+        post,
         imgPromise: post.img ? new PromiseState(this.app.getImage(post.img)) : undefined,
       };
     }
     return;
   }
 
+  private handlers = {
+    deletion: {
+      show: () => {
+        this.showDelete = true;
+      },
+
+      close: () => {
+        this.showDelete = false;
+      },
+
+      deleteClick: async () => {
+        this.showDelete = false;
+        this.app.loading = true;
+        try {
+          await this.app.deletePost(this.announceID, this.postID);
+          pushRoute(`/${this.announceID}`, true);
+        } finally {
+          this.app.loading = false;
+        }
+      },
+    },
+  };
+
   componentWillLoad() {
-    this.watchAnnounceID();
+    this.watchPostID();
   }
 
   componentWillRender() {
@@ -87,97 +133,112 @@ export class AppPost {
       this.postState = new PromiseState(this.loadPost());
     }
   }
-
-  @State()
-  showDelete = false;
-
-  private handleDelete = (ev: Event) => {
-    ev.preventDefault();
-    this.showDelete = true;
-  };
-
-  private handleDeleteModalClose = () => {
-    this.showDelete = false;
-  };
-
-  private handleDeleteClick = async () => {
-    this.showDelete = false;
-    this.app.loading = true;
-    try {
-      await this.app.deletePost(this.announceID, this.postID);
-      pushRoute(`/${this.announceID}`, true);
-    } finally {
-      this.app.loading = false;
-    }
-  };
+  private renderContext() {
+    const announceStatus = this.announceState?.status();
+    assert(announceStatus);
+    const postStatus = this.postState?.status();
+    assert(postStatus);
+    const { announce } = this.announceState?.result() || {};
+    const { post } = this.postState?.result() || {};
+    const naviLinks = announce && post ? this.naviLinks : this.naviLinksLoading;
+    const pageTitle =
+      announce && post
+        ? this.app.msgs.post.pageTitle(post?.title || post?.body?.substr(0, 20) || '')
+        : this.app.msgs.common.pageTitle;
+    return {
+      msgs: this.app.msgs,
+      announceID: this.announceID,
+      postID: this.postID,
+      announceStatus,
+      postStatus,
+      showDelete: this.showDelete,
+      handlers: this.handlers,
+      naviLinks,
+      pageTitle,
+    };
+  }
 
   render() {
-    if (this.announceState?.noResult() || this.postState?.noResult()) {
-      pushRoute(`/${this.announceID}`, true);
-      return;
-    }
-
-    const announce = this.announceState?.result();
-    const post = this.postState?.result();
-
-    const renderContent = () => {
-      if (!announce) {
-        return <ap-spinner />;
-      }
-
-      const apAnnounce = (
-        <ap-announce
-          announce={announce}
-          iconImgPromise={announce.iconImgPromise}
-          href={`/${this.announceID}`}
-        />
-      );
-
-      if (!post) {
-        return (
-          <Fragment>
-            {apAnnounce}
-            <ap-spinner />
-          </Fragment>
-        );
-      }
-
-      this.app.setTitle(this.app.msgs.post.pageTitle(post.title || post.body?.substr(0, 20) || ''));
-
-      return (
-        <Fragment>
-          {apAnnounce}
-          <ap-post
-            post={post}
-            imgPromise={post.imgPromise}
-            msgs={{ datetime: this.app.msgs.common.datetime }}
-          />
-        </Fragment>
-      );
-    };
-
-    return (
-      <Host>
-        {renderContent()}
-        <hr />
-        <div class="edit">
-          <a {...href(`/${this.announceID}/${this.postID}/edit`)}>{this.app.msgs.post.edit}</a>
-          <a href="#" onClick={this.handleDelete}>
-            {this.app.msgs.post.delete}
-          </a>
-        </div>
-        {this.showDelete && (
-          <ap-modal onClose={this.handleDeleteModalClose}>
-            <div class="delete-modal">
-              <div>{this.app.msgs.post.deleteConfirm}</div>
-              <div class="buttons">
-                <button onClick={this.handleDeleteModalClose}>{this.app.msgs.common.cancel}</button>
-                <button onClick={this.handleDeleteClick}>{this.app.msgs.common.ok}</button>
-              </div>
-            </div>
-          </ap-modal>
-        )}
-      </Host>
-    );
+    return render(this.renderContext());
   }
 }
+
+type RenderContext = ReturnType<AppPost['renderContext']>;
+
+const render = (ctx: RenderContext) => {
+  return (
+    <Host>
+      {renderAnnounce(ctx)}
+      {renderPost(ctx)}
+      {renderDeleteModal(ctx)}
+      <hr />
+      <div class="edit">
+        <a {...href(`/${ctx.announceID}/${ctx.postID}/edit`)}>{ctx.msgs.post.edit}</a>
+        <button class="anchor" onClick={ctx.handlers.deletion.show}>
+          {ctx.msgs.post.delete}
+        </button>
+      </div>
+      <ap-navi links={ctx.naviLinks} />
+      <ap-head pageTitle={ctx.pageTitle} />
+    </Host>
+  );
+};
+
+const renderAnnounce = (ctx: RenderContext) => {
+  const status = ctx.announceStatus;
+
+  switch (status.state) {
+    case 'rejected':
+    case 'fulfilled-empty':
+      redirectRoute(`/${ctx.announceID}`);
+      return;
+    case 'fulfilled': {
+      const { announce, iconImgPromise } = status.value;
+      return <ap-announce announce={announce} iconImgPromise={iconImgPromise} />;
+    }
+    default:
+      return <ap-spinner />;
+  }
+};
+
+const renderPost = (ctx: RenderContext) => {
+  if (ctx.announceStatus.state != 'fulfilled') return;
+
+  const status = ctx.postStatus;
+
+  switch (status.state) {
+    case 'rejected':
+    case 'fulfilled-empty':
+      redirectRoute(`/${ctx.announceID}`);
+      return;
+    case 'fulfilled': {
+      const { post, imgPromise } = status.value;
+
+      return (
+        <ap-post
+          post={post}
+          imgPromise={imgPromise}
+          msgs={{ datetime: ctx.msgs.common.datetime }}
+        />
+      );
+    }
+    default:
+      return <ap-spinner />;
+  }
+};
+
+const renderDeleteModal = (ctx: RenderContext) => {
+  if (!ctx.showDelete) return;
+
+  return (
+    <ap-modal onClose={ctx.handlers.deletion.close}>
+      <div class="delete-modal">
+        <div>{ctx.msgs.post.deleteConfirm}</div>
+        <div class="buttons">
+          <button onClick={ctx.handlers.deletion.close}>{ctx.msgs.common.cancel}</button>
+          <button onClick={ctx.handlers.deletion.deleteClick}>{ctx.msgs.common.ok}</button>
+        </div>
+      </div>
+    </ap-modal>
+  );
+};

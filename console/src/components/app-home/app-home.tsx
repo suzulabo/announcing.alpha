@@ -1,9 +1,11 @@
 import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
+import assert from 'assert';
 import { App } from 'src/app/app';
-import { Announce, AnnounceMetaBase, Post, User } from 'src/shared';
+import { User } from 'src/shared';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PromiseState } from 'src/shared-ui/utils/promise';
 import { href, pushRoute } from 'src/shared-ui/utils/route';
+import { AsyncReturnType } from 'type-fest';
 
 @Component({
   tag: 'app-home',
@@ -37,22 +39,18 @@ export class AppHome {
   @State()
   private announceStateMap = new Map<
     string,
-    PromiseState<
-      Announce &
-        AnnounceMetaBase & {
-          announceIcon?: PromiseState<string>;
-          latestPost?: Post;
-        }
-    >
+    PromiseState<AsyncReturnType<AppHome['loadAnnounce']>>
   >();
 
   private async loadAnnounce(id: string) {
-    const a = await this.app.getAnnounceAndMeta(id);
-    if (a) {
-      const post = await this.app.getLatestPost(id, a);
+    const announce = await this.app.getAnnounceAndMeta(id);
+    if (announce) {
+      const post = await this.app.getLatestPost(id, announce);
       return {
-        ...a,
-        announceIcon: a.icon ? new PromiseState(this.app.getImage(a.icon)) : undefined,
+        announce,
+        iconImgPromise: announce.icon
+          ? new PromiseState(this.app.getImage(announce.icon))
+          : undefined,
         latestPost: post,
       };
     }
@@ -77,67 +75,86 @@ export class AppHome {
     pushRoute('/signin');
   };
 
-  private renderAnnounces() {
-    if (this.userState?.state() == 'pending') {
-      return <ap-spinner />;
-    }
+  private renderContext() {
+    const userStatus = this.userState?.status();
+    assert(userStatus);
 
-    if (this.userState?.error()) {
-      return <span class="data-error">{this.app.msgs.home.dataError}</span>;
-    }
+    const user = this.userState?.result() || {};
+    const announces =
+      user.announces?.map(id => {
+        const state = this.announceStateMap.get(id);
+        assert(state);
+        const status = state.status();
+        return {
+          id,
+          status,
+        };
+      }) || [];
 
-    const user = this.userState?.result();
-    if (!user) {
-      return;
-    }
-
-    return user.announces?.map(id => {
-      const announceState = this.announceStateMap.get(id);
-      if (!announceState) {
-        return;
-      }
-
-      const state = announceState.state();
-      switch (state) {
-        case 'rejected':
-          console.error('load announce error', announceState.error());
-          return <a class="announce-box">{this.app.msgs.home.dataError}</a>;
-        case 'fulfilled': {
-          const announce = announceState.result();
-          if (!announce) {
-            return;
-          }
-          return (
-            <a class="announce-box" {...href(`/${id}`)}>
-              <div class="head">
-                <span class="name">{announce.name}</span>
-                {announce.announceIcon && <ap-image srcPromise={announce.announceIcon} />}
-              </div>
-              <span class="desc">{announce.desc}</span>
-            </a>
-          );
-        }
-        default:
-          return (
-            <a class="announce-box">
-              <ap-spinner />
-            </a>
-          );
-      }
-    });
+    return {
+      msgs: this.app.msgs,
+      pageTitle: this.app.msgs.home.pageTitle,
+      userStatus,
+      announces,
+      handleSignOutClick: this.handleSignOutClick,
+    };
   }
 
   render() {
-    return (
-      <Host>
-        <div class="announces-grid">{this.renderAnnounces()}</div>
-        <a class="create button" {...href('/create')}>
-          {this.app.msgs.home.createAnnounceBtn}
-        </a>
-        <button class="logout anchor" onClick={this.handleSignOutClick}>
-          {this.app.msgs.home.signOut}
-        </button>
-      </Host>
-    );
+    return render(this.renderContext());
   }
 }
+
+type RenderContext = ReturnType<AppHome['renderContext']>;
+
+const render = (ctx: RenderContext) => {
+  return (
+    <Host>
+      <div class="announces-grid">{renderAnnounces(ctx)}</div>
+      <a class="create button" {...href('/create')}>
+        {ctx.msgs.home.createAnnounceBtn}
+      </a>
+      <button class="logout anchor" onClick={ctx.handleSignOutClick}>
+        {ctx.msgs.home.signOut}
+      </button>
+      <ap-head pageTitle={ctx.pageTitle} />
+    </Host>
+  );
+};
+
+const renderAnnounces = (ctx: RenderContext) => {
+  switch (ctx.userStatus.state) {
+    case 'pending':
+      return <ap-spinner />;
+    case 'rejected':
+      return <span class="data-error">{ctx.msgs.home.dataError}</span>;
+  }
+
+  return ctx.announces.map(({ id, status }) => {
+    switch (status.state) {
+      case 'rejected':
+        return <a class="announce-box">{ctx.msgs.home.dataError}</a>;
+      case 'fulfilled-empty':
+        console.warn('missing own announce', id);
+        return;
+      case 'fulfilled': {
+        const { announce, iconImgPromise } = status.value;
+        return (
+          <a class="announce-box" {...href(`/${id}`)}>
+            <div class="head">
+              <span class="name">{announce.name}</span>
+              {iconImgPromise && <ap-image srcPromise={iconImgPromise} />}
+            </div>
+            <span class="desc">{announce.desc}</span>
+          </a>
+        );
+      }
+      default:
+        return (
+          <a class="announce-box">
+            <ap-spinner />
+          </a>
+        );
+    }
+  });
+};

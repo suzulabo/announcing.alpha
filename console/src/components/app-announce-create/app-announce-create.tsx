@@ -1,7 +1,7 @@
 import { Component, h, Host, Prop, State } from '@stencil/core';
 import { App } from 'src/app/app';
 import { AnnounceMetaRule } from 'src/shared';
-import { href, pushRoute } from 'src/shared-ui/utils/route';
+import { pushRoute } from 'src/shared-ui/utils/route';
 
 @Component({
   tag: 'app-announce-create',
@@ -14,47 +14,69 @@ export class AppAnnounceCreate {
   @State()
   values = { name: '', desc: '' };
 
-  private handleInput = {
-    name: (ev: Event) => {
-      this.values = { ...this.values, name: (ev.target as HTMLInputElement).value };
+  private naviLinks = [
+    {
+      label: this.app.msgs.common.back,
+      href: '/',
+      back: true,
     },
-    desc: (ev: Event) => {
-      this.values = { ...this.values, desc: (ev.target as HTMLTextAreaElement).value };
+  ];
+
+  private handlers = {
+    input: {
+      name: (ev: Event) => {
+        this.values = { ...this.values, name: (ev.target as HTMLInputElement).value };
+      },
+      desc: (ev: Event) => {
+        this.values = { ...this.values, desc: (ev.target as HTMLTextAreaElement).value };
+      },
+    },
+    submit: async () => {
+      await this.app.processLoading(async () => {
+        await this.app.createAnnounce(this.values.name, this.values.desc);
+        pushRoute('/', true);
+      });
     },
   };
 
-  componentWillLoad() {
-    this.app.setTitle(this.app.msgs.announceCreate.pageTitle);
+  private renderContext() {
+    return {
+      msgs: this.app.msgs,
+      values: this.values,
+      handlers: this.handlers,
+      naviLinks: this.naviLinks,
+      pageTitle: this.app.msgs.announceCreate.pageTitle,
+    };
   }
-
-  private handleSubmitClick = async () => {
-    await this.app.processLoading(async () => {
-      await this.app.createAnnounce(this.values.name, this.values.desc);
-      pushRoute('/', true);
-    });
-  };
 
   render() {
-    return (
-      <Host>
-        <ap-input
-          label={this.app.msgs.announceCreate.form.name}
-          value={this.values.name}
-          maxLength={AnnounceMetaRule.name.length}
-          onInput={this.handleInput.name}
-        />
-        <ap-input
-          textarea={true}
-          label={this.app.msgs.announceCreate.form.desc}
-          value={this.values.desc}
-          maxLength={AnnounceMetaRule.desc.length}
-          onInput={this.handleInput.desc}
-        />
-        <button disabled={!this.values.name} onClick={this.handleSubmitClick}>
-          {this.app.msgs.announceCreate.form.btn}
-        </button>
-        <a {...href('/', true)}>{this.app.msgs.common.back}</a>
-      </Host>
-    );
+    return render(this.renderContext());
   }
 }
+
+type RenderContext = ReturnType<AppAnnounceCreate['renderContext']>;
+
+const render = (ctx: RenderContext) => {
+  return (
+    <Host>
+      <ap-input
+        label={ctx.msgs.announceCreate.form.name}
+        value={ctx.values.name}
+        maxLength={AnnounceMetaRule.name.length}
+        onInput={ctx.handlers.input.name}
+      />
+      <ap-input
+        textarea={true}
+        label={ctx.msgs.announceCreate.form.desc}
+        value={ctx.values.desc}
+        maxLength={AnnounceMetaRule.desc.length}
+        onInput={ctx.handlers.input.desc}
+      />
+      <button disabled={!ctx.values.name} onClick={ctx.handlers.submit}>
+        {ctx.msgs.announceCreate.form.btn}
+      </button>
+      <ap-navi links={ctx.naviLinks} />
+      <ap-head pageTitle={ctx.pageTitle} />
+    </Host>
+  );
+};

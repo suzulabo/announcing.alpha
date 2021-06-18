@@ -1,9 +1,12 @@
-import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
+import assert from 'assert';
 import { App } from 'src/app/app';
-import { Announce, AnnounceMetaBase, Post, PostRule } from 'src/shared';
+import { PostRule } from 'src/shared';
+import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { PromiseState } from 'src/shared-ui/utils/promise';
-import { href, pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
+import { pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
 import { isURL } from 'src/utils/isurl';
+import { AsyncReturnType } from 'type-fest';
 
 @Component({
   tag: 'app-post-form',
@@ -21,176 +24,231 @@ export class AppPostForm {
     this.announceState = undefined;
   }
 
-  @State()
-  announceState?: PromiseState<
-    Announce &
-      AnnounceMetaBase & {
-        iconData?: string;
-      }
-  >;
-
   @Prop()
-  postID!: string;
+  postID?: string;
 
   @Watch('postID')
   watchPostID() {
     this.values = undefined;
-  }
 
-  @State()
-  postState?: PromiseState<Post & { imgData?: string }>;
+    this.naviLinks = [
+      {
+        label: this.app.msgs.common.back,
+        href: this.postID ? `/${this.announceID}/${this.postID}` : `/${this.announceID}`,
+        back: true,
+      },
+    ];
+  }
 
   @State()
   values?: { title?: string; body?: string; link?: string; img?: string; imgData?: string };
 
-  private backPath!: string;
+  @State()
+  announceState?: PromiseState<AsyncReturnType<AppPostForm['laodAnnounce']>>;
 
-  private handleInput = {
-    title: (ev: Event) => {
-      this.values = { ...this.values, title: (ev.target as HTMLInputElement).value };
+  @State()
+  postState?: PromiseState<AsyncReturnType<AppPostForm['loadPost']>>;
+
+  private naviLinks!: ApNaviLinks;
+
+  private async laodAnnounce() {
+    const id = this.announceID;
+    const announce = await this.app.getAnnounceAndMeta(id);
+    if (announce) {
+      return {
+        announce,
+        iconImgPromise: announce.icon
+          ? new PromiseState(this.app.getImage(announce.icon))
+          : undefined,
+      };
+    }
+    return;
+  }
+
+  private async loadPost() {
+    const id = this.announceID;
+    const postID = this.postID;
+    if (!postID) return;
+
+    const post = await this.app.getPost(id, postID);
+    if (post) {
+      return {
+        post,
+        imgData: post.img ? await this.app.getImage(post.img) : undefined,
+      };
+    }
+    return;
+  }
+
+  private handlers = {
+    input: {
+      title: (ev: Event) => {
+        this.values = { ...this.values, title: (ev.target as HTMLInputElement).value };
+      },
+      body: (ev: Event) => {
+        this.values = { ...this.values, body: (ev.target as HTMLTextAreaElement).value };
+      },
+      link: (ev: Event) => {
+        this.values = { ...this.values, link: (ev.target as HTMLInputElement).value };
+      },
+      img: (ev: CustomEvent<string>) => {
+        this.values = { ...this.values, imgData: ev.detail };
+      },
+      resizing: (ev: CustomEvent<boolean>) => {
+        this.app.loading = ev.detail;
+      },
     },
-    body: (ev: Event) => {
-      this.values = { ...this.values, body: (ev.target as HTMLTextAreaElement).value };
-    },
-    link: (ev: Event) => {
-      this.values = { ...this.values, link: (ev.target as HTMLInputElement).value };
-    },
-    img: (ev: CustomEvent<string>) => {
-      this.values = { ...this.values, imgData: ev.detail };
-    },
-    resizing: (ev: CustomEvent<boolean>) => {
-      this.app.loading = ev.detail;
+    submit: async () => {
+      if (!this.values) {
+        return;
+      }
+      this.app.loading = true;
+      try {
+        await this.app.putPost(
+          this.announceID,
+          this.values.title,
+          this.values.body,
+          this.values.link,
+          this.values.imgData?.split(',')[1],
+          this.postID,
+        );
+        pushRoute(`/${this.announceID}`);
+      } finally {
+        this.app.loading = false;
+      }
     },
   };
 
-  private handleSubmitClick = async () => {
-    if (!this.values) {
-      return;
-    }
-    this.app.loading = true;
-    try {
-      await this.app.putPost(
-        this.announceID,
-        this.values.title,
-        this.values.body,
-        this.values.link,
-        this.values.imgData?.split(',')[1],
-        this.postID,
-      );
-      pushRoute(`/${this.announceID}`);
-    } finally {
-      this.app.loading = false;
-    }
-  };
+  componentWillLoad() {
+    this.watchPostID();
+  }
 
   componentWillRender() {
     if (!this.announceState) {
-      this.backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
-
-      this.announceState = new PromiseState(
-        (async () => {
-          const id = this.announceID;
-          const a = await this.app.getAnnounceAndMeta(id);
-          if (a) {
-            return {
-              ...a,
-              iconData: a.icon ? await this.app.getImage(a.icon) : undefined,
-            };
-          }
-          return;
-        })(),
-      );
+      this.announceState = new PromiseState(this.laodAnnounce());
     }
 
     if (!this.values) {
       if (!this.postID) {
         this.values = {};
-        return;
-      }
-      this.postState = new PromiseState(
-        (async () => {
-          const id = this.announceID;
-          const postID = this.postID;
-          const post = await this.app.getPost(id, postID);
-          if (post) {
-            return {
-              ...post,
-              imgPromise: post.img ? new PromiseState(this.app.getImage(post.img)) : undefined,
-            };
+      } else {
+        this.postState = new PromiseState(this.loadPost());
+        this.postState.then(value => {
+          if (value) {
+            this.values = { ...value.post, imgData: value.imgData };
           }
-          return;
-        })(),
-      );
-      this.postState.then(post => {
-        this.values = { ...post };
-      });
+        });
+      }
     }
+  }
+
+  private renderContext() {
+    const announceStatus = this.announceState?.status();
+    assert(announceStatus);
+    const postStatus = this.postState?.status();
+    const { announce } = this.announceState?.result() || {};
+
+    const values = this.values || {};
+
+    let canSubmit = (values.title || values.body) && isURL(values.link);
+    if (canSubmit && this.postID) {
+      const { post, imgData } = this.postState?.result() || {};
+      if (!post) {
+        canSubmit = false;
+      } else {
+        canSubmit =
+          values.title != post.title ||
+          values.body != post.body ||
+          values.link != post.link ||
+          values.imgData != imgData;
+      }
+    }
+
+    const naviLinks = this.naviLinks;
+    const backPath = `/${this.announceID}` + (this.postID ? `/${this.postID}` : '');
+    const pageTitle = announce
+      ? this.app.msgs.postForm.pageTitle(announce.name)
+      : this.app.msgs.common.pageTitle;
+    return {
+      msgs: this.app.msgs,
+      announceID: this.announceID,
+      announceStatus,
+      postStatus,
+      values,
+      canSubmit,
+      handlers: this.handlers,
+      naviLinks,
+      backPath,
+      pageTitle,
+    };
   }
 
   render() {
-    if (!this.announceState || !this.values) {
-      return;
-    }
-
-    if (this.announceState.error() || this.postState?.error()) {
-      redirectRoute(this.backPath);
-      return;
-    }
-
-    const announce = this.announceState.result();
-    if (!announce) {
-      return;
-    }
-
-    this.app.setTitle(this.app.msgs.postForm.pageTitle(announce.name));
-
-    const values = this.values;
-
-    let canSubmit = (values.title || values.body) && isURL(this.values.link);
-    if (canSubmit && this.postID) {
-      const post = this.postState?.result();
-      if (!post) {
-        return;
-      }
-      canSubmit =
-        values.title != post.title ||
-        values.body != post.body ||
-        values.link != post.link ||
-        values.imgData != post.imgData;
-    }
-
-    return (
-      <Host>
-        <ap-image-input
-          resizeRect={{ width: 800, height: 800 }}
-          data={this.values.imgData}
-          onImageResizing={this.handleInput.resizing}
-          onImageChange={this.handleInput.img}
-        />
-        <ap-input
-          label={this.app.msgs.postForm.title}
-          value={this.values.title}
-          maxLength={PostRule.title.length}
-          onInput={this.handleInput.title}
-        />
-        <ap-input
-          textarea={true}
-          label={this.app.msgs.postForm.body}
-          value={this.values.body}
-          maxLength={PostRule.body.length}
-          onInput={this.handleInput.body}
-        />
-        <ap-input
-          label={this.app.msgs.postForm.lnik}
-          value={this.values.link}
-          maxLength={PostRule.link.length}
-          onInput={this.handleInput.link}
-        />
-        <button disabled={!canSubmit} onClick={this.handleSubmitClick}>
-          {this.app.msgs.postForm.btn}
-        </button>
-        <a {...href(this.backPath, true)}>{this.app.msgs.common.back}</a>
-      </Host>
-    );
+    return render(this.renderContext());
   }
 }
+
+type RenderContext = ReturnType<AppPostForm['renderContext']>;
+
+const render = (ctx: RenderContext) => {
+  return (
+    <Host>
+      {renderAnnounce(ctx)}
+      {renderForm(ctx)}
+      <ap-navi links={ctx.naviLinks} />
+      <ap-head pageTitle={ctx.pageTitle} />
+    </Host>
+  );
+};
+
+const renderAnnounce = (ctx: RenderContext) => {
+  const status = ctx.announceStatus;
+
+  switch (status.state) {
+    case 'rejected':
+    case 'fulfilled-empty':
+      redirectRoute(ctx.backPath);
+      return;
+    case 'fulfilled': {
+      const { announce, iconImgPromise } = status.value;
+      return <ap-announce announce={announce} iconImgPromise={iconImgPromise} />;
+    }
+    default:
+      return <ap-spinner />;
+  }
+};
+
+const renderForm = (ctx: RenderContext) => {
+  return (
+    <Fragment>
+      <ap-image-input
+        resizeRect={{ width: 800, height: 800 }}
+        data={ctx.values.imgData}
+        onImageResizing={ctx.handlers.input.resizing}
+        onImageChange={ctx.handlers.input.img}
+      />
+      <ap-input
+        label={ctx.msgs.postForm.title}
+        value={ctx.values.title}
+        maxLength={PostRule.title.length}
+        onInput={ctx.handlers.input.title}
+      />
+      <ap-input
+        textarea={true}
+        label={ctx.msgs.postForm.body}
+        value={ctx.values.body}
+        maxLength={PostRule.body.length}
+        onInput={ctx.handlers.input.body}
+      />
+      <ap-input
+        label={ctx.msgs.postForm.lnik}
+        value={ctx.values.link}
+        maxLength={PostRule.link.length}
+        onInput={ctx.handlers.input.link}
+      />
+      <button disabled={!ctx.canSubmit} onClick={ctx.handlers.submit}>
+        {ctx.msgs.postForm.btn}
+      </button>
+    </Fragment>
+  );
+};

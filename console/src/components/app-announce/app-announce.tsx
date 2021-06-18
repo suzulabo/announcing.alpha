@@ -96,9 +96,10 @@ export class AppAnnounce {
     return `${this.app.clientSite}/${this.announceID}`;
   }
 
-  private urlModal = {
-    urlEl: undefined as HTMLElement | undefined,
-    handlers: {
+  private urlElement?: HTMLElement;
+
+  private handlers = {
+    urlModal: {
       show: () => {
         this.showURL = true;
         this.showQRCode = false;
@@ -110,7 +111,7 @@ export class AppAnnounce {
         this.showQRCode = true;
       },
       copy: async () => {
-        const urlEl = this.urlModal.urlEl;
+        const urlEl = this.urlElement;
         if (!urlEl) {
           return;
         }
@@ -137,7 +138,7 @@ export class AppAnnounce {
       },
       urlRef: (el?: HTMLElement) => {
         if (el) {
-          this.urlModal.urlEl = el;
+          this.urlElement = el;
         }
       },
       qrcodeRef: (el?: HTMLElement) => {
@@ -175,7 +176,7 @@ export class AppAnnounce {
       showURL: this.showURL,
       showQRCode: this.showQRCode,
       clientURL: this.clientURL,
-      urlModalHandlers: this.urlModal.handlers,
+      handlers: this.handlers,
     };
   }
 
@@ -222,7 +223,7 @@ const renderContent = (ctx: RenderContext) => {
             <a class="button small" {...href(`${ctx.announceID}/edit`)}>
               {ctx.msgs.announce.edit}
             </a>
-            <button class="small" onClick={ctx.urlModalHandlers.show}>
+            <button class="small" onClick={ctx.handlers.urlModal.show}>
               {ctx.msgs.announce.showURL}
             </button>
           </div>
@@ -250,16 +251,16 @@ const renderURLModal = (ctx: RenderContext) => {
   if (!ctx.showURL) return;
 
   return (
-    <ap-modal onClose={ctx.urlModalHandlers.close}>
+    <ap-modal onClose={ctx.handlers.urlModal.close}>
       <div class="url-modal">
         {!ctx.showQRCode && (
-          <button class="anchor" onClick={ctx.urlModalHandlers.showQrCode}>
+          <button class="anchor" onClick={ctx.handlers.urlModal.showQrCode}>
             {ctx.msgs.announce.showQRCode}
           </button>
         )}
         {ctx.showQRCode && (
           <Fragment>
-            <div class="qr" ref={ctx.urlModalHandlers.qrcodeRef} />
+            <div class="qr" ref={ctx.handlers.urlModal.qrcodeRef} />
             <input
               class="qr-size"
               type="range"
@@ -267,24 +268,24 @@ const renderURLModal = (ctx: RenderContext) => {
               max="300"
               value="200"
               step="50"
-              onInput={ctx.urlModalHandlers.qrsize}
+              onInput={ctx.handlers.urlModal.qrsize}
             />
-            <button class="slim qr-download" onClick={ctx.urlModalHandlers.download}>
+            <button class="slim qr-download" onClick={ctx.handlers.urlModal.download}>
               {ctx.msgs.announce.downloadQRCode}
             </button>
           </Fragment>
         )}
-        <div class="url" ref={ctx.urlModalHandlers.urlRef}>
+        <div class="url" ref={ctx.handlers.urlModal.urlRef}>
           {ctx.clientURL}
         </div>
         <div class="buttons">
           <a class="button slim open" href={ctx.clientURL} target="_blank" rel="noopener">
             {ctx.msgs.announce.openURL}
           </a>
-          <button class="slim copy" onClick={ctx.urlModalHandlers.copy}>
+          <button class="slim copy" onClick={ctx.handlers.urlModal.copy}>
             {ctx.msgs.announce.copyURL}
           </button>
-          <button class="slim close" onClick={ctx.urlModalHandlers.close}>
+          <button class="slim close" onClick={ctx.handlers.urlModal.close}>
             {ctx.msgs.common.close}
           </button>
         </div>
