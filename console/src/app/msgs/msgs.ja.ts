@@ -89,11 +89,11 @@ export const msgs: Msgs = {
     },
     deletion: {
       guide: 'アナウンスの削除',
-      desc: 'アナウンスを削除します。この操作は元に戻せません。',
+      desc: 'アナウンスを削除します。\nこの操作は元に戻せません。',
       btn: (s: string) => {
         return `"${s}"を削除する`;
       },
-      confirm: 'アナウンスを削除します。よろしいですか？',
+      confirm: 'アナウンスを削除します。本当によろしいですか？',
     },
   },
   postForm: {

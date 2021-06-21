@@ -1,33 +1,41 @@
 app-announce-edit {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  padding: 10px;
 
-  > * {
-    margin: 20px 0;
+  div.form {
+    & > * {
+      margin-top: 30px;
+    }
+
+    ap-image-input {
+      --img-width: 100px;
+      --img-height: 100px;
+      display: block;
+      margin: inherit auto;
+    }
+
+    button.submit {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    button.deletion-toggle {
+      display: block;
+      margin: 50px 0 0 auto;
+    }
   }
 
-  ap-image-input {
-    --img-max-width: 100px;
-    --img-max-height: 100px;
-  }
-
-  .deletion-toggle {
-    align-self: flex-end;
-    color: var(--light-color);
+  div.deletion {
+    margin-top: 30px;
+    text-align: center;
+    white-space: pre-line;
+    button {
+      margin-top: 20px;
+    }
   }
 
   .delete-modal {
-    background-color: var(--bk-color);
-    border-radius: 5px;
     padding: 20px 10px;
-
-    width: 100%;
-    max-width: 400px;
 
     text-align: center;
     .buttons {

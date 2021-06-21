@@ -20,7 +20,10 @@ ap-navi {
   }
 
   @media (min-width: 601px) {
-    position: sticky;
+    &.sticky {
+      position: sticky;
+    }
+
     margin-top: 30px;
     bottom: 0;
     left: 0;

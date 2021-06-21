@@ -205,44 +205,48 @@ const renderForm = (ctx: RenderContext) => {
 
   return (
     <Fragment>
-      <ap-image-input
-        label={ctx.msgs.announceEdit.form.icon}
-        data={ctx.values.iconData}
-        resizeRect={{ width: 200, height: 200 }}
-        onImageResizing={ctx.handlers.image.resize}
-        onImageChange={ctx.handlers.image.change}
-      />
-      <ap-input
-        label={ctx.msgs.announceEdit.form.name}
-        value={ctx.values.name}
-        onInput={ctx.handlers.input.name}
-        maxLength={AnnounceMetaRule.name.length}
-      />
-      <ap-input
-        textarea={true}
-        label={ctx.msgs.announceEdit.form.desc}
-        value={ctx.values.desc}
-        onInput={ctx.handlers.input.desc}
-        maxLength={AnnounceMetaRule.desc.length}
-      />
-      <ap-input
-        label={ctx.msgs.announceEdit.form.link}
-        value={ctx.values.link}
-        onInput={ctx.handlers.input.link}
-        maxLength={AnnounceMetaRule.link.length}
-      />
-      <button disabled={!ctx.canSubmit} onClick={ctx.handlers.submit}>
-        {ctx.msgs.announceEdit.form.btn}
-      </button>
-      <button class="clear deletion-toggle" onClick={ctx.handlers.deletion.toggle}>
-        {ctx.msgs.announceEdit.deletion.guide}
-      </button>
+      <div class="form">
+        <ap-image-input
+          label={ctx.msgs.announceEdit.form.icon}
+          data={ctx.values.iconData}
+          resizeRect={{ width: 200, height: 200 }}
+          onImageResizing={ctx.handlers.image.resize}
+          onImageChange={ctx.handlers.image.change}
+        />
+        <ap-input
+          label={ctx.msgs.announceEdit.form.name}
+          value={ctx.values.name}
+          onInput={ctx.handlers.input.name}
+          maxLength={AnnounceMetaRule.name.length}
+        />
+        <ap-input
+          textarea={true}
+          label={ctx.msgs.announceEdit.form.desc}
+          value={ctx.values.desc}
+          onInput={ctx.handlers.input.desc}
+          maxLength={AnnounceMetaRule.desc.length}
+        />
+        <ap-input
+          label={ctx.msgs.announceEdit.form.link}
+          value={ctx.values.link}
+          onInput={ctx.handlers.input.link}
+          maxLength={AnnounceMetaRule.link.length}
+        />
+        <button class="submit" disabled={!ctx.canSubmit} onClick={ctx.handlers.submit}>
+          {ctx.msgs.announceEdit.form.btn}
+        </button>
+        <button class="clear deletion-toggle" onClick={ctx.handlers.deletion.toggle}>
+          {ctx.msgs.announceEdit.deletion.guide}
+        </button>
+      </div>
       {ctx.showDeletion && (
         <Fragment>
-          <div>{ctx.msgs.announceEdit.deletion.desc}</div>
-          <button onClick={ctx.handlers.deletion.show}>
-            {ctx.msgs.announceEdit.deletion.btn(announce.name)}
-          </button>
+          <div class="deletion">
+            <div>{ctx.msgs.announceEdit.deletion.desc}</div>
+            <button onClick={ctx.handlers.deletion.show}>
+              {ctx.msgs.announceEdit.deletion.btn(announce.name)}
+            </button>
+          </div>
         </Fragment>
       )}
       {ctx.showDeleteConfirm && (

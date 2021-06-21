@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, h, Host, Prop } from '@stencil/core';
+import { Component, Event, EventEmitter, Fragment, h, Host, Prop } from '@stencil/core';
 import pica from 'pica';
 
 @Component({
@@ -54,6 +54,42 @@ export class ApImageInput {
   render() {
     const imageData = this.data;
 
+    const renderContent = () => {
+      if (!imageData) {
+        return (
+          <Fragment>
+            <button class="select" onClick={this.handlers.click}>
+              {this.label}
+            </button>
+          </Fragment>
+        );
+      } else {
+        return (
+          <Fragment>
+            <div class="image">
+              <img src={imageData} />
+              <button class="delete clear" onClick={this.handlers.delete}>
+                <ap-icon icon="trash" />
+              </button>
+            </div>
+          </Fragment>
+        );
+      }
+    };
+
+    return (
+      <Host>
+        {renderContent()}
+        <input
+          type="file"
+          accept="image/*"
+          ref={this.handlers.ref}
+          onChange={this.handlers.change}
+        />
+      </Host>
+    );
+
+    /*
     return (
       <Host>
         <div class={{ 'img-box': true, 'no-img': !imageData }} onClick={this.handlers.click}>
@@ -78,6 +114,7 @@ export class ApImageInput {
         />
       </Host>
     );
+    */
   }
 }
 
