@@ -3,11 +3,12 @@ const syncDirectory = require('sync-directory');
 
 const watch = process.argv.includes('-w');
 
-const syncDir = (src, dst) => {
+const syncDir = (src, dst, config) => {
   syncDirectory(path.resolve(src), path.resolve(dst), {
+    ...config,
     watch,
   });
 };
 
 syncDir('../shared/src', 'src/shared');
-syncDir('../shared-ui3/src/components', 'src/shared-ui');
+syncDir('../shared-ui3/src/components', 'src/shared-ui', { exclude: ['ap-image-input'] });
