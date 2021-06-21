@@ -8,4 +8,82 @@ app-announce {
     margin: auto;
     white-space: pre-line;
   }
+
+  .actions {
+    padding: 10px 10px 0;
+    .line1 {
+      display: flex;
+      justify-content: space-around;
+    }
+    hr {
+      margin: 20px 0;
+    }
+    .new-post {
+      display: block;
+      width: fit-content;
+      margin: auto;
+    }
+  }
+
+  .url-modal {
+    padding: 40px 10px 20px;
+
+    button.show-qr {
+      display: block;
+      margin: 0 auto;
+    }
+
+    div.qr {
+      margin: 0 auto;
+      width: 300px;
+      min-height: 200px;
+      text-align: center;
+
+      input.qr-size {
+        margin-top: 10px;
+        align-self: center;
+        width: 300px;
+      }
+      button.qr-download {
+        margin-top: 20px;
+        align-self: center;
+      }
+    }
+
+    .url {
+      margin-top: 20px;
+      text-align: center;
+      border-radius: 5px;
+      border: 1px solid var(--light-border-color);
+      user-select: all;
+      padding: 10px 0;
+      font-weight: bolder;
+
+      &.copied {
+        animation: copied 0.1s 1;
+      }
+
+      @keyframes copied {
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+    }
+
+    div.buttons {
+      align-self: stretch;
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      .open {
+        margin-right: 20px;
+      }
+      .close {
+        margin-left: auto;
+      }
+    }
+  }
 }

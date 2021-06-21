@@ -56,6 +56,7 @@ export const msgs: Msgs = {
     noPosts: 'お知らせが投稿されていません',
     dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     newPost: '新しいお知らせを投稿する',
+    newPostNavi: '新しい投稿',
     edit: '編集する',
     showURL: 'URLを表示',
     showQRCode: 'QRコードを表示',

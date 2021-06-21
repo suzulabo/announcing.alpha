@@ -21,7 +21,9 @@ export class ApModal {
   render() {
     return (
       <Host onClick={this.handleClick}>
-        <slot />
+        <div class="modal-content">
+          <slot />
+        </div>
       </Host>
     );
   }

@@ -41,8 +41,8 @@ export class AppAnnounce {
         back: true,
       },
       {
-        label: this.app.msgs.announce.edit,
-        href: `/${this.announceID}/edit`,
+        label: this.app.msgs.announce.newPostNavi,
+        href: `/${this.announceID}/post`,
       },
     ];
     this.naviLinksLoading = [
@@ -218,18 +218,22 @@ const renderContent = (ctx: RenderContext) => {
             announce={announce}
             href={`/${ctx.announceID}/config`}
             iconImgPromise={iconImgPromise}
+            showDetails={true}
           ></ap-announce>
-          <div class="buttons" slot="bottomAnnounce">
-            <a class="button small" {...href(`${ctx.announceID}/edit`)}>
-              {ctx.msgs.announce.edit}
+          <div class="actions">
+            <div class="line1">
+              <a class="button small" {...href(`${ctx.announceID}/edit`)}>
+                {ctx.msgs.announce.edit}
+              </a>
+              <button class="small" onClick={ctx.handlers.urlModal.show}>
+                {ctx.msgs.announce.showURL}
+              </button>
+            </div>
+            <hr />
+            <a class="button slim new-post" {...href(`${ctx.announceID}/post`)}>
+              {ctx.msgs.announce.newPost}
             </a>
-            <button class="small" onClick={ctx.handlers.urlModal.show}>
-              {ctx.msgs.announce.showURL}
-            </button>
           </div>
-          <a class="button new-post" {...href(`${ctx.announceID}/post`)}>
-            {ctx.msgs.announce.newPost}
-          </a>
           <ap-posts
             posts={announce.posts}
             postsPromises={postsPromises}
@@ -254,25 +258,27 @@ const renderURLModal = (ctx: RenderContext) => {
     <ap-modal onClose={ctx.handlers.urlModal.close}>
       <div class="url-modal">
         {!ctx.showQRCode && (
-          <button class="anchor" onClick={ctx.handlers.urlModal.showQrCode}>
+          <button class="show-qr anchor" onClick={ctx.handlers.urlModal.showQrCode}>
             {ctx.msgs.announce.showQRCode}
           </button>
         )}
         {ctx.showQRCode && (
           <Fragment>
-            <div class="qr" ref={ctx.handlers.urlModal.qrcodeRef} />
-            <input
-              class="qr-size"
-              type="range"
-              min="100"
-              max="300"
-              value="200"
-              step="50"
-              onInput={ctx.handlers.urlModal.qrsize}
-            />
-            <button class="slim qr-download" onClick={ctx.handlers.urlModal.download}>
-              {ctx.msgs.announce.downloadQRCode}
-            </button>
+            <div class="qr">
+              <div ref={ctx.handlers.urlModal.qrcodeRef} />
+              <input
+                class="qr-size"
+                type="range"
+                min="100"
+                max="300"
+                value="200"
+                step="50"
+                onInput={ctx.handlers.urlModal.qrsize}
+              />
+              <button class="slim qr-download" onClick={ctx.handlers.urlModal.download}>
+                {ctx.msgs.announce.downloadQRCode}
+              </button>
+            </div>
           </Fragment>
         )}
         <div class="url" ref={ctx.handlers.urlModal.urlRef}>

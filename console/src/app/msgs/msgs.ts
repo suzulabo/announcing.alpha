@@ -39,6 +39,7 @@ export interface Msgs {
     noPosts: string;
     dataError: string;
     newPost: string;
+    newPostNavi: string;
     edit: string;
     showURL: string;
     showQRCode: string;
