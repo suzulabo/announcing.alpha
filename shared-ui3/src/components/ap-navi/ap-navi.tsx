@@ -16,9 +16,12 @@ export class ApNavi {
   @Prop()
   links!: ApNaviLinks;
 
+  @Prop()
+  position: 'fixed' | 'sticky' = 'fixed';
+
   render() {
     return (
-      <Host>
+      <Host class={{ sticky: this.position == 'sticky' }}>
         {this.links.map(v => {
           if (v.href) {
             return (
