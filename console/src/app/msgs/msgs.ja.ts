@@ -110,7 +110,7 @@ export const msgs: Msgs = {
     pageTitle: (s: string) => {
       return `${s} - ${titleSuffix}`;
     },
-    edit: '編集',
+    edit: '修正する',
     delete: '削除',
     deleteConfirm: 'お知らせを削除します。よろしいですか？',
   },

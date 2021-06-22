@@ -4,7 +4,7 @@ import { App } from 'src/app/app';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PromiseState } from 'src/shared-ui/utils/promise';
-import { href, pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
+import { pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
 import { AsyncReturnType } from 'type-fest';
 
 @Component({
@@ -33,12 +33,16 @@ export class AppPost {
     this.naviLinks = [
       {
         label: this.app.msgs.common.back,
-        href: '/',
+        href: `/${this.announceID}`,
         back: true,
       },
       {
         label: this.app.msgs.post.edit,
         href: `/${this.announceID}/${this.postID}/edit`,
+      },
+      {
+        label: this.app.msgs.post.delete,
+        handler: this.handlers.deletion.show,
       },
     ];
     this.naviLinksLoading = [
@@ -172,13 +176,6 @@ const render = (ctx: RenderContext) => {
       {renderAnnounce(ctx)}
       {renderPost(ctx)}
       {renderDeleteModal(ctx)}
-      <hr />
-      <div class="edit">
-        <a {...href(`/${ctx.announceID}/${ctx.postID}/edit`)}>{ctx.msgs.post.edit}</a>
-        <button class="anchor" onClick={ctx.handlers.deletion.show}>
-          {ctx.msgs.post.delete}
-        </button>
-      </div>
       <ap-navi links={ctx.naviLinks} />
       <ap-head pageTitle={ctx.pageTitle} />
     </Host>
