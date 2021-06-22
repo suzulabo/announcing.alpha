@@ -18,8 +18,9 @@ export class AppHome {
   @Prop()
   app!: App;
 
-  @Listen('FirestoreUpdated')
-  handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
+  @Listen('FirestoreUpdated', { target: 'window' }) handleFirestoreUpdated(
+    event: FirestoreUpdatedEvent,
+  ) {
     const { collection, id } = event.detail;
     if (collection == 'users') {
       this.userState = undefined;

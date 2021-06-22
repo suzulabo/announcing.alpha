@@ -37,8 +37,9 @@ export class AppHome {
     return;
   }
 
-  @Listen('FirestoreUpdated')
-  handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
+  @Listen('FirestoreUpdated', { target: 'window' }) handleFirestoreUpdated(
+    event: FirestoreUpdatedEvent,
+  ) {
     const { collection, id } = event.detail;
     if (collection == 'announces') {
       if (this.announceStateMap.has(id)) {

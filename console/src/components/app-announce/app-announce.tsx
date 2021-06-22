@@ -56,8 +56,9 @@ export class AppAnnounce {
     this.announceState = undefined;
   }
 
-  @Listen('FirestoreUpdated')
+  @Listen('FirestoreUpdated', { target: 'window' })
   handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
+    console.log('FirestoreUpdated');
     const { collection, id } = event.detail;
     if (collection == 'announces' && id == this.announceID) {
       this.announceState = undefined;
