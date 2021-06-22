@@ -32,9 +32,9 @@ export class ApNavi {
           }
           if (v.handler) {
             return (
-              <a class="navi" onClick={v.handler}>
+              <button class="navi anchor" onClick={v.handler}>
                 {v.label}
-              </a>
+              </button>
             );
           }
         })}
