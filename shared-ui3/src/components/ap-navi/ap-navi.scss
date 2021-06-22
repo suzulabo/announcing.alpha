@@ -1,20 +1,35 @@
 ap-navi {
   @media (max-width: 600px) {
-    .navi {
-      padding: 15px;
-      text-decoration: none;
+    & {
       position: fixed;
       bottom: 0;
-      background-color: var(--light-bk-color);
-      z-index: 99;
+      left: 0;
+      right: 0;
+      pointer-events: none;
 
-      &:nth-of-type(1) {
-        left: 0;
-        border-top-right-radius: 10px;
+      display: flex;
+      z-index: 99;
+    }
+
+    .navi {
+      pointer-events: all;
+      padding: 15px;
+      background-color: var(--light-bk-color);
+      text-decoration: none;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+
+      &:first-of-type {
+        margin-right: auto;
+        border-top-left-radius: unset;
       }
-      &:nth-of-type(2) {
-        right: 0;
-        border-top-left-radius: 10px;
+
+      &:nth-of-type(n + 2) {
+        margin-left: 15px;
+      }
+
+      &:last-of-type {
+        border-top-right-radius: unset;
       }
     }
   }
@@ -43,7 +58,7 @@ ap-navi {
       text-decoration: none;
       background-color: var(--light-bk-color);
       border-radius: 10px;
-      margin: 0 10px 20px;
+      margin: 0 20px 20px;
     }
   }
 }
