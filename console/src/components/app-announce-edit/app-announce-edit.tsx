@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, Fragment, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
 import assert from 'assert';
 import { App } from 'src/app/app';
 import { AnnounceMetaRule } from 'src/shared';
@@ -13,6 +13,11 @@ import { AsyncReturnType } from 'type-fest';
   styleUrl: 'app-announce-edit.scss',
 })
 export class AppAnnounceEdit {
+  @Listen('PageActivated')
+  listenPageActivated() {
+    this.announceState = undefined;
+  }
+
   @Prop()
   app!: App;
 
