@@ -15,6 +15,9 @@ export class ApImageInput {
   @Prop()
   data?: string;
 
+  @Prop()
+  border?: boolean;
+
   @Event()
   imageResizing!: EventEmitter<boolean>;
 
@@ -67,7 +70,7 @@ export class ApImageInput {
         return (
           <Fragment>
             <div class="image">
-              <img src={imageData} />
+              <img class={{ border: !!this.border }} src={imageData} />
               <button class="delete clear" onClick={this.handlers.delete}>
                 <ap-icon icon="trash" />
               </button>

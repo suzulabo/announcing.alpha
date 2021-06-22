@@ -9,17 +9,26 @@ ap-image-input {
   }
 
   div.image {
+    max-width: var(--max-width);
+
     img {
       border-radius: 5px;
-      width: var(--img-width);
-      height: var(--img-height);
       object-fit: contain;
 
-      border: 1px solid var(--light-border-color);
+      max-width: 100%;
+      max-height: var(--max-height);
+
+      width: var(--img-width);
+      height: var(--img-height);
+
+      &.border {
+        border: 1px solid var(--light-border-color);
+      }
 
       display: block;
       margin: auto;
     }
+
     button.delete {
       display: block;
       margin: 10px auto 0;

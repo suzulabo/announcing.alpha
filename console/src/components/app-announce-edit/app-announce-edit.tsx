@@ -215,6 +215,7 @@ const renderForm = (ctx: RenderContext) => {
           label={ctx.msgs.announceEdit.form.icon}
           data={ctx.values.iconData}
           resizeRect={{ width: 200, height: 200 }}
+          border={true}
           onImageResizing={ctx.handlers.image.resize}
           onImageChange={ctx.handlers.image.change}
         />
