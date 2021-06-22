@@ -216,7 +216,7 @@ const renderContent = (ctx: RenderContext) => {
         <Fragment>
           <ap-announce
             announce={announce}
-            href={`/${ctx.announceID}/config`}
+            href={`/${ctx.announceID}/edit`}
             iconImgPromise={iconImgPromise}
             showDetails={true}
           ></ap-announce>
