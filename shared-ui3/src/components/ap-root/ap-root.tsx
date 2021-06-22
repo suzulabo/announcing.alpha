@@ -80,11 +80,33 @@ export class ApRoot {
   }
 
   componentDidRender() {
-    const apHead = this.el.querySelector<HTMLApHeadElement>('ap-root > .page:not(.hide) > ap-head');
-    if (apHead) {
-      apHead.writeHead();
-    } else if (this.defaultApHead) {
-      this.defaultApHead.writeHead();
+    this.el.children;
+
+    const page = searchElement(this.el.children, el => {
+      return el.classList.contains('page') && !el.classList.contains('hide');
+    });
+
+    if (page) {
+      const apHead = searchElement(page.children, el => {
+        return el.tagName == 'AP-HEAD';
+      }) as HTMLApHeadElement;
+      if (apHead) {
+        void apHead.writeHead();
+      } else if (this.defaultApHead) {
+        void this.defaultApHead.writeHead();
+      }
+
+      page.dispatchEvent(new CustomEvent('PageActivated'));
     }
   }
 }
+
+const searchElement = (c: HTMLCollection, cb: (el: HTMLElement) => boolean) => {
+  for (let i = 0; i < c.length; i++) {
+    const el = c.item(i) as HTMLElement;
+    if (cb(el)) {
+      return el;
+    }
+  }
+  return;
+};
