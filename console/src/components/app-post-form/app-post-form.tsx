@@ -22,6 +22,7 @@ export class AppPostForm {
   @Watch('announceID')
   watchAnnounceID() {
     this.announceState = undefined;
+    this.values = undefined;
   }
 
   @Prop()
@@ -112,6 +113,7 @@ export class AppPostForm {
           this.values.imgData?.split(',')[1],
           this.postID,
         );
+        this.values = undefined;
         pushRoute(`/${this.announceID}`);
       } finally {
         this.app.loading = false;
@@ -221,34 +223,37 @@ const renderAnnounce = (ctx: RenderContext) => {
 const renderForm = (ctx: RenderContext) => {
   return (
     <Fragment>
-      <ap-image-input
-        resizeRect={{ width: 800, height: 800 }}
-        data={ctx.values.imgData}
-        onImageResizing={ctx.handlers.input.resizing}
-        onImageChange={ctx.handlers.input.img}
-      />
-      <ap-input
-        label={ctx.msgs.postForm.title}
-        value={ctx.values.title}
-        maxLength={PostRule.title.length}
-        onInput={ctx.handlers.input.title}
-      />
-      <ap-input
-        textarea={true}
-        label={ctx.msgs.postForm.body}
-        value={ctx.values.body}
-        maxLength={PostRule.body.length}
-        onInput={ctx.handlers.input.body}
-      />
-      <ap-input
-        label={ctx.msgs.postForm.lnik}
-        value={ctx.values.link}
-        maxLength={PostRule.link.length}
-        onInput={ctx.handlers.input.link}
-      />
-      <button disabled={!ctx.canSubmit} onClick={ctx.handlers.submit}>
-        {ctx.msgs.postForm.btn}
-      </button>
+      <div class="form">
+        <ap-image-input
+          label={ctx.msgs.postForm.img}
+          resizeRect={{ width: 800, height: 800 }}
+          data={ctx.values.imgData}
+          onImageResizing={ctx.handlers.input.resizing}
+          onImageChange={ctx.handlers.input.img}
+        />
+        <ap-input
+          label={ctx.msgs.postForm.title}
+          value={ctx.values.title}
+          maxLength={PostRule.title.length}
+          onInput={ctx.handlers.input.title}
+        />
+        <ap-input
+          textarea={true}
+          label={ctx.msgs.postForm.body}
+          value={ctx.values.body}
+          maxLength={PostRule.body.length}
+          onInput={ctx.handlers.input.body}
+        />
+        <ap-input
+          label={ctx.msgs.postForm.lnik}
+          value={ctx.values.link}
+          maxLength={PostRule.link.length}
+          onInput={ctx.handlers.input.link}
+        />
+        <button class="submit" disabled={!ctx.canSubmit} onClick={ctx.handlers.submit}>
+          {ctx.msgs.postForm.btn}
+        </button>
+      </div>
     </Fragment>
   );
 };

@@ -1,18 +1,19 @@
 app-post-form {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  div.form {
+    padding: 30px 10px 20px;
+    & > * {
+      margin-top: 30px;
+    }
 
-  > * {
-    margin: 10px 0;
-  }
+    ap-image-input {
+      --max-width: 600px;
+      --max-height: 300px;
+    }
 
-  ap-image-input {
-    --img-max-width: 600px;
-    --img-max-height: 200px;
+    button.submit {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 }

@@ -103,7 +103,7 @@ export const msgs: Msgs = {
     title: 'タイトル',
     body: '本文',
     lnik: 'リンク',
-    img: '画像',
+    img: '画像を追加',
     btn: '投稿する',
   },
   post: {
