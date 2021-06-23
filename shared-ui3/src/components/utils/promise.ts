@@ -1,11 +1,12 @@
 import { forceUpdate, getRenderingRef } from '@stencil/core';
 
-export class LazyPromise<T> implements Promise<T> {
+export class LazyPromise<T> implements PromiseLike<T> {
   constructor(private executor: () => Promise<T>) {}
 
   private _promise?: Promise<T>;
 
-  private lazyThens: ((v: T) => unknown)[] = [];
+  private lazyFulfilled: ((value: T) => void)[] = [];
+  private lazyRejected: ((reason: any) => void)[] = [];
 
   private startPromise() {
     if (!this._promise) {
@@ -14,10 +15,12 @@ export class LazyPromise<T> implements Promise<T> {
 
     this._promise.then(
       v => {
-        this.lazyThens.forEach(f => f(v));
+        this.lazyFulfilled.forEach(f => f(v));
+        this.lazyFulfilled = [];
       },
-      () => {
-        //
+      reason => {
+        this.lazyRejected.forEach(f => f(reason));
+        this.lazyRejected = [];
       },
     );
 
@@ -27,22 +30,13 @@ export class LazyPromise<T> implements Promise<T> {
   then<TResult1 = T, TResult2 = never>(
     onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
     onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null,
-  ): Promise<TResult1 | TResult2> {
+  ): PromiseLike<TResult1 | TResult2> {
     return this.startPromise().then(onfulfilled, onrejected);
   }
-  catch<TResult = never>(
-    onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null,
-  ): Promise<T | TResult> {
-    return this.startPromise().catch(onrejected);
-  }
-  finally(onfinally?: (() => void) | null): Promise<T> {
-    return this.startPromise().finally(onfinally);
-  }
 
-  [Symbol.toStringTag] = 'LazyPromise';
-
-  lazyThen(onfulfilled: (v: T) => unknown) {
-    this.lazyThens.push(onfulfilled);
+  lazyThen(onfulfilled?: (value: T) => void, onrejected?: (reason: any) => void): void {
+    if (onfulfilled) this.lazyFulfilled.push(onfulfilled);
+    if (onrejected) this.lazyRejected.push(onrejected);
   }
 }
 
@@ -59,7 +53,7 @@ export class PromiseState<T> {
   private touched = false;
   private refs = new Set<any>();
 
-  constructor(private promise: Promise<T | undefined>) {
+  constructor(private promise: PromiseLike<T | undefined>) {
     if (!(promise instanceof LazyPromise)) {
       this.touch();
     }
@@ -139,8 +133,8 @@ export class LazyPromiseState<T> extends PromiseState<T> {
     this.lazyPromise = p;
   }
 
-  lazyThen(onfulfilled: (v: T | undefined) => unknown) {
-    this.lazyPromise.lazyThen(onfulfilled);
+  lazyThen(onfulfilled?: (value: T | undefined) => void, onrejected?: (reason: any) => void): void {
+    this.lazyPromise.lazyThen(onfulfilled, onrejected);
   }
 }
 
