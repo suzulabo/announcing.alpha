@@ -1,17 +1,8 @@
 {
   "name": "announcing-client",
   "private": true,
-  "watch": {
-    "copy-shared": {
-      "patterns": [
-        "../shared-ui/src",
-        "../shared/src"
-      ],
-      "extensions": "ts,tsx,scss"
-    }
-  },
   "scripts": {
-    "build": "rm -rf www && stencil build",
+    "build": "rm -rf www && npm run copy-shared && stencil build",
     "build.cap": "rm -rf cap && CAP_BUILD=y stencil build && cap sync && cp google-services.json android/app",
     "serve": "stencil build --dev --watch --serve --service-worker",
     "test": "stencil test --spec --e2e",
