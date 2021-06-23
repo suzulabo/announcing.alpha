@@ -1,7 +1,13 @@
-const fs = require('fs-extra');
+const path = require('path');
+const syncDirectory = require('sync-directory');
 
-const copy = (src, dest) => {
-  fs.copySync(src, dest, { preserveTimestamps: true });
+const watch = process.argv.includes('-w');
+
+const syncDir = (src, dst, config) => {
+  syncDirectory(path.resolve(src), path.resolve(dst), {
+    ...config,
+    watch,
+  });
 };
 
-copy('../../shared/src', 'src/shared');
+syncDir('../../shared/src', 'src/shared');
