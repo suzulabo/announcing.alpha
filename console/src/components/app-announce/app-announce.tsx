@@ -134,7 +134,7 @@ export class AppAnnounce {
       download: () => {
         const { announce } = this.announceState?.result() || {};
         if (announce) {
-          this.qrCode.download({ name: `qrcode-${announce.name}`, extension: 'png' });
+          void this.qrCode.download({ name: `qrcode-${announce.name}`, extension: 'png' });
         }
       },
       urlRef: (el?: HTMLElement) => {
