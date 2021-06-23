@@ -55,12 +55,11 @@ export class ApInput {
           {!this.textarea && <input value={this.value} maxLength={this.maxLength} />}
           {this.textarea && (
             <textarea
+              value={this.value}
               maxLength={this.maxLength}
               ref={this.autoGrow.handleRef}
               onInput={this.autoGrow.handleInput}
-            >
-              {this.value}
-            </textarea>
+            ></textarea>
           )}
         </label>
       </Host>
