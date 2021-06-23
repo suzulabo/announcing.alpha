@@ -4,7 +4,6 @@ import {
   Auth,
   getAuth,
   GoogleAuthProvider,
-  setPersistence,
   signInWithRedirect,
   TwitterAuthProvider,
   useAuthEmulator,
@@ -87,30 +86,29 @@ export class AppFirebase {
     return this.auth.currentUser;
   }
 
-  async signInGoogle(keep: boolean) {
+  async signIn(keep: boolean, kind: 'google' | 'twitter') {
+    // TODO: not work v9 beta
     if (keep) {
-      await setPersistence(this.auth, { type: 'LOCAL' });
+      //await setPersistence(this.auth, { type: 'LOCAL' });
+    } else {
+      //await setPersistence(this.auth, { type: 'SESSION' });
     }
 
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account',
-    });
+    switch (kind) {
+      case 'google': {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({
+          prompt: 'select_account',
+        });
 
-    await signInWithRedirect(this.auth, provider);
-  }
-
-  async signInTwitter(keep: boolean) {
-    if (keep) {
-      await setPersistence(this.auth, { type: 'LOCAL' });
+        await signInWithRedirect(this.auth, provider);
+        return;
+      }
+      case 'twitter': {
+        const provider = new TwitterAuthProvider();
+        await signInWithRedirect(this.auth, provider);
+      }
     }
-
-    const provider = new TwitterAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account',
-    });
-
-    await signInWithRedirect(this.auth, provider);
   }
 
   async signOut() {
