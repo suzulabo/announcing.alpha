@@ -59,6 +59,7 @@ export class PromiseState<T> {
           this.refs.forEach(forceUpdate);
         },
         reason => {
+          console.error('PromiseState error', reason);
           this._state = 'rejected';
           this.reason = reason;
           this.refs.forEach(forceUpdate);
