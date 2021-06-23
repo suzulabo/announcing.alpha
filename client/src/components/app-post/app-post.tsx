@@ -83,6 +83,8 @@ export class AppPost {
     const postID = this.postID;
     const post = await this.app.fetchPost(id, postID);
     if (post) {
+      await this.app.setReadTime(this.announceID, post.pT);
+
       return {
         post,
         imgPromise: post.img ? new PromiseState(this.app.fetchImage(post.img)) : undefined,
