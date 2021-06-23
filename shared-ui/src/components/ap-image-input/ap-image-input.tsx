@@ -91,33 +91,6 @@ export class ApImageInput {
         />
       </Host>
     );
-
-    /*
-    return (
-      <Host>
-        <div class={{ 'img-box': true, 'no-img': !imageData }} onClick={this.handlers.click}>
-          {imageData && <img src={imageData} />}
-          {!imageData && (
-            <div class="stack">
-              {this.label && <span class="label">{this.label}</span>}
-              <ap-icon icon="image" />
-            </div>
-          )}
-        </div>
-        {imageData && (
-          <button class="delete clear" onClick={this.handlers.delete}>
-            <ap-icon icon="trash" />
-          </button>
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          ref={this.handlers.ref}
-          onChange={this.handlers.change}
-        />
-      </Host>
-    );
-    */
   }
 }
 
@@ -150,9 +123,9 @@ const resizeImage = async (file: File, width: number, height: number) => {
 
   const resizer = pica();
   await resizer.resize(image, canvas, {
-    unsharpAmount: 80,
+    unsharpAmount: 160,
     unsharpRadius: 0.6,
-    unsharpThreshold: 2,
+    unsharpThreshold: 1,
     alpha: true,
   });
 

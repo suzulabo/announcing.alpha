@@ -23,7 +23,7 @@
     "firebase": "^9.0.0-beta.2",
     "intersection-observer": "^0.12.0",
     "npm-run-all": "^4.1.5",
-    "pica": "^6.1.1",
+    "pica": "^7.1.0",
     "qr-code-styling": "^1.5.0",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "sync-directory": "^2.2.22",
