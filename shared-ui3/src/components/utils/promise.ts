@@ -5,10 +5,21 @@ export class LazyPromise<T> implements Promise<T> {
 
   private _promise?: Promise<T>;
 
+  private lazyThens: ((v: T) => unknown)[] = [];
+
   private startPromise() {
     if (!this._promise) {
       this._promise = this.executor();
     }
+
+    this._promise.then(
+      v => {
+        this.lazyThens.forEach(f => f(v));
+      },
+      () => {
+        //
+      },
+    );
 
     return this._promise;
   }
@@ -29,6 +40,10 @@ export class LazyPromise<T> implements Promise<T> {
   }
 
   [Symbol.toStringTag] = 'LazyPromise';
+
+  lazyThen(onfulfilled: (v: T) => unknown) {
+    this.lazyThens.push(onfulfilled);
+  }
 }
 
 type StatusResult<T> =
@@ -116,8 +131,16 @@ export class PromiseState<T> {
 }
 
 export class LazyPromiseState<T> extends PromiseState<T> {
+  private lazyPromise: LazyPromise<T | undefined>;
+
   constructor(executor: () => Promise<T | undefined>) {
-    super(new LazyPromise(executor));
+    const p = new LazyPromise(executor);
+    super(p);
+    this.lazyPromise = p;
+  }
+
+  lazyThen(onfulfilled: (v: T | undefined) => unknown) {
+    this.lazyPromise.lazyThen(onfulfilled);
   }
 }
 
