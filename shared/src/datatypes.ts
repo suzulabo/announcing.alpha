@@ -53,7 +53,7 @@ export interface AnnounceMetaJSON extends AnnounceMetaBase {
 }
 
 export const AnnounceMetaRule = {
-  name: { length: 100 },
+  name: { length: 50 },
   desc: { length: 500 },
   link: { length: 500 },
 };
