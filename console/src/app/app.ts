@@ -123,6 +123,14 @@ export class App {
   }
 
   async getAnnounceAndMeta(id: string): Promise<(Announce & AnnounceMetaBase) | undefined> {
+    const user = await this.getUser();
+    if (!user) {
+      return;
+    }
+    if (!user.announces?.includes(id)) {
+      return;
+    }
+
     const a = await this.appFirebase.getAnnounce(id);
     if (!a) {
       return;
