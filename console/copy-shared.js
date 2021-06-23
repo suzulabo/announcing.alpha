@@ -10,4 +10,4 @@ const syncDir = (src, dst) => {
 };
 
 syncDir('../shared/src', 'src/shared');
-syncDir('../shared-ui3/src/components', 'src/shared-ui');
+syncDir('../shared-ui/src/components', 'src/shared-ui');

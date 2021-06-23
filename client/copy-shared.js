@@ -11,4 +11,4 @@ const syncDir = (src, dst, config) => {
 };
 
 syncDir('../shared/src', 'src/shared');
-syncDir('../shared-ui3/src/components', 'src/shared-ui', { exclude: ['ap-image-input'] });
+syncDir('../shared-ui/src/components', 'src/shared-ui', { exclude: ['ap-image-input'] });
