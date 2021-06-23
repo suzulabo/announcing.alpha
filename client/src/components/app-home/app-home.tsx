@@ -11,6 +11,11 @@ import { AsyncReturnType } from 'type-fest';
   styleUrl: 'app-home.scss',
 })
 export class AppHome {
+  @Listen('PageActivated')
+  listenPageActivated() {
+    this.rerender = {};
+  }
+
   @State()
   rerender = {};
 

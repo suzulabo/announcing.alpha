@@ -57,12 +57,22 @@ export class AppAnnounce {
     const id = this.announceID;
     const announce = await this.app.getAnnounceAndMeta(id);
     if (announce) {
+      const postsPromises = this.app.getPosts(id, announce);
+
+      Object.values(postsPromises).forEach(p => {
+        p.lazyThen(post => {
+          if (post) {
+            void this.app.setReadTime(this.announceID, post.pT);
+          }
+        });
+      });
+
       return {
         announce,
         iconImgPromise: announce.icon
           ? new PromiseState(this.app.fetchImage(announce.icon))
           : undefined,
-        postsPromises: this.app.getPosts(id, announce),
+        postsPromises,
       };
     }
     return;

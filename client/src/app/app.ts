@@ -4,7 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { Share } from '@capacitor/share';
 import { Build } from '@stencil/core';
 import { Announce, AnnounceMetaBase, AnnounceMetaJSON, AppEnv, PostJSON } from 'src/shared';
-import { LazyPromiseState, PromiseState } from 'src/shared-ui/utils/promise';
+import { LazyPromiseState } from 'src/shared-ui/utils/promise';
 import { pushRoute } from 'src/shared-ui/utils/route';
 import nacl from 'tweetnacl';
 import { Follow } from './datatypes';
@@ -110,7 +110,7 @@ export class App {
     return { ...a, ...meta };
   }
 
-  private latestPost(a: Announce) {
+  latestPost(a: Announce) {
     const posts = Object.entries(a.posts);
     let latest = posts.shift();
     if (!latest) {
@@ -135,7 +135,7 @@ export class App {
   }
 
   getPosts(id: string, a: Announce) {
-    const postsPromises: Record<string, PromiseState<PostJSON>> = {};
+    const postsPromises: Record<string, LazyPromiseState<PostJSON>> = {};
     for (const postID of Object.keys(a.posts)) {
       postsPromises[postID] = new LazyPromiseState(() => {
         return this.fetchPost(id, postID);
