@@ -59,22 +59,24 @@ type RenderContext = ReturnType<AppAnnounceCreate['renderContext']>;
 const render = (ctx: RenderContext) => {
   return (
     <Host>
-      <ap-input
-        label={ctx.msgs.announceCreate.form.name}
-        value={ctx.values.name}
-        maxLength={AnnounceMetaRule.name.length}
-        onInput={ctx.handlers.input.name}
-      />
-      <ap-input
-        textarea={true}
-        label={ctx.msgs.announceCreate.form.desc}
-        value={ctx.values.desc}
-        maxLength={AnnounceMetaRule.desc.length}
-        onInput={ctx.handlers.input.desc}
-      />
-      <button disabled={!ctx.values.name} onClick={ctx.handlers.submit}>
-        {ctx.msgs.announceCreate.form.btn}
-      </button>
+      <div class="form">
+        <ap-input
+          label={ctx.msgs.announceCreate.form.name}
+          value={ctx.values.name}
+          maxLength={AnnounceMetaRule.name.length}
+          onInput={ctx.handlers.input.name}
+        />
+        <ap-input
+          textarea={true}
+          label={ctx.msgs.announceCreate.form.desc}
+          value={ctx.values.desc}
+          maxLength={AnnounceMetaRule.desc.length}
+          onInput={ctx.handlers.input.desc}
+        />
+        <button class="submit" disabled={!ctx.values.name} onClick={ctx.handlers.submit}>
+          {ctx.msgs.announceCreate.form.btn}
+        </button>
+      </div>
       <ap-navi links={ctx.naviLinks} />
       <ap-head pageTitle={ctx.pageTitle} />
     </Host>
