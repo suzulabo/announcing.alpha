@@ -17,6 +17,16 @@ import nacl from 'tweetnacl';
 import { PostNotificationRecievedEvent } from './datatypes';
 import { bs62 } from './utils';
 
+const devonly_setEmulator = (functions: Functions, firestore: FirebaseFirestore) => {
+  if (!Build.isDev) {
+    return;
+  }
+  console.log('useEmulator');
+
+  useFunctionsEmulator(functions, location.hostname, parseInt(location.port));
+  useFirestoreEmulator(firestore, location.hostname, parseInt(location.port));
+};
+
 class CapNotification {
   private token?: string;
 
@@ -150,17 +160,8 @@ export class AppFirebase {
         console.warn('create messaging', err);
       }
     }
-    this.devonly_setEmulator();
-  }
 
-  private devonly_setEmulator() {
-    if (!Build.isDev) {
-      return;
-    }
-    console.log('useEmulator');
-
-    useFunctionsEmulator(this.functions, location.hostname, parseInt(location.port));
-    useFirestoreEmulator(this.firestore, location.hostname, parseInt(location.port));
+    devonly_setEmulator(this.functions, this.firestore);
   }
 
   async init() {
