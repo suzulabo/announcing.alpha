@@ -17,3 +17,9 @@ export class PostNotificationRecievedEvent extends CustomEvent<{
     super('PostNotificationRecieved', { detail });
   }
 }
+
+export interface ClientConfig {
+  embedTwitter?: boolean;
+  embedYoutube?: boolean;
+  storeHistory?: boolean;
+}

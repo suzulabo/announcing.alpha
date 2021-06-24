@@ -7,7 +7,7 @@ import { Announce, AnnounceMetaBase, AnnounceMetaJSON, AppEnv, PostJSON } from '
 import { LazyPromiseState } from 'src/shared-ui/utils/promise';
 import { pushRoute } from 'src/shared-ui/utils/route';
 import nacl from 'tweetnacl';
-import { Follow } from './datatypes';
+import { ClientConfig, Follow } from './datatypes';
 import { AppFirebase } from './firebase';
 import { AppIdbCache } from './idbcache';
 import { AppMsg } from './msg';
@@ -263,5 +263,13 @@ export class App {
     const s = bs62.encode(pair.secretKey);
     await this.appStorage.signKey.set(s);
     return s;
+  }
+
+  async getConfig() {
+    return this.appStorage.config.get();
+  }
+
+  async setConfig(v: ClientConfig) {
+    await this.appStorage.config.set(v);
   }
 }

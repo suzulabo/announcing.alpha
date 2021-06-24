@@ -39,6 +39,10 @@ export const msgs: Msgs = {
     notFound: 'アナウンスのデータが見つかりませんでした',
     dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     unfollowBtn: 'フォローを解除する',
+    config: '設定',
+  },
+  config: {
+    pageTitle: `設定 - ${titleSuffix}`,
   },
   announce: {
     pageTitle: (announceName: string) => {

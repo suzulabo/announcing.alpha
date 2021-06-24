@@ -1,6 +1,6 @@
 import { Storage } from '@capacitor/storage';
 import { createStore } from '@stencil/store';
-import { Follow } from './datatypes';
+import { ClientConfig, Follow } from './datatypes';
 
 const kvGetSet = (key: string) => {
   return {
@@ -107,6 +107,7 @@ export class AppStorage {
   readonly notifications = objectMultiState<{
     x?: never; // no props now
   }>('notifications.');
+  readonly config = objectGetSet<ClientConfig>('config');
 
   init() {
     return Promise.all([this.follows.init(), this.notifications.init()]);

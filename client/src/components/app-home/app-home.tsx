@@ -1,6 +1,7 @@
 import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
 import assert from 'assert';
 import { App } from 'src/app/app';
+import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PromiseState } from 'src/shared-ui/utils/promise';
 import { href } from 'src/shared-ui/utils/route';
@@ -14,6 +15,18 @@ export class AppHome {
   @Listen('PageActivated')
   listenPageActivated() {
     this.rerender = {};
+  }
+
+  @Listen('FirestoreUpdated', { target: 'window' }) handleFirestoreUpdated(
+    event: FirestoreUpdatedEvent,
+  ) {
+    const { collection, id } = event.detail;
+    if (collection == 'announces') {
+      if (this.announceStateMap.has(id)) {
+        this.announceStateMap.set(id, new PromiseState(this.loadAnnounce(id)));
+      }
+      this.rerender = {};
+    }
   }
 
   @State()
@@ -42,17 +55,12 @@ export class AppHome {
     return;
   }
 
-  @Listen('FirestoreUpdated', { target: 'window' }) handleFirestoreUpdated(
-    event: FirestoreUpdatedEvent,
-  ) {
-    const { collection, id } = event.detail;
-    if (collection == 'announces') {
-      if (this.announceStateMap.has(id)) {
-        this.announceStateMap.set(id, new PromiseState(this.loadAnnounce(id)));
-      }
-      this.rerender = {};
-    }
-  }
+  private naviLinks: ApNaviLinks = [
+    {
+      label: this.app.msgs.home.config,
+      href: '/config',
+    },
+  ];
 
   componentWillRender() {
     const follows = this.app.getFollows();
@@ -89,6 +97,7 @@ export class AppHome {
       msgs: this.app.msgs,
       pageTitle: this.app.msgs.home.pageTitle,
       announces,
+      naviLinks: this.naviLinks,
       handleUnfollowClick: this.handleUnfollowClick,
     };
   }
@@ -104,6 +113,7 @@ const render = (ctx: RenderContext) => {
   return (
     <Host>
       {renderContent(ctx)}
+      <ap-navi links={ctx.naviLinks} />
       <ap-head pageTitle={ctx.pageTitle} />
     </Host>
   );

@@ -24,6 +24,10 @@ export interface Msgs {
     notFound: string;
     dataError: string;
     unfollowBtn: string;
+    config: string;
+  };
+  config: {
+    pageTitle: string;
   };
   announce: {
     pageTitle: (announceName: string) => string;
