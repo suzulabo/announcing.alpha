@@ -1,4 +1,6 @@
 import { Component, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
+import assert from 'assert';
+
 import { App } from 'src/app/app';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
@@ -23,19 +25,12 @@ export class AppPost {
   @Prop()
   app!: App;
 
-  @Watch('pageVisible')
-  watchPageVisible() {
-    if (this.pageVisible) {
-      this.announceState = new PromiseState(this.loadAnnounce());
-    }
-  }
-
   @Prop()
   announceID!: string;
 
   @Watch('announceID')
   watchAnnounceID() {
-    this.announceState = new PromiseState(this.loadAnnounce());
+    this.announceState = undefined;
   }
 
   @Prop()
@@ -43,7 +38,7 @@ export class AppPost {
 
   @Watch('postID')
   watchPostID() {
-    this.postState = new PromiseState(this.loadPost());
+    this.postState = undefined;
 
     this.naviLinks = [
       {
@@ -69,16 +64,11 @@ export class AppPost {
     ];
   }
 
-  @Listen('FirestoreUpdated', { target: 'window' }) handleFirestoreUpdated(
-    event: FirestoreUpdatedEvent,
-  ) {
-    if (!this.pageVisible) {
-      return;
-    }
-
+  @Listen('FirestoreUpdated', { target: 'window' })
+  handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
     const { collection, id } = event.detail;
     if (collection == 'announces' && id == this.announceID) {
-      this.announceState = new PromiseState(this.loadAnnounce());
+      this.announceState = undefined;
     }
   }
 
@@ -86,10 +76,10 @@ export class AppPost {
   showDelete = false;
 
   @State()
-  announceState!: PromiseState<AsyncReturnType<AppPost['loadAnnounce']>>;
+  announceState?: PromiseState<AsyncReturnType<AppPost['loadAnnounce']>>;
 
   @State()
-  postState!: PromiseState<AsyncReturnType<AppPost['loadPost']>>;
+  postState?: PromiseState<AsyncReturnType<AppPost['loadPost']>>;
 
   private naviLinks!: ApNaviLinks;
   private naviLinksLoading!: ApNaviLinks;
@@ -150,9 +140,21 @@ export class AppPost {
     this.watchPostID();
   }
 
+  componentWillRender() {
+    if (!this.announceState) {
+      this.announceState = new PromiseState(this.loadAnnounce());
+    }
+    if (!this.postState) {
+      this.postState = new PromiseState(this.loadPost());
+    }
+  }
+
   private renderContext() {
-    const announceStatus = this.announceState.status();
-    const postStatus = this.postState.status();
+    const announceStatus = this.announceState?.status();
+    assert(announceStatus);
+    const postStatus = this.postState?.status();
+    assert(postStatus);
+
     const { announce } = this.announceState?.result() || {};
     const { post } = this.postState?.result() || {};
     const naviLinks = announce && post ? this.naviLinks : this.naviLinksLoading;
