@@ -73,7 +73,15 @@ export class ApRoot {
     return (
       <Host>
         {[...this.tags.entries()].map(([Tag, params]) => {
-          return <Tag key={Tag} class={{ page: true, hide: Tag != curTag }} {...params} />;
+          const visible = Tag == curTag;
+          return (
+            <Tag
+              key={Tag}
+              class={{ page: true, hide: !visible }}
+              pageVisible={visible}
+              {...params}
+            />
+          );
         })}
       </Host>
     );
