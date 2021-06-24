@@ -1,7 +1,7 @@
 import { Component, Element, h, Host, Listen, Prop, State } from '@stencil/core';
 import { Match, pathMatcher } from 'src/shared/path-matcher';
+import { PageVisible } from '../utils/pagevisible';
 import { redirectRoute } from '../utils/route';
-import { PageVisible } from './pagevisible';
 
 export type RouteMatch = Match & { tag?: string };
 
