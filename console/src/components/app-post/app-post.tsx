@@ -2,6 +2,7 @@ import { Component, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
 import { App } from 'src/app/app';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
+import { PageVisible } from 'src/shared-ui/utils/pagevisible';
 import { PromiseState } from 'src/shared-ui/utils/promise';
 import { pushRoute, redirectRoute } from 'src/shared-ui/utils/route';
 import { AsyncReturnType } from 'type-fest';
@@ -12,10 +13,15 @@ import { AsyncReturnType } from 'type-fest';
 })
 export class AppPost {
   @Prop()
-  app!: App;
+  pageVisible!: PageVisible;
+
+  // eslint-disable-next-line @stencil/own-methods-must-be-private
+  componentShouldUpdate() {
+    return this.pageVisible.shouldUpdate();
+  }
 
   @Prop()
-  pageVisible!: boolean;
+  app!: App;
 
   @Watch('pageVisible')
   watchPageVisible() {

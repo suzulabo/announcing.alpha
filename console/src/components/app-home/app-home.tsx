@@ -3,6 +3,7 @@ import assert from 'assert';
 import { App } from 'src/app/app';
 import { User } from 'src/shared';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
+import { PageVisible } from 'src/shared-ui/utils/pagevisible';
 import { PromiseState } from 'src/shared-ui/utils/promise';
 import { href, pushRoute } from 'src/shared-ui/utils/route';
 import { AsyncReturnType } from 'type-fest';
@@ -12,6 +13,14 @@ import { AsyncReturnType } from 'type-fest';
   styleUrl: 'app-home.scss',
 })
 export class AppHome {
+  @Prop()
+  pageVisible!: PageVisible;
+
+  // eslint-disable-next-line @stencil/own-methods-must-be-private
+  componentShouldUpdate() {
+    return this.pageVisible.shouldUpdate();
+  }
+
   @State()
   rerender = {};
 

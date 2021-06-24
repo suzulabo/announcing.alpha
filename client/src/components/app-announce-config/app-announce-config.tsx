@@ -3,6 +3,7 @@ import assert from 'assert';
 import { App } from 'src/app/app';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
+import { PageVisible } from 'src/shared-ui/utils/pagevisible';
 import { PromiseState } from 'src/shared-ui/utils/promise';
 import { redirectRoute } from 'src/shared-ui/utils/route';
 import { AsyncReturnType } from 'type-fest';
@@ -12,6 +13,14 @@ import { AsyncReturnType } from 'type-fest';
   styleUrl: 'app-announce-config.scss',
 })
 export class AppAnnounceConfig {
+  @Prop()
+  pageVisible!: PageVisible;
+
+  // eslint-disable-next-line @stencil/own-methods-must-be-private
+  componentShouldUpdate() {
+    return this.pageVisible.shouldUpdate();
+  }
+
   @Prop()
   app!: App;
 
