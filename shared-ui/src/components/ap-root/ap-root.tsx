@@ -1,6 +1,7 @@
 import { Component, Element, h, Host, Listen, Prop, State } from '@stencil/core';
 import { Match, pathMatcher } from 'src/shared/path-matcher';
 import { redirectRoute } from '../utils/route';
+import { PageVisible } from './pagevisible';
 
 export type RouteMatch = Match & { tag?: string };
 
@@ -54,7 +55,7 @@ export class ApRoot {
 
   private defaultApHead?: HTMLApHeadElement | null;
 
-  private tags = new Map<string, Record<string, any>>();
+  private tags = new Map<string, { params: Record<string, any>; pageVisible: PageVisible }>();
 
   render() {
     const p = this.path;
@@ -68,18 +69,30 @@ export class ApRoot {
     }
 
     const curTag = m.match.tag;
-    this.tags.set(curTag, { ...m.params, ...this.componentProps });
+    const tagInfo = this.tags.get(curTag);
+    if (tagInfo) {
+      tagInfo.params = { ...m.params, ...this.componentProps };
+      if (tagInfo.pageVisible.isSkiped()) {
+        tagInfo.pageVisible = new PageVisible();
+      }
+    } else {
+      this.tags.set(curTag, {
+        params: { ...m.params, ...this.componentProps },
+        pageVisible: new PageVisible(),
+      });
+    }
 
     return (
       <Host>
-        {[...this.tags.entries()].map(([Tag, params]) => {
+        {[...this.tags.entries()].map(([Tag, tagInfo]) => {
           const visible = Tag == curTag;
+          tagInfo.pageVisible.setVisible(visible);
           return (
             <Tag
               key={Tag}
               class={{ page: true, hide: !visible }}
-              pageVisible={visible}
-              {...params}
+              pageVisible={tagInfo.pageVisible}
+              {...tagInfo.params}
             />
           );
         })}
