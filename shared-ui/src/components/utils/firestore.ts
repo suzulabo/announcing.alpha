@@ -65,13 +65,6 @@ export class FirestoreHelper {
       this.listenerMap.set(p, docInfo);
     }
 
-    {
-      const v = await getCache<T>(docRef);
-      if (v) {
-        return v;
-      }
-    }
-
     const v = await docInfo.listener;
     return v.data as T;
   }
