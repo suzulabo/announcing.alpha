@@ -182,7 +182,13 @@ export class AppFirebase {
   }
 
   async getAnnounce(id: string, temporary?: boolean) {
-    return this.firestoreHelper.listenAndGet<Announce>(`announces/${id}`, temporary);
+    return this.firestoreHelper.listenAndGet<Announce>(
+      `announces/${id}`,
+      (oldData, newData) => {
+        return oldData.uT.toMillis() != newData.uT.toMillis();
+      },
+      temporary,
+    );
   }
 
   private async messageToken() {

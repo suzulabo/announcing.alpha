@@ -30,27 +30,36 @@ export class FirestoreHelper {
 
   constructor(private firestore: FirebaseFirestore) {}
 
-  async listenAndGet<T>(p: string, temporary?: boolean): Promise<T | undefined> {
+  async listenAndGet<T>(
+    p: string,
+    shoudFireEvent?: (oldData: T, newData: T) => boolean,
+    temporary?: boolean,
+  ): Promise<T | undefined> {
     const docInfo = this.listenerMap.get(p) || {};
     const docRef = doc(this.firestore, p);
 
     if (!docInfo.listener) {
       docInfo.temporary = temporary;
       docInfo.listener = new Promise((resolve, reject) => {
-        const value: { data?: DocumentData } = {};
+        const value: { data?: T } = {};
 
         docInfo.unsubscribe = onSnapshot(docRef, {
           next: ds => {
-            value.data = ds.data();
+            const oldData = value.data;
+            const newData = ds.data() as T;
+
+            value.data = newData;
             resolve(value);
 
-            window.dispatchEvent(
-              new FirestoreUpdatedEvent({
-                collection: docRef.parent.id,
-                id: docRef.id,
-                value: ds.data(),
-              }),
-            );
+            if (!oldData || !shoudFireEvent || shoudFireEvent(oldData, newData)) {
+              window.dispatchEvent(
+                new FirestoreUpdatedEvent({
+                  collection: docRef.parent.id,
+                  id: docRef.id,
+                  value: ds.data(),
+                }),
+              );
+            }
           },
           error: reason => {
             if (docInfo.unsubscribe) {

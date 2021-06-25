@@ -150,11 +150,15 @@ export class AppFirebase {
       return;
     }
 
-    return this.firestoreHelper.listenAndGet<User>(`users/${this.user.uid}`);
+    return this.firestoreHelper.listenAndGet<User>(`users/${this.user.uid}`, (oldData, newData) => {
+      return oldData.uT.toMillis() != newData.uT.toMillis();
+    });
   }
 
   async getAnnounce(id: string) {
-    return this.firestoreHelper.listenAndGet<Announce>(`announces/${id}`);
+    return this.firestoreHelper.listenAndGet<Announce>(`announces/${id}`, (oldData, newData) => {
+      return oldData.uT.toMillis() != newData.uT.toMillis();
+    });
   }
 
   async getAnnounceMeta(id: string, metaID: string) {
