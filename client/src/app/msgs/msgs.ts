@@ -28,6 +28,11 @@ export interface Msgs {
   };
   config: {
     pageTitle: string;
+    noStoreHistory: string;
+    embedTwitter: string;
+    embedTwitterDesc: string;
+    embedYoutube: string;
+    embedYoutubeDesc: string;
   };
   announce: {
     pageTitle: (announceName: string) => string;

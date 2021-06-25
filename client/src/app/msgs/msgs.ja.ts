@@ -43,6 +43,13 @@ export const msgs: Msgs = {
   },
   config: {
     pageTitle: `設定 - ${titleSuffix}`,
+    noStoreHistory: '閲覧履歴を保存しない',
+    embedTwitter: 'リンクのツイートを表示',
+    embedTwitterDesc:
+      'お知らせのリンクがTwitterのツイートのとき、アプリ内で表示します。\nこの動作にはTwitterのプライバシーポリシーが適用されます。\nhttps://twitter.com/privacy',
+    embedYoutube: 'リンクのYoutubeを表示',
+    embedYoutubeDesc:
+      'お知らせのリンクがYoutubeの動画のとき、アプリ内で表示します。\nこの動作にはYoutubeのプライバシーポリシーが適用されます。\nhttps://www.youtube.com/static?template=terms',
   },
   announce: {
     pageTitle: (announceName: string) => {
