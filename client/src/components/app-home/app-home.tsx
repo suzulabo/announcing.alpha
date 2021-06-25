@@ -66,6 +66,9 @@ export class AppHome {
 
   private naviLinks: ApNaviLinks = [
     {
+      label: '',
+    },
+    {
       label: this.app.msgs.home.config,
       href: '/config',
     },

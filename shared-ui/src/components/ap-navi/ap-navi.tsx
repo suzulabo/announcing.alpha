@@ -37,6 +37,7 @@ export class ApNavi {
               </button>
             );
           }
+          return <span class="navi blank"></span>;
         })}
       </Host>
     );
