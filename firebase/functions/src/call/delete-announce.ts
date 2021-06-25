@@ -28,7 +28,10 @@ export const callDeleteAnnounce = async (
     if (d.id == uid) {
       isOwner = true;
     }
-    batch.update(d.ref, { announces: admin.firestore.FieldValue.arrayRemove(id) });
+    batch.update(d.ref, {
+      announces: admin.firestore.FieldValue.arrayRemove(id),
+      uT: admin.firestore.FieldValue.serverTimestamp(),
+    });
   }
   if (!isOwner) {
     logger.warn('not owner', { uid, id });

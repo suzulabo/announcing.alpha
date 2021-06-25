@@ -28,7 +28,7 @@ export const callCreateAnnounce = async (
   const metaData = {
     name,
     ...(!!desc && { desc }),
-    cT: admin.firestore.FieldValue.serverTimestamp() as any,
+    cT: admin.firestore.FieldValue.serverTimestamp(),
   };
 
   const id = autoID();
@@ -41,6 +41,7 @@ export const callCreateAnnounce = async (
   };
   const userData = {
     announces: admin.firestore.FieldValue.arrayUnion(id),
+    uT: admin.firestore.FieldValue.serverTimestamp(),
   };
 
   const firestore = adminApp.firestore();

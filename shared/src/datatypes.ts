@@ -60,6 +60,7 @@ export const AnnounceMetaRule = {
 
 export interface User {
   announces?: string[];
+  uT: Timestamp;
 }
 
 export interface Image {

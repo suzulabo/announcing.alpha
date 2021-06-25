@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { AnnounceMeta, Post, User } from '../shared';
+import { AnnounceMetaBase, Post, User } from '../shared';
 import { logger } from '../utils/logger';
 import { toMD5Base62 } from './util';
 
@@ -10,7 +10,7 @@ const serialize = (...args: (string | undefined)[]) => {
     .replace(/\0+$/, '');
 };
 
-export const announceMetaHash = (v: AnnounceMeta) => {
+export const announceMetaHash = (v: AnnounceMetaBase) => {
   return toMD5Base62(serialize(v.name, v.desc, v.link, v.icon)).substr(0, 8);
 };
 

@@ -91,9 +91,9 @@ export class AppHome {
     const userStatus = this.userState?.status();
     assert(userStatus);
 
-    const user = this.userState?.result() || {};
+    const user = this.userState?.result();
     const announces =
-      user.announces?.map(id => {
+      user?.announces?.map(id => {
         const state = this.announceStateMap.get(id);
         assert(state);
         const status = state.status();
