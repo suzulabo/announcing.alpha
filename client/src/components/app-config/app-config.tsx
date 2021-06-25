@@ -1,4 +1,4 @@
-import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop } from '@stencil/core';
 import { App } from 'src/app/app';
 import { ClientConfig } from 'src/app/datatypes';
 import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
@@ -11,9 +11,6 @@ export class AppConfig {
   @Prop()
   app!: App;
 
-  @State()
-  config?: ClientConfig;
-
   private naviLinks: ApNaviLinks = [
     {
       label: this.app.msgs.common.back,
@@ -22,38 +19,28 @@ export class AppConfig {
     },
   ];
 
+  private async toggleConfig(key: keyof ClientConfig) {
+    const config = this.app.getConfig() || {};
+    config[key] = !config[key];
+    await this.app.setConfig(config);
+  }
+
   private handlers = {
     noStoreHistory: async () => {
-      if (this.config) {
-        this.config.noStoreHistory = !this.config.noStoreHistory;
-        await this.app.setConfig(this.config);
-        this.config = undefined;
-      }
+      await this.toggleConfig('noStoreHistory');
     },
     embedTwitter: async () => {
-      if (this.config) {
-        this.config.embedTwitter = !this.config.embedTwitter;
-        await this.app.setConfig(this.config);
-        this.config = undefined;
-      }
+      await this.toggleConfig('embedTwitter');
     },
     embedYoutube: async () => {
-      if (this.config) {
-        this.config.embedYoutube = !this.config.embedYoutube;
-        await this.app.setConfig(this.config);
-        this.config = undefined;
-      }
+      await this.toggleConfig('embedYoutube');
     },
   };
-
-  async componentWillRender() {
-    this.config = (await this.app.getConfig()) || {};
-  }
 
   private renderContext() {
     return {
       msgs: this.app.msgs,
-      config: this.config || {},
+      config: this.app.getConfig() || {},
       handlers: this.handlers,
       naviLinks: this.naviLinks,
       pageTitle: this.app.msgs.config.pageTitle,

@@ -265,8 +265,8 @@ export class App {
     return s;
   }
 
-  async getConfig() {
-    return this.appStorage.config.get();
+  getConfig() {
+    return this.appStorage.config.get() || {};
   }
 
   async setConfig(v: ClientConfig) {

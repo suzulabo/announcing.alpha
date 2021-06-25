@@ -69,6 +69,25 @@ const objectMulti = <T>(prefix: string) => {
   return x;
 };
 
+const objectGetSetState = <T>(key: string) => {
+  const ogs = objectGetSet<T>(key);
+  const store = createStore<{ v?: T }>({});
+
+  const x = {
+    init: async () => {
+      store.set('v', await ogs.get());
+    },
+    get: () => {
+      return store.get('v');
+    },
+    set: async (v: T) => {
+      await ogs.set(v);
+      store.set('v', { ...v });
+    },
+  };
+  return x;
+};
+
 const objectMultiState = <T>(prefix: string) => {
   const om = objectMulti<T>(prefix);
   const store = createStore<Record<string, T | undefined>>({});
@@ -107,9 +126,9 @@ export class AppStorage {
   readonly notifications = objectMultiState<{
     x?: never; // no props now
   }>('notifications.');
-  readonly config = objectGetSet<ClientConfig>('config');
+  readonly config = objectGetSetState<ClientConfig>('config');
 
   init() {
-    return Promise.all([this.follows.init(), this.notifications.init()]);
+    return Promise.all([this.follows.init(), this.notifications.init(), this.config.init()]);
   }
 }
