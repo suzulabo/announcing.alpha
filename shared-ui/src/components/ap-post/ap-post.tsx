@@ -23,8 +23,12 @@ export class ApPost {
     datetime: (v: number) => string;
   };
 
+  @Prop()
+  showTweet?: boolean;
+
   private renderTweet(link: string) {
-    //
+    if (!this.showTweet) return;
+
     const m = link.match(tweetIDPattern);
     if (!m) {
       return;

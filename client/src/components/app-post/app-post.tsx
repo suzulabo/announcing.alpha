@@ -149,6 +149,7 @@ export class AppPost {
       announceStatus,
       postStatus,
       icons,
+      config: this.app.getConfig() || {},
       naviLinks,
       pageTitle,
     };
@@ -208,6 +209,7 @@ const renderPost = (ctx: RenderContext) => {
           imgPromise={imgPromise}
           imgHref={imgHref}
           msgs={{ datetime: ctx.msgs.common.datetime }}
+          showTweet={ctx.config.embedTwitter}
         />
       );
     }
