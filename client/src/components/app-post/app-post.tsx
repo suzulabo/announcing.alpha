@@ -210,6 +210,7 @@ const renderPost = (ctx: RenderContext) => {
           imgHref={imgHref}
           msgs={{ datetime: ctx.msgs.common.datetime }}
           showTweet={ctx.config.embedTwitter}
+          showYoutube={ctx.config.embedYoutube}
         />
       );
     }

@@ -3,6 +3,24 @@ import { PostJSON } from 'src/shared';
 import { PromiseState } from '../utils/promise';
 
 const tweetIDPattern = new RegExp('^https://twitter\\.com/.+/status/([0-9]+)$');
+const youtubeIDPattern = (s: string) => {
+  const url = new URL(s);
+  if (url.hostname.endsWith('youtube.com')) {
+    const v = url.searchParams.get('v');
+    if (v) {
+      return v;
+    }
+    return null;
+  }
+  if (url.hostname.endsWith('youtu.be')) {
+    const v = url.pathname.substring(1);
+    if (v) {
+      return v;
+    }
+    return null;
+  }
+  return;
+};
 
 @Component({
   tag: 'ap-post',
@@ -26,6 +44,9 @@ export class ApPost {
   @Prop()
   showTweet?: boolean;
 
+  @Prop()
+  showYoutube?: boolean;
+
   private renderTweet(link: string) {
     if (!this.showTweet) return;
 
@@ -38,11 +59,44 @@ export class ApPost {
     return <ap-twitter tweetID={tweetID} />;
   }
 
+  private renderYoutube(link: string) {
+    if (!this.showYoutube) return;
+
+    const id = youtubeIDPattern(link);
+    if (id) {
+      return <ap-youtube youtubeID={id} />;
+    }
+    return;
+  }
+
+  private renderEmbed() {
+    const link = this.post.link;
+    if (!link) {
+      return;
+    }
+
+    {
+      const tweet = this.renderTweet(link);
+      if (tweet) {
+        return tweet;
+      }
+    }
+    {
+      const youtube = this.renderYoutube(link);
+      if (youtube) {
+        return youtube;
+      }
+    }
+    return;
+  }
+
   render() {
     const post = this.post;
 
+    const embed = this.renderEmbed();
+
     return (
-      <Host>
+      <Host class={{ 'full-width': embed != undefined }}>
         {this.imgPromise && (
           <div class="image">
             <ap-image srcPromise={this.imgPromise} href={this.imgHref} />
@@ -53,7 +107,7 @@ export class ApPost {
         {post.body && <ap-textview class="body" text={post.body} />}
         {post.link && (
           <Fragment>
-            {this.renderTweet(post.link)}
+            {embed}
             <a class="link" href={post.link}>
               {post.link}
             </a>

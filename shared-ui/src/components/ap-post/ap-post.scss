@@ -1,9 +1,14 @@
 ap-post {
   display: block;
   padding: 10px;
-  width: fit-content;
-  min-width: 250px;
+  min-width: 300px;
   margin: 0 auto;
+
+  width: fit-content;
+
+  &.full-width {
+    width: unset;
+  }
 
   div.image {
     min-height: 100px;
@@ -44,9 +49,13 @@ ap-post {
     letter-spacing: 0.1em;
   }
   ap-twitter {
-    margin: 30px 0;
+    margin: 30px 0 0;
+  }
+  ap-youtube {
+    margin: 30px 0 0;
   }
   .link {
+    display: inline-block;
     word-break: break-all;
     margin: 30px 0 0;
   }
