@@ -105,6 +105,17 @@ export class AppHome {
       };
     });
 
+    const pT = (status: typeof announces[number]['status']) => {
+      if (status.state == 'fulfilled') {
+        return status.value.latestPost?.pT || 0;
+      }
+      return 0;
+    };
+
+    announces.sort((a1, a2) => {
+      return pT(a2.status) - pT(a1.status);
+    });
+
     return {
       msgs: this.app.msgs,
       pageTitle: this.app.msgs.home.pageTitle,
