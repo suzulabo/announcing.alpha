@@ -28,7 +28,6 @@ export interface Msgs {
   };
   config: {
     pageTitle: string;
-    noStoreHistory: string;
     embedTwitter: string;
     embedTwitterDesc: string;
     embedYoutube: string;

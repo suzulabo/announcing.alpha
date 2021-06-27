@@ -21,5 +21,4 @@ export class PostNotificationRecievedEvent extends CustomEvent<{
 export interface ClientConfig {
   embedTwitter?: boolean;
   embedYoutube?: boolean;
-  noStoreHistory?: boolean;
 }

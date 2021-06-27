@@ -26,9 +26,6 @@ export class AppConfig {
   }
 
   private handlers = {
-    noStoreHistory: async () => {
-      await this.toggleConfig('noStoreHistory');
-    },
     embedTwitter: async () => {
       await this.toggleConfig('embedTwitter');
     },
@@ -68,12 +65,6 @@ const renderForm = (ctx: RenderContext) => {
   return (
     <Fragment>
       <div class="form">
-        <ap-checkbox
-          label={ctx.msgs.config.noStoreHistory}
-          checked={ctx.config.noStoreHistory}
-          onClick={ctx.handlers.noStoreHistory}
-        />
-        <hr />
         <ap-checkbox
           label={ctx.msgs.config.embedTwitter}
           checked={ctx.config.embedTwitter}

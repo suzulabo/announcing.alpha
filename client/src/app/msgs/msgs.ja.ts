@@ -43,7 +43,6 @@ export const msgs: Msgs = {
   },
   config: {
     pageTitle: `設定 - ${titleSuffix}`,
-    noStoreHistory: '閲覧履歴を保存しない',
     embedTwitter: 'リンクのツイートを表示',
     embedTwitterDesc:
       'お知らせのリンクがTwitterのツイートのとき、アプリ内で表示します。\nこの動作にはTwitterのプライバシーポリシーが適用されます。\nhttps://twitter.com/privacy',
@@ -58,7 +57,7 @@ export const msgs: Msgs = {
     deleted: 'アナウンスのデータが見つかりませんでした',
     dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     noPosts: 'お知らせはまだありません',
-    detail: '詳細をみる',
+    detail: '詳細',
   },
   announceConfig: {
     pageTitle: (announceName: string) => {
