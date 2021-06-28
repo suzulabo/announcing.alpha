@@ -17,7 +17,6 @@ export class AppPost {
   @Prop()
   pageVisible!: PageVisible;
 
-  // eslint-disable-next-line @stencil/own-methods-must-be-private
   componentShouldUpdate() {
     return this.pageVisible.shouldUpdate();
   }
