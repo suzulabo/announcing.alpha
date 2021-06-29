@@ -17,8 +17,17 @@ export const pushRoute = (path: string, back?: boolean) => {
   if (back && history.state?.beforeRoute == url.pathname) {
     history.back();
   } else {
+    history.replaceState({ ...history.state, scrollY: window.scrollY }, '');
     history.pushState({ beforeRoute: location.pathname }, '', url.pathname);
     window.dispatchEvent(new PopStateEvent('popstate'));
+  }
+};
+
+export const restoreScroll = () => {
+  const scrollY = history.state?.scrollY;
+  console.log({ scrollY });
+  if (scrollY != null) {
+    window.scroll(0, scrollY);
   }
 };
 

@@ -1,7 +1,7 @@
 import { Component, Element, h, Host, Listen, Prop, State } from '@stencil/core';
 import { Match, pathMatcher } from 'src/shared/path-matcher';
 import { PageVisible } from '../utils/pagevisible';
-import { redirectRoute } from '../utils/route';
+import { redirectRoute, restoreScroll } from '../utils/route';
 
 export type RouteMatch = Match & { tag?: string };
 
@@ -49,6 +49,7 @@ export class ApRoot {
   }
 
   componentWillLoad() {
+    //history.scrollRestoration = 'manual';
     this.handlePopState();
     this.defaultApHead = document.querySelector<HTMLApHeadElement>('ap-head.default');
   }
@@ -119,6 +120,8 @@ export class ApRoot {
 
       page.dispatchEvent(new CustomEvent('PageActivated'));
     }
+
+    restoreScroll();
   }
 }
 
