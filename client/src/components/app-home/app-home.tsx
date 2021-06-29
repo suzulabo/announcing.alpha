@@ -25,9 +25,15 @@ export class AppHome {
     this.rerender = {};
   }
 
-  @Listen('FirestoreUpdated', { target: 'window' }) handleFirestoreUpdated(
-    event: FirestoreUpdatedEvent,
-  ) {
+  @Listen('AppBackButton', { target: 'window' })
+  handleAppBackButton() {
+    if (this.pageVisible.isVisible()) {
+      this.app.exitApp();
+    }
+  }
+
+  @Listen('FirestoreUpdated', { target: 'window' })
+  handleFirestoreUpdated(event: FirestoreUpdatedEvent) {
     const { collection, id } = event.detail;
     if (collection == 'announces') {
       if (this.announceStateMap.has(id)) {

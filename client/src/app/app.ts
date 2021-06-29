@@ -63,6 +63,10 @@ export class App {
       const url = new URL(data.url);
       pushRoute(url.pathname);
     });
+    await CapApp.addListener('backButton', () => {
+      window.history.back();
+      window.dispatchEvent(new CustomEvent<void>('AppBackButton'));
+    });
   }
 
   async processLoading(f: () => Promise<void>) {
@@ -88,6 +92,10 @@ export class App {
     }
 
     return false;
+  }
+
+  exitApp() {
+    CapApp.exitApp();
   }
 
   share(url: string) {
