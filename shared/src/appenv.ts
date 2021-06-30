@@ -15,6 +15,7 @@ export interface AppEnvironment {
   sites: {
     console: string;
     client: string;
+    manual: string;
   };
 }
 

@@ -40,6 +40,7 @@ export const msgs: Msgs = {
     dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
     unfollowBtn: 'フォローを解除する',
     config: '設定',
+    about: '使い方',
   },
   config: {
     pageTitle: `設定 - ${titleSuffix}`,
@@ -49,6 +50,10 @@ export const msgs: Msgs = {
     embedYoutube: 'リンクのYoutubeを表示',
     embedYoutubeDesc:
       'お知らせのリンクがYoutubeの動画のとき、アプリ内で表示します。\nこの動作にはYoutubeのプライバシーポリシーが適用されます。\nhttps://www.youtube.com/static?template=terms',
+  },
+  about: {
+    pageTitle: `使い方 - ${titleSuffix}`,
+    manualLink: '使い方サイトへ',
   },
   announce: {
     pageTitle: (announceName: string) => {

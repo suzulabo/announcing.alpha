@@ -25,6 +25,7 @@ export interface Msgs {
     dataError: string;
     unfollowBtn: string;
     config: string;
+    about: string;
   };
   config: {
     pageTitle: string;
@@ -32,6 +33,10 @@ export interface Msgs {
     embedTwitterDesc: string;
     embedYoutube: string;
     embedYoutubeDesc: string;
+  };
+  about: {
+    pageTitle: string;
+    manualLink: string;
   };
   announce: {
     pageTitle: (announceName: string) => string;

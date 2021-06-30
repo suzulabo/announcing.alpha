@@ -77,6 +77,10 @@ export class AppHome {
       label: this.app.msgs.home.config,
       href: '/config',
     },
+    {
+      label: this.app.msgs.home.about,
+      href: '/about',
+    },
   ];
 
   componentWillRender() {

@@ -24,6 +24,7 @@ export class App {
 
   private dataURLPrefix: string;
   readonly clientSite: string;
+  readonly manualSite: string;
 
   constructor(
     private appEnv: AppEnv,
@@ -39,6 +40,7 @@ export class App {
       this.dataURLPrefix = `${this.appEnv.env.sites.client}/data`;
       this.clientSite = this.appEnv.env.sites.client;
     }
+    this.manualSite = this.appEnv.env.sites.manual;
   }
 
   async init() {

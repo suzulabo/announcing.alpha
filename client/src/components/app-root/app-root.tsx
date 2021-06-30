@@ -19,6 +19,10 @@ const matches: RouteMatch[] = [
     tag: 'app-config',
   },
   {
+    pattern: 'about',
+    tag: 'app-about',
+  },
+  {
     pattern: /^[0-9A-Z]{12}$/,
     name: 'announceID',
     tag: 'app-announce',
