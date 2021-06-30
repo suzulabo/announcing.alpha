@@ -1,0 +1,10 @@
+{
+  "name": "announcing-manual",
+  "private": true,
+  "scripts": {
+    "start": "docsify serve docs"
+  },
+  "devDependencies": {
+    "docsify-cli": "^4.4.3"
+  }
+}
