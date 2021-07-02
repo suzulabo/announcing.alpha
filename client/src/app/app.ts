@@ -40,7 +40,7 @@ export class App {
       this.dataURLPrefix = `${this.appEnv.env.sites.client}/data`;
       this.clientSite = this.appEnv.env.sites.client;
     }
-    this.manualSite = this.appEnv.env.sites.manual;
+    this.manualSite = `${this.appEnv.env.sites.docs}/manual/#/${this.appMsg.lang}/`;
   }
 
   async init() {
