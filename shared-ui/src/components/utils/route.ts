@@ -25,7 +25,6 @@ export const pushRoute = (path: string, back?: boolean) => {
 
 export const restoreScroll = () => {
   const scrollY = history.state?.scrollY;
-  console.log({ scrollY });
   if (scrollY != null) {
     window.scroll(0, scrollY);
   }
