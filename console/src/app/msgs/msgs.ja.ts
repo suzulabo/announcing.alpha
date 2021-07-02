@@ -48,6 +48,11 @@ export const msgs: Msgs = {
       editBtn: '設定',
     },
     dataError: 'データの読み込み中にエラーが発生しました。\nしばらくしてから再度お試しください。',
+    about: '使い方',
+  },
+  about: {
+    pageTitle: `使い方 - ${titleSuffix}`,
+    manualLink: '使い方サイトへ',
   },
   announce: {
     pageTitle: (s: string) => {

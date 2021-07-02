@@ -14,6 +14,7 @@ export class App {
   readonly buildInfo = BUILD_INFO;
 
   readonly clientSite: string;
+  readonly manualSite: string;
 
   constructor(
     appEnv: AppEnv,
@@ -26,6 +27,7 @@ export class App {
     } else {
       this.clientSite = appEnv.env.sites.client;
     }
+    this.manualSite = `${appEnv.env.sites.docs}/manual/#/${this.appMsg.lang}/publisher`;
   }
 
   async init() {

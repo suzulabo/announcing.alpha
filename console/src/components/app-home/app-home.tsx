@@ -2,6 +2,7 @@ import { Component, h, Host, Listen, Prop, State } from '@stencil/core';
 import assert from 'assert';
 import { App } from 'src/app/app';
 import { User } from 'src/shared';
+import { ApNaviLinks } from 'src/shared-ui/ap-navi/ap-navi';
 import { FirestoreUpdatedEvent } from 'src/shared-ui/utils/firestore';
 import { PageVisible } from 'src/shared-ui/utils/pagevisible';
 import { PromiseState } from 'src/shared-ui/utils/promise';
@@ -68,6 +69,16 @@ export class AppHome {
     return;
   }
 
+  private naviLinks: ApNaviLinks = [
+    {
+      label: '',
+    },
+    {
+      label: this.app.msgs.home.about,
+      href: '/about',
+    },
+  ];
+
   componentWillRender() {
     if (!this.userState) {
       this.userState = new PromiseState(this.app.getUser());
@@ -107,6 +118,7 @@ export class AppHome {
       pageTitle: this.app.msgs.home.pageTitle,
       userStatus,
       announces,
+      naviLinks: this.naviLinks,
       handleSignOutClick: this.handleSignOutClick,
     };
   }
@@ -128,6 +140,7 @@ const render = (ctx: RenderContext) => {
       <button class="logout anchor" onClick={ctx.handleSignOutClick}>
         {ctx.msgs.home.signOut}
       </button>
+      <ap-navi links={ctx.naviLinks} />
       <ap-head pageTitle={ctx.pageTitle} />
     </Host>
   );

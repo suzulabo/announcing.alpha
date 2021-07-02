@@ -33,6 +33,11 @@ export interface Msgs {
       editBtn: string;
     };
     dataError: string;
+    about: string;
+  };
+  about: {
+    pageTitle: string;
+    manualLink: string;
   };
   announce: {
     pageTitle: (s: string) => string;

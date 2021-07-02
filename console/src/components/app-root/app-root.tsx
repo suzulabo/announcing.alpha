@@ -16,6 +16,10 @@ const matches: RouteMatch[] = [
     tag: 'app-signin',
   },
   {
+    pattern: 'about',
+    tag: 'app-about',
+  },
+  {
     pattern: 'create',
     tag: 'app-announce-create',
   },
