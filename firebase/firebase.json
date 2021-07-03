@@ -8,22 +8,6 @@
   },
   "hosting": [
     {
-      "target": "docs",
-      "public": "docs",
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "headers": [
-        {
-          "source": "**",
-          "headers": [
-            {
-              "key": "Cache-Control",
-              "value": "public, max-age=60"
-            }
-          ]
-        }
-      ]
-    },
-    {
       "target": "client",
       "public": "client",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
@@ -110,6 +94,22 @@
             {
               "key": "Cache-Control",
               "value": "public, max-age=31556952, immutable"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "target": "docs",
+      "public": "docs",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "headers": [
+        {
+          "source": "**",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "public, max-age=60"
             }
           ]
         }
