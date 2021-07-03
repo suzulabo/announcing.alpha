@@ -10,7 +10,7 @@ import {
   useFirestoreEmulator,
 } from 'firebase/firestore';
 import { Functions, getFunctions, httpsCallable, useFunctionsEmulator } from 'firebase/functions';
-import { FirebaseMessaging, getMessaging, getToken } from 'firebase/messaging';
+import { FirebaseMessaging, getMessaging, getToken, isSupported } from 'firebase/messaging';
 import { Announce, AppEnv, Lang, RegisterNotificationParams } from 'src/shared';
 import { FirestoreHelper } from 'src/shared-ui/utils/firestore';
 import nacl from 'tweetnacl';
@@ -140,25 +140,17 @@ export class AppFirebase {
   private messaging?: FirebaseMessaging;
   private capNotification?: CapNotification;
 
-  constructor(private appEnv: AppEnv, _firebaseApp?: FirebaseApp) {
-    if (!_firebaseApp) {
-      _firebaseApp = initializeApp(this.appEnv.env.firebaseConfig);
+  constructor(private appEnv: AppEnv, private firebaseApp?: FirebaseApp) {
+    if (!this.firebaseApp) {
+      this.firebaseApp = initializeApp(this.appEnv.env.firebaseConfig);
     }
 
-    this.functions = getFunctions(_firebaseApp, this.appEnv.env.functionsRegion);
-    this.firestore = getFirestore(_firebaseApp);
+    this.functions = getFunctions(this.firebaseApp, this.appEnv.env.functionsRegion);
+    this.firestore = getFirestore(this.firebaseApp);
     this.firestoreHelper = new FirestoreHelper(this.firestore);
 
     if (Capacitor.getPlatform() != 'web') {
       this.capNotification = new CapNotification();
-    }
-
-    if (!this.capNotification) {
-      try {
-        this.messaging = getMessaging(_firebaseApp);
-      } catch (err) {
-        console.warn('create messaging', err);
-      }
     }
 
     devonly_setEmulator(this.functions, this.firestore);
@@ -169,6 +161,16 @@ export class AppFirebase {
       await enableMultiTabIndexedDbPersistence(this.firestore);
     } catch (err) {
       console.warn('enablePersistence', err);
+    }
+
+    if (!this.capNotification) {
+      try {
+        if (await isSupported()) {
+          this.messaging = getMessaging(this.firebaseApp);
+        }
+      } catch (err) {
+        console.warn('create messaging', err);
+      }
     }
   }
 
