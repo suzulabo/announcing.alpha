@@ -35,7 +35,8 @@ const outputTargetWww: OutputTargetWww = isCapacitor
         swSrc: 'src/sw.js',
         globPatterns: process.argv.includes('--dev') ? ['index.html'] : ['**/*.{js,html}'],
       },
-      copy: [{ src: '../assetlinks.json', dest: '.well-known/assetlinks.json' }],
+      copy: [{ src: '../assetlinks.json', dest: '.well-known/assetlinks.json' },
+      { src: '../apple-app-site-association', dest: '.well-known/apple-app-site-association' }],
     };
 
 export const config: Config = {

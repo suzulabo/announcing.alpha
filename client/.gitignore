@@ -1,6 +1,7 @@
 www/
 cap/
 assetlinks.json
+apple-app-site-association
 **/google-services.json
 
 src/components.d.ts
