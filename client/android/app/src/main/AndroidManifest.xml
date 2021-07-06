@@ -29,7 +29,8 @@
 
         <data
           android:scheme="https"
-          android:host="announcing-dev3.web.app" />
+          android:host="${appLinkHostName}"
+          android:pathPattern="/..*" />
       </intent-filter>
 
     </activity>

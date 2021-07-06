@@ -49,3 +49,12 @@ try {
 } catch(Exception e) {
     logger.warn("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
+
+def props = new Properties()
+file("../../android.custom.properties").withInputStream { props.load(it) }
+
+android {
+    defaultConfig {
+        manifestPlaceholders = [appLinkHostName:props.getProperty("appLinkHostName")]
+    }
+}
