@@ -16,9 +16,9 @@ jobs:
         run: sh ./ci-setup.sh
         working-directory: ./
         env:
-          _APPENV_TS: ${secrets._APPENV_TS}
-          _FIREBASERC: ${secrets._FIREBASERC}
-          _ASSETLINKS_JSON: ${secrets._ASSETLINKS_JSON}
+          _APPENV_TS: ${{ secrets._APPENV_TS }}
+          _FIREBASERC: ${{ secrets._FIREBASERC }}
+          _ASSETLINKS_JSON: ${{ secrets._ASSETLINKS_JSON }}
 
       - uses: actions/setup-java@v1
         with:
