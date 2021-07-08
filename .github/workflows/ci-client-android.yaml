@@ -32,6 +32,11 @@ jobs:
       - run: npm install
         working-directory: ./client
 
+      - run: rm -rf ./client/android
+
+      - run: npx cap add android
+        working-directory: ./client
+
       - run: npm run build.android
         working-directory: ./client
 
