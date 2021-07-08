@@ -20,6 +20,7 @@ jobs:
           _APPENV_TS: ${{ secrets._APPENV_TS }}
           _FIREBASERC: ${{ secrets._FIREBASERC }}
           _ASSETLINKS_JSON: ${{ secrets._ASSETLINKS_JSON }}
+          _GOOGLE_SERVICES_JSON: ${{ secrets._GOOGLE_SERVICES_JSON }}
 
       - uses: actions/setup-java@v1
         with:
