@@ -21,12 +21,14 @@ jobs:
           _ANDROID_CUSTOM_PROPS: ${{ secrets._ANDROID_CUSTOM_PROPS }}
 
       - uses: actions/upload-artifact@v2
-        name: android.custom.properties
-        path: client/android.custom.properties
+        with:
+          name: android.custom.properties
+          path: client/android.custom.properties
 
       - uses: actions/upload-artifact@v2
-        name: google-services.json
-        path: client/google-services.json
+        with:
+          name: google-services.json
+          path: client/google-services.json
 
       - uses: actions/setup-java@v1
         with:
