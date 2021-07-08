@@ -18,6 +18,7 @@ jobs:
           _FIREBASERC: ${{ secrets._FIREBASERC }}
           _ASSETLINKS_JSON: ${{ secrets._ASSETLINKS_JSON }}
           _GOOGLE_SERVICES_JSON: ${{ secrets._GOOGLE_SERVICES_JSON }}
+          _ANDROID_CUSTOM_PROPS: ${{ secrets._ANDROID_CUSTOM_PROPS }}
 
       - uses: actions/setup-java@v1
         with:
