@@ -36,5 +36,5 @@ jobs:
       - run: npm run build.cap
         working-directory: ./client
 
-      - run: ./gradlew assembleDebug
+      - run: ./gradlew assembleDebug  --stacktrace --info
         working-directory: ./client/android
