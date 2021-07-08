@@ -40,7 +40,5 @@ jobs:
       - run: npm run build.android
         working-directory: ./client
 
-      - run: head -n 10 ./client/android/app/google-services.json
-
       - run: ./gradlew assembleDebug
         working-directory: ./client/android
