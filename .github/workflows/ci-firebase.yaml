@@ -46,3 +46,8 @@ jobs:
 
       - run: npm run build
         working-directory: ./firebase
+
+      - run: npm run deploy
+        working-directory: ./firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets._FIREBASE_TOKEN }}
