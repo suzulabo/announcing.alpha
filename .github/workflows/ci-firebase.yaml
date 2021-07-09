@@ -20,6 +20,9 @@ jobs:
       - run: echo "$V" > client/assetlinks.json
         env:
           V: ${{ secrets._ASSETLINKS_JSON }}
+      - run: echo "$V" > client/apple-app-site-association
+        env:
+          V: ${{ secrets._APPLE_APP_SITE_ASSOCIATION }}
 
       - uses: actions/setup-node@v2
         with:
