@@ -14,10 +14,21 @@ declare const process: {
 };
 
 const buildSrc = () => {
-  const commitId = process.env['COMMIT_ID'];
-  const branchName = process.env['BRANCH_NAME'];
-  if (commitId && branchName) {
-    return `${branchName}/${commitId}`;
+  {
+    // GitHub Actions
+    const sha = process.env['GITHUB_SHA'];
+    const ref = process.env['GITHUB_REF'];
+    if (sha && ref) {
+      return `${ref.split('/').pop()}/${sha.substr(0, 7)}`;
+    }
+  }
+  {
+    // Google Cloud Build
+    const sha = process.env['SHORT_SHA'];
+    const branchName = process.env['BRANCH_NAME'];
+    if (sha && branchName) {
+      return `${branchName}/${sha}`;
+    }
   }
   return 'local build';
 };
@@ -35,8 +46,10 @@ const outputTargetWww: OutputTargetWww = isCapacitor
         swSrc: 'src/sw.js',
         globPatterns: process.argv.includes('--dev') ? ['index.html'] : ['**/*.{js,html}'],
       },
-      copy: [{ src: '../assetlinks.json', dest: '.well-known/assetlinks.json' },
-      { src: '../apple-app-site-association', dest: '.well-known/apple-app-site-association' }],
+      copy: [
+        { src: '../assetlinks.json', dest: '.well-known/assetlinks.json' },
+        { src: '../apple-app-site-association', dest: '.well-known/apple-app-site-association' },
+      ],
     };
 
 export const config: Config = {

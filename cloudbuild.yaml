@@ -45,7 +45,7 @@ steps:
     dir: firebase
     args: ['run', 'build']
     env:
-      - 'COMMIT_ID=$SHORT_SHA'
+      - 'SHORT_SHA=$SHORT_SHA'
       - 'BRANCH_NAME=$BRANCH_NAME'
 
   - id: 'deploy'
