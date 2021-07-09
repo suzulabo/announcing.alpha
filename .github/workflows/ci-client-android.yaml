@@ -37,3 +37,8 @@ jobs:
 
       - run: ./gradlew assembleDebug
         working-directory: ./client/android
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: announcing-debug.apk
+          path: ./client/android/app/build/outputs/apk/debug/app-debug.apk
