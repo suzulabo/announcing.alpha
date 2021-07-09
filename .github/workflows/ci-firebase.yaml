@@ -12,11 +12,11 @@ jobs:
       - uses: actions/checkout@v2
 
       - run: echo "$V" > shared/src/appenv.env.ts
-        env: V: ${{ secrets._APPENV_TS }}
+        env: { V: ${{ secrets._APPENV_TS }} }
       - run: echo "$V" > firebase/.firebaserc
-        env: V: ${{ secrets._FIREBASERC }}
+        env: { V: ${{ secrets._FIREBASERC }} }
       - run: echo "$V" > client/assetlinks.json
-        env: V: ${{ secrets._ASSETLINKS_JSON }}
+        env: { V: ${{ secrets._ASSETLINKS_JSON }} }
 
       - uses: actions/setup-node@v2
         with:
