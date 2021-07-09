@@ -1,0 +1,53 @@
+name: CI - firebase
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    environment: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: echo "$V" > shared/src/appenv.env.ts
+        env:
+          V: ${{ secrets._APPENV_TS }}
+      - run: echo "$V" > firebase/.firebaserc
+        env:
+          V: ${{ secrets._FIREBASERC }}
+      - run: echo "$V" > client/assetlinks.json
+        env:
+          V: ${{ secrets._ASSETLINKS_JSON }}
+      - run: echo "$V" > client/apple-app-site-association
+        env:
+          V: ${{ secrets._APPLE_APP_SITE_ASSOCIATION }}
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'npm'
+
+      # https://github.com/actions/setup-node/issues/213#issuecomment-833724757
+      - run: npm i -g npm@7 --registry=https://registry.npmjs.org
+
+      - run: npm install
+        working-directory: ./firebase
+
+      - run: npm install
+        working-directory: ./firebase/functions
+
+      - run: npm install
+        working-directory: ./console
+
+      - run: npm install
+        working-directory: ./client
+
+      - run: npm run build
+        working-directory: ./firebase
+
+      - run: npm run deploy
+        working-directory: ./firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets._FIREBASE_TOKEN }}
