@@ -41,6 +41,8 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
+      - run echo "build"
+
       - name: Clean up keychain and provisioning profile
         if: ${{ always() }}
         run: |
