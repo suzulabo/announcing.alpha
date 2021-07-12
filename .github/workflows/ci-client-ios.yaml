@@ -45,8 +45,6 @@ jobs:
         env:
           V: ${{ secrets._APPENV_TS }}
 
-      - run: security list-keychains
-
       #- uses: actions/setup-node@v2
       #  with:
       #    node-version: '14'
@@ -59,18 +57,11 @@ jobs:
       #  working-directory: ./client
 
       - run: >-
-          xcodebuild
+          xcodebuild 
           -workspace App.xcworkspace
-          -configuration Release
           -scheme App
-          -allowProvisioningUpdates
-          build
-        working-directory: ./client/ios/App
-
-      - run: >-
-          xcodebuild -workspace App.xcworkspace -scheme App 
           -archivePath $RUNNER_TEMP/announcing.xcarchive 
-          -allowProvisioningUpdates
+          CODE_SIGN_STYLE=Manual
           archive
         working-directory: ./client/ios/App
 
