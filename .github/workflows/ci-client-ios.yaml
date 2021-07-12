@@ -43,7 +43,9 @@ jobs:
 
       - run: >-
           xcodebuild -workspace App.xcworkspace -scheme App 
-          -archivePath $RUNNER_TEMP/announcing.xcarchive archive
+          -archivePath $RUNNER_TEMP/announcing.xcarchive 
+          -allowProvisioningUpdates
+          archive
         working-directory: ./client/ios/App
 
       - run: >-
