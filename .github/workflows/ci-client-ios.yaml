@@ -41,6 +41,8 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
+      - run: cat ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+
       - run: >-
           xcodebuild -workspace App.xcworkspace -scheme App 
           -archivePath $RUNNER_TEMP/announcing.xcarchive 
