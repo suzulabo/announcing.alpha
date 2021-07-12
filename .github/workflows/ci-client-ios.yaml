@@ -56,7 +56,7 @@ jobs:
       #- run: npm run build.ios
       #  working-directory: ./client
 
-      - run: npx cap sync ios
+      - run: mkdir cap && echo "hello" > cap/index.html npx cap sync ios
         working-directory: ./client
 
       - run: >-
