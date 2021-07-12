@@ -45,16 +45,19 @@ jobs:
         env:
           V: ${{ secrets._APPENV_TS }}
 
-      #- uses: actions/setup-node@v2
-      #  with:
-      #    node-version: '14'
-      #    cache: 'npm'
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'npm'
 
-      #- run: npm install
-      #  working-directory: ./client
+      - run: npm install
+        working-directory: ./client
 
       #- run: npm run build.ios
       #  working-directory: ./client
+
+      - run: npx cap sync ios
+        working-directory: ./client
 
       - run: >-
           xcodebuild 
