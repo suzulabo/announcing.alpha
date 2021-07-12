@@ -2,14 +2,11 @@ name: CI - client - ios
 
 on: workflow_dispatch
 
-env:
-  DEVELOPER_DIR: /Applications/Xcode_12.5.1.app
-
 jobs:
   build:
     environment: build
 
-    runs-on: macos-11
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v2
