@@ -41,7 +41,16 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
-      - run: echo "build"
+      - run: >-
+          xcodebuild -workspace App.xcworkspace -scheme App 
+          -archivePath $RUNNER_TEMP/announcing.xcarchive archive
+        working-directory: ./client/ios
+
+      - run: >-
+          xcodebuild -exportArchive -archivePath $RUNNER_TEMP/announcing.xcarchive
+          -exportPath $RUNNER_TEMP/announcing.ipa 
+          -exportOptionsPlist ../ios-export-adhoc.plist
+        working-directory: ./client/ios
 
       - name: Clean up keychain and provisioning profile
         if: ${{ always() }}
