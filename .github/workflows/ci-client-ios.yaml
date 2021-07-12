@@ -60,7 +60,7 @@ jobs:
           xcodebuild 
           -project App.xcodeproj
           -scheme App build
-          working-directory: ./client/ios/App
+        working-directory: ./client/ios/App
 
       - run: >-
           xcodebuild -workspace App.xcworkspace -scheme App 
