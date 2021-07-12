@@ -56,7 +56,7 @@ jobs:
       - run: npm run build.ios
         working-directory: ./client
 
-      - run: xcodebuild -workspace App.xcworkspace -scheme App build
+      - run: xcodebuild -workspace App.xcworkspace -project App.xcodeproj -scheme App build
         working-directory: ./client/ios/App
 
       - run: >-
