@@ -41,6 +41,12 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
+      - run: npm install
+        working-directory: ./client
+
+      - run: npm run build.ios
+        working-directory: ./client
+
       - run: xcodebuild -workspace App.xcworkspace -scheme App build
         working-directory: ./client/ios/App
 
