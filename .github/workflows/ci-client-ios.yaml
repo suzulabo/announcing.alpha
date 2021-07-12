@@ -41,6 +41,15 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
+      - run: echo "$V" > shared/src/appenv.env.ts
+        env:
+          V: ${{ secrets._APPENV_TS }}
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+          cache: 'npm'
+
       - run: npm install
         working-directory: ./client
 
