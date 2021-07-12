@@ -57,9 +57,12 @@ jobs:
       #  working-directory: ./client
 
       - run: >-
-          xcodebuild 
-          -project App.xcodeproj
-          -scheme App build
+          xcodebuild
+          -workspace App.xcworkspace
+          -configuration Release
+          -scheme App
+          -allowProvisioningUpdates
+          build
         working-directory: ./client/ios/App
 
       - run: >-
