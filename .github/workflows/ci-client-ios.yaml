@@ -45,6 +45,8 @@ jobs:
         env:
           V: ${{ secrets._APPENV_TS }}
 
+      - run: security list-keychains
+
       #- uses: actions/setup-node@v2
       #  with:
       #    node-version: '14'
