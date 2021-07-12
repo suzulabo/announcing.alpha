@@ -64,8 +64,6 @@ jobs:
           -workspace App.xcworkspace
           -scheme App
           -archivePath $RUNNER_TEMP/announcing.xcarchive 
-          CODE_SIGN_STYLE=Manual
-          PROVISION_PROFILE="announcing reader Ad Hoc"
           archive
         working-directory: ./client/ios/App
 
