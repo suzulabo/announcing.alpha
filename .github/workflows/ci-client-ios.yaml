@@ -42,8 +42,9 @@ jobs:
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - run: >-
-          xcodebuild -workspace ./client/ios/App/App.xcworkspace -scheme App 
+          xcodebuild -workspace App.xcworkspace -scheme App 
           -archivePath $RUNNER_TEMP/announcing.xcarchive archive
+        working-directory: ./client/ios/App
 
       - run: >-
           xcodebuild -exportArchive -archivePath $RUNNER_TEMP/announcing.xcarchive
