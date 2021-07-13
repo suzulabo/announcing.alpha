@@ -60,8 +60,11 @@ jobs:
       - run: npm install
         working-directory: ./client
 
-      - run: npm run build.ios
+      - run: mkdir cap && echo "hello" > cap/index.html && npx cap sync ios
         working-directory: ./client
+
+      #- run: npm run build.ios
+      #  working-directory: ./client
 
       - run: >-
           xcodebuild 
