@@ -83,17 +83,27 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: announcing-adhoc.ipa
-          path: $RUNNER_TEMP/announcing.ipa/
-
-      - uses: wzieba/Firebase-Distribution-Github-Action@v1.3.2
-        with:
-          appId: ${{ secrets._FIREBASE_APP_ID_IOS }}
-          token: ${{ secrets._FIREBASE_TOKEN }}
-          groups: testers
-          file: $RUNNER_TEMP/announcing.ipa/App.ipa
+          path: $RUNNER_TEMP/announcing.ipa/App.ipa
 
       - name: Clean up keychain and provisioning profile
         if: ${{ always() }}
         run: |
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
           rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
+
+  distribute:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: announcing-adhoc.ipa
+          path: App.ipa
+
+      - uses: wzieba/Firebase-Distribution-Github-Action@v1.3.2
+        with:
+          appId: ${{ secrets._FIREBASE_APP_ID_IOS }}
+          token: ${{ secrets._FIREBASE_TOKEN }}
+          groups: testers
+          file: App.ipa
