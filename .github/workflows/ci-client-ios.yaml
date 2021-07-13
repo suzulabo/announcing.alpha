@@ -50,13 +50,17 @@ jobs:
           node-version: '14'
           cache: 'npm'
 
+      - uses: actions/cache@v2
+        with:
+          path: ./client/ios/App/Pods
+          key: ${{ runner.os }}-pods-${{ hashFiles('./client/ios/App/Podfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
       - run: npm install
         working-directory: ./client
 
-      #- run: npm run build.ios
-      #  working-directory: ./client
-
-      - run: mkdir cap && echo "hello" > cap/index.html && npx cap sync ios
+      - run: npm run build.ios
         working-directory: ./client
 
       - run: >-
