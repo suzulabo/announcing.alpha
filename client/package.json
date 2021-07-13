@@ -4,6 +4,7 @@
   "scripts": {
     "build": "rm -rf www && npm run copy-shared && stencil build",
     "build.android": "rm -rf cap && npm run copy-shared && CAP_BUILD=y stencil build && cap sync android && cp google-services.json android/app",
+    "build.ios": "rm -rf cap && npm run copy-shared && CAP_BUILD=y stencil build && cap sync ios",
     "serve": "stencil build --dev --watch --serve --service-worker",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watch",
