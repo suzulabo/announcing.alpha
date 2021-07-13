@@ -64,8 +64,8 @@ jobs:
 
       - run: >-
           xcodebuild 
-          CODE_SIGN_IDENTITY="iPhone Distribution"
           CODE_SIGN_STYLE=Manual
+          CODE_SIGN_IDENTITY="Apple Distribution"
           PROVISIONING_PROFILE_SPECIFIER="announcing reader Ad Hoc"
           -workspace App.xcworkspace
           -scheme App
@@ -75,8 +75,8 @@ jobs:
 
       - run: >-
           xcodebuild
-          CODE_SIGN_IDENTITY="iPhone Distribution"
           CODE_SIGN_STYLE=Manual
+          CODE_SIGN_IDENTITY="Apple Distribution"
           PROVISIONING_PROFILE_SPECIFIER="announcing reader Ad Hoc"
           -exportArchive
           -archivePath $RUNNER_TEMP/announcing.xcarchive
