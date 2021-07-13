@@ -50,9 +50,6 @@ jobs:
           node-version: '14'
           cache: 'npm'
 
-      # https://github.com/actions/setup-node/issues/213#issuecomment-833724757
-      - run: npm i -g npm@7 --registry=https://registry.npmjs.org
-
       - run: npm install
         working-directory: ./client
 
@@ -83,27 +80,20 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: announcing-adhoc.ipa
-          path: ${{ runner.temp }}/announcing.ipa/App.ipa
+          path: ${{ runner.temp }}/announcing.ipa
+
+      - run: >-
+          npm_config_yes=true npx firebase-tools
+          appdistribution:distribute
+          $RUNNER_TEMP/announcing.ipa/App.ipa
+          --app ${APP_ID}
+          --groups testers
+        env:
+          FIREBASE_TOKEN: ${{ secrets._FIREBASE_TOKEN }}
+          APP_ID: ${{ secrets._FIREBASE_APP_ID_IOS }}
 
       - name: Clean up keychain and provisioning profile
         if: ${{ always() }}
         run: |
           security delete-keychain $RUNNER_TEMP/app-signing.keychain-db
           rm ~/Library/MobileDevice/Provisioning\ Profiles/build_pp.mobileprovision
-
-  distribute:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: announcing-adhoc.ipa
-          path: App.ipa
-
-      - uses: wzieba/Firebase-Distribution-Github-Action@v1.3.2
-        with:
-          appId: ${{ secrets._FIREBASE_APP_ID_IOS }}
-          token: ${{ secrets._FIREBASE_TOKEN }}
-          groups: testers
-          file: App.ipa
