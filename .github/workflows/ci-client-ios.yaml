@@ -50,12 +50,8 @@ jobs:
           node-version: '14'
           cache: 'npm'
 
-      - uses: actions/cache@v2
-        with:
-          path: ./client/ios/App/Pods
-          key: ${{ runner.os }}-pods-${{ hashFiles('./client/ios/App/Podfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pods-
+      # https://github.com/actions/setup-node/issues/213#issuecomment-833724757
+      - run: npm i -g npm@7 --registry=https://registry.npmjs.org
 
       - run: npm install
         working-directory: ./client
