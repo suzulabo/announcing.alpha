@@ -50,16 +50,6 @@ export class App {
     }
     await Promise.all([this.appFirebase.init(), this.appIdbCache.init(), this.appStorage.init()]);
 
-    // Check permission of notification
-    // if not granted, clear local settings. Server settings will delete automatically.
-    const permission = await this.appFirebase.checkNotifyPermission(false);
-    if (permission != 'granted') {
-      const ids = this.appStorage.notifications.keys();
-      for (const id of ids) {
-        await this.appStorage.notifications.remove(id);
-      }
-    }
-
     await CapApp.addListener('appUrlOpen', data => {
       console.log('App opened with URL:', data);
       const url = new URL(data.url);
