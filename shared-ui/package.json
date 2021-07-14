@@ -11,7 +11,7 @@
   "devDependencies": {
     "@stencil/core": "^2.6.0",
     "@stencil/sass": "^1.4.1",
-    "@types/pica": "^5.1.2",
+    "@types/pica": "^5.1.3",
     "autolinker": "^3.14.3",
     "bootstrap-icons": "^1.5.0",
     "destyle.css": "^2.0.2",

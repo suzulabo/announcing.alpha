@@ -15,7 +15,7 @@
     "@stencil/core": "^2.6.0",
     "@stencil/sass": "^1.4.1",
     "@stencil/store": "^1.4.1",
-    "@types/pica": "^5.1.2",
+    "@types/pica": "^5.1.3",
     "autolinker": "^3.14.3",
     "bootstrap-icons": "^1.5.0",
     "date-fns": "^2.22.1",
@@ -27,6 +27,6 @@
     "qr-code-styling": "^1.5.0",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "sync-directory": "^2.2.22",
-    "type-fest": "^1.2.1"
+    "type-fest": "^1.2.2"
   }
 }
