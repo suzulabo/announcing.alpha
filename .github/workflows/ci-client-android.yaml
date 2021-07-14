@@ -20,6 +20,9 @@ jobs:
       - run: echo "$V" > client/google-services.json
         env:
           V: ${{ secrets._GOOGLE_SERVICES_JSON }}
+      - run: echo "$V" > client/android.custom.properties
+        env:
+          V: ${{ secrets._ANDROID_CUSTOM_PROPS }}
 
       - uses: actions/setup-java@v2
         with:
