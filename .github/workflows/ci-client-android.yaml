@@ -17,6 +17,9 @@ jobs:
       - run: echo "$V" > client/assetlinks.json
         env:
           V: ${{ secrets._ASSETLINKS_JSON }}
+      - run: echo "$V" > client/google-services.json
+        env:
+          V: ${{ secrets._GOOGLE_SERVICES_JSON }}
 
       - uses: actions/setup-java@v2
         with:
