@@ -1,7 +1,7 @@
 const disables = {
   'announces': ['mid', 'posts', 'uT'],
+  'posts': ['title', 'body', 'link', 'img', 'edited', 'pT'],
   'meta': ['name', 'desc', 'link', 'icon', 'cT'],
-  'posts': ['title', 'body', 'link', 'img', 'pT'],
   'images': ['data'],
   'notif-devices': ['signKey', 'lang', 'announces', 'uT'],
   'notif-imm': ['announceID', 'devices', 'cancels', 'archives', 'uT'],

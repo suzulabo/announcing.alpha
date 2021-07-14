@@ -17,6 +17,36 @@
       "indexes": []
     },
     {
+      "collectionGroup": "posts",
+      "fieldPath": "title",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "body",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "link",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "img",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "edited",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "posts",
+      "fieldPath": "pT",
+      "indexes": []
+    },
+    {
       "collectionGroup": "meta",
       "fieldPath": "name",
       "indexes": []
@@ -39,31 +69,6 @@
     {
       "collectionGroup": "meta",
       "fieldPath": "cT",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "posts",
-      "fieldPath": "title",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "posts",
-      "fieldPath": "body",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "posts",
-      "fieldPath": "link",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "posts",
-      "fieldPath": "img",
-      "indexes": []
-    },
-    {
-      "collectionGroup": "posts",
-      "fieldPath": "pT",
       "indexes": []
     },
     {
