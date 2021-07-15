@@ -123,6 +123,10 @@ class CapNotification {
     ];
 
     try {
+      const status = await this.checkNotifyPermission(true);
+      if (status != 'granted') {
+        return;
+      }
       await PushNotifications.register();
       this.token = await p.promise;
       return this.token;

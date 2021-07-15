@@ -3,6 +3,7 @@ cap/
 assetlinks.json
 apple-app-site-association
 **/google-services.json
+**/GoogleService-Info.plist
 android.custom.properties
 
 src/components.d.ts
