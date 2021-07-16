@@ -20,6 +20,11 @@ export class AppAnnounceConfig {
     return this.pageVisible.shouldUpdate();
   }
 
+  @Listen('PageActivated')
+  listenPageActivated() {
+    this.permission = undefined;
+  }
+
   @Prop()
   app!: App;
 
@@ -50,16 +55,17 @@ export class AppAnnounceConfig {
   @State()
   announceState?: PromiseState<AsyncReturnType<AppAnnounceConfig['loadAnnounce']>>;
 
+  @State()
+   permission?: AsyncReturnType<App["checkNotifyPermission"]>;
+
   private async loadAnnounce(id: string) {
     const announce = await this.app.getAnnounceAndMeta(id);
-    const permission = await this.app.checkNotifyPermission(false);
     if (announce) {
       return {
         announce,
         iconImgPromise: announce.icon
           ? new PromiseState(this.app.fetchImage(announce.icon))
           : undefined,
-        permission,
       } as const;
     }
     return;
@@ -103,10 +109,13 @@ export class AppAnnounceConfig {
     });
   };
 
-  componentWillRender() {
+
+  async componentWillRender() {
     if (!this.announceState) {
       this.announceState = new PromiseState(this.loadAnnounce(this.announceID));
     }
+    this.permission =  await this.app.checkNotifyPermission(false);
+
   }
 
   private renderContext() {
@@ -126,6 +135,7 @@ export class AppAnnounceConfig {
       msgs: this.app.msgs,
       announceID: this.announceID,
       announceStatus,
+      permission: this.permission,
       icons,
       naviLinks,
       pageTitle,
@@ -160,7 +170,7 @@ const renderContent = (ctx: RenderContext) => {
       redirectRoute(`/${ctx.announceID}`);
       return;
     case 'fulfilled': {
-      const { announce, iconImgPromise, permission } = ctx.announceStatus.value;
+      const { announce, iconImgPromise } = ctx.announceStatus.value;
 
       return (
         <Fragment>
@@ -179,7 +189,7 @@ const renderContent = (ctx: RenderContext) => {
               <button onClick={ctx.handleFollowClick}>{ctx.msgs.announceConfig.followBtn}</button>
             )}
           </div>
-          <div class="notify">{renderNotification(ctx, permission)}</div>
+          <div class="notify">{renderNotification(ctx)}</div>
         </Fragment>
       );
     }
@@ -190,9 +200,8 @@ const renderContent = (ctx: RenderContext) => {
 
 const renderNotification = (
   ctx: RenderContext,
-  permission: AsyncReturnType<App['checkNotifyPermission']>,
 ) => {
-  switch (permission) {
+  switch (ctx.permission) {
     case 'unsupported':
       return (
         <div class="warn">

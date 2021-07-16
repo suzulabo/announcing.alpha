@@ -237,6 +237,11 @@ export class App {
       }
     }
 
+    const permission = await this.appFirebase.checkNotifyPermission(true);
+    if (permission != 'granted') {
+      return;
+    }
+
     const announces = new Set(this.appStorage.notifications.keys());
     if (enable) {
       announces.add(announceID);
