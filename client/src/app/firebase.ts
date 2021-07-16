@@ -210,8 +210,7 @@ export class AppFirebase {
     const token = await getToken(this.messaging, {
       vapidKey: this.appEnv.env.vapidKey,
       serviceWorkerRegistration,
-    } as any);
-    // TODO: It seeems a bug of declare
+    });
 
     return token;
   }
